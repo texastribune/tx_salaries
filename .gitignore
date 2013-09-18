@@ -1,0 +1,9 @@
+example/.sass-cache/
+example/bundle/
+example/static/
+example/project.db
+MANIFEST
+dist/
+*.egg-info
+*.pyc
+*.pyo
