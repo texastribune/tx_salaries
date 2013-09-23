@@ -121,6 +121,9 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 
+    # Third-party dependencies
+    'tx_people',
+
     # Custom application being tested
     'tx_salaries',
 
