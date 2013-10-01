@@ -1,13 +1,13 @@
 from copy import copy
 
-from .base import DEFAULT_DATA_TEMPLATE
+from . import base
 
 
 def transform(labels, source):
     data = []
     for raw_row in source:
         row = dict(zip(labels, raw_row))
-        d = copy(DEFAULT_DATA_TEMPLATE)
+        d = copy(base.DEFAULT_DATA_TEMPLATE)
 
         job_title = row["JOB TITLE"].strip()
         compensation_type = "Full Time"

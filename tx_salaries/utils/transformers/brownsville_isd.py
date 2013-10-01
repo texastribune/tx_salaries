@@ -1,6 +1,6 @@
 from copy import copy
 
-from .base import DEFAULT_DATA_TEMPLATE
+from . import base
 
 
 def transform(labels, source):
@@ -12,7 +12,7 @@ def transform(labels, source):
             continue
 
         row = dict(zip(labels, raw_row))
-        d = copy(DEFAULT_DATA_TEMPLATE)
+        d = copy(base.DEFAULT_DATA_TEMPLATE)
         d["original"] = raw_row
         d["tx_people.Person"] = {
             "family_name": row["LAST NAME"],
