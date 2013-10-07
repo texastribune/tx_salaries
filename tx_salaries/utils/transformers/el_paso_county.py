@@ -1,6 +1,36 @@
 from copy import copy
+import re
+
+from name_cleaver import cleaver, names
 
 from .import base
+
+
+regex_i = lambda a: re.compile(a, re.IGNORECASE)
+
+DEPARTMENT_NAME_MAP = (
+    (regex_i(r' OF '), ' of '),
+    (regex_i(r'ADM\.$'), 'Administration'),
+    (regex_i(r'DIST ATTY'), 'District Attorney'),
+    (regex_i(r'COATTYADM'), 'County Attorney Administration'),
+    (regex_i(r'COATTY'), 'County Attorney'),
+)
+
+
+class DepartmentName(names.OrganizationName):
+    def case_name_parts(self):
+        super(DepartmentName, self).case_name_parts()
+        self.expand_abbreviations()
+        return self
+
+    def expand_abbreviations(self):
+        for pattern, replacement in DEPARTMENT_NAME_MAP:
+            self.name = re.sub(pattern, replacement, self.name)
+
+
+class DepartmentNameCleaver(cleaver.OrganizationNameCleaver):
+    object_class = DepartmentName
+
 
 
 def transform(labels, source):
@@ -19,8 +49,9 @@ def transform(labels, source):
                     row["LAST NAME"]),
         }
 
+        department = DepartmentCleaver(row['DEPARTMENT']).parse()
         d["tx_people.Organization"] = {
-            "label": row["DEPARTMENT"],
+            "label": department,
         }
 
         d["tx_people.Post"] = {
