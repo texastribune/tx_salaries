@@ -44,7 +44,7 @@ class Employee(mixins.TimeTrackingMixin, mixins.ReducedDateStartAndEndMixin,
         a ``compensation`` of ``100000`` and connected to the
         appropriate ``CompensationType``.
     """
-    person = models.ForeignKey(Membership)
+    position = models.ForeignKey(Membership)
     hire_date = fields.ReducedDateField()
     compensation = models.DecimalField(decimal_places=4, max_digits=12)
     compensation_type = models.ForeignKey(CompensationType)
