@@ -10,10 +10,15 @@ regex_i = lambda a: re.compile(a, re.IGNORECASE)
 
 DEPARTMENT_NAME_MAP = (
     (regex_i(r' OF '), ' of '),
+    (regex_i(r' AT '), ' at '),
+    (regex_i(r' THE '), ' the '),
     (regex_i(r'ADM\.$'), 'Administration'),
     (regex_i(r'DIST ATTY'), 'District Attorney'),
     (regex_i(r'COATTYADM'), 'County Attorney Administration'),
     (regex_i(r'COATTY'), 'County Attorney'),
+    (regex_i(r'\-TAIP'), '- Treatment Alternative to Incarceration Program'),
+    (regex_i(r'AP COMMUNITY INTERVENTION CTR'), 'Adult Probation Community Intervention Center'),
+    (regex_i(r'ADULT PROB-GANG INTERVENTION'), 'Adult Probation - Gang Intervention'),
 )
 
 
@@ -49,7 +54,7 @@ def transform(labels, source):
                     row["LAST NAME"]),
         }
 
-        department = DepartmentCleaver(row['DEPARTMENT']).parse()
+        department = DepartmentCleaver(row['DEPARTMENT'].title()).parse()
         d["tx_people.Organization"] = {
             "label": department,
         }
