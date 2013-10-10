@@ -3,7 +3,7 @@ from tx_people import models as tx_people
 from .. import models
 
 
-def save(source_department, data):
+def save(data):
     # TODO: Save source data
     identifier, id_created = tx_people.Identifier.objects.get_or_create(
             **data['tx_people.Identifier'])
@@ -14,8 +14,16 @@ def save(source_department, data):
     else:
         person = tx_people.Person.objects.get(identifiers__in=[identifier, ])
 
-    department, _ = tx_people.Organization.objects.get_or_create(
-            parent=source_department, **data['tx_people.Organization'])
+    # TODO: How should we deal with multiple children?  Right now they
+    #       all have one child underneath their parent.
+    #
+    # TODO: How should we/can we deal with recursive children?
+    children = data['tx_people.Organization'].pop('children', [])
+    source_department, _ = tx_people.Organization.objects.get_or_create(
+            **data['tx_people.Organization'])
+    for child in children:
+        department, _ = tx_people.Organization.objects.get_or_create(
+                parent=source_department, **child)
 
     post, _ = tx_people.Post.objects.get_or_create(organization=department,
             **data['tx_people.Post'])

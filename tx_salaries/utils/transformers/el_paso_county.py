@@ -44,7 +44,10 @@ def transform(labels, source):
         department = cleaver.DepartmentNameCleaver(row['DEPARTMENT'].title(),
                 object_class=ElPasoDepartmentName).parse()
         d['tx_people.Organization'] = {
-            'name': str(department),
+            'name': 'El Paso County',
+            'children': [
+                {'name': str(department), },
+            ],
         }
 
         d['tx_people.Post'] = {
