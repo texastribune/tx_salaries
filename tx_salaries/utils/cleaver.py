@@ -29,3 +29,15 @@ class DepartmentNameCleaver(cleaver.OrganizationNameCleaver):
         super(DepartmentNameCleaver, self).__init__(name)
         if object_class is not None:
             self.object_class = object_class
+
+
+class EmployeeName(names.PersonName):
+    middle = ''
+
+
+class EmployeeNameCleaver(cleaver.IndividualNameCleaver):
+    """
+    Custom ``IndividualNameCleaver`` for dealing with employees
+
+    """
+    object_class = EmployeeName

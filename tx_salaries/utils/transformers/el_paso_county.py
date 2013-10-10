@@ -25,11 +25,20 @@ def transform(labels, source):
         row = dict(zip(labels, raw_row))
         d = copy(base.DEFAULT_DATA_TEMPLATE)
         d["original"] = row
+        raw_name = "%s %s %s" % (row["FIRST NAME"], row['MIDDLE'],
+                row["LAST NAME"])
+
+        d['tx_people.Identifier'] = {
+            'scheme': 'tx_salaries_hash',
+            'identifier': base.create_hash_for_row(row, exclude=['PAY RATE', ]),
+        }
+        name = cleaver.EmployeeNameCleaver(raw_name).parse()
         d["tx_people.Person"] = {
-            "family_name": row["LAST NAME"],
-            "given_name": row['FIRST NAME'],
-            "name": "%s %s %s" % (row["FIRST NAME"], row['MIDDLE'],
-                    row["LAST NAME"]),
+            "family_name": name.last,
+            "given_name": name.first,
+            "additional_name": name.middle,
+            "name": str(name),
+            "gender": row["SEX"],
         }
 
         department = cleaver.DepartmentNameCleaver(row['DEPARTMENT'].title(),
@@ -39,7 +48,7 @@ def transform(labels, source):
         }
 
         d["tx_people.Post"] = {
-            "label": row["JOB TITLE"],
+            "label": row["JOB TITLE"].title(),
         }
 
         d["tx_people.Membership"] = {
