@@ -24,49 +24,49 @@ def transform(labels, source):
 
         row = dict(zip(labels, raw_row))
         d = copy(base.DEFAULT_DATA_TEMPLATE)
-        d["original"] = row
-        raw_name = "%s %s %s" % (row["FIRST NAME"], row['MIDDLE'],
-                row["LAST NAME"])
+        d['original'] = row
+        raw_name = '%s %s %s' % (row['FIRST NAME'], row['MIDDLE'],
+                row['LAST NAME'])
 
         d['tx_people.Identifier'] = {
             'scheme': 'tx_salaries_hash',
             'identifier': base.create_hash_for_row(row, exclude=['PAY RATE', ]),
         }
         name = cleaver.EmployeeNameCleaver(raw_name).parse()
-        d["tx_people.Person"] = {
-            "family_name": name.last,
-            "given_name": name.first,
-            "additional_name": name.middle,
-            "name": str(name),
-            "gender": row["SEX"],
+        d['tx_people.Person'] = {
+            'family_name': name.last,
+            'given_name': name.first,
+            'additional_name': name.middle,
+            'name': str(name),
+            'gender': row['SEX'],
         }
 
         department = cleaver.DepartmentNameCleaver(row['DEPARTMENT'].title(),
                 object_class=ElPasoDepartmentName).parse()
-        d["tx_people.Organization"] = {
-            "name": str(department),
+        d['tx_people.Organization'] = {
+            'name': str(department),
         }
 
-        d["tx_people.Post"] = {
-            "label": row["JOB TITLE"].title(),
+        d['tx_people.Post'] = {
+            'label': row['JOB TITLE'].title(),
         }
 
-        d["tx_people.Membership"] = {
-            "start_date": row["HIRE DATE"],
+        d['tx_people.Membership'] = {
+            'start_date': row['HIRE DATE'],
         }
 
-        d["tx_salaries.CompensationType"] = {
-            "name": "{0} Time".format("Part" if row["PART FULL"].strip() == "P"
-                    else "Full"),
+        d['tx_salaries.CompensationType'] = {
+            'name': '{0} Time'.format('Part' if row['PART FULL'].strip() == 'P'
+                    else 'Full'),
         }
 
-        if row["ANNUAL RATE"].strip() == "0":
-            compensation_key = "PAY RATE"
+        if row['ANNUAL RATE'].strip() == '0':
+            compensation_key = 'PAY RATE'
         else:
-            compensation_key = "ANNUAL RATE"
-        d["tx_salaries.Employee"] = {
-            "hire_date": row["HIRE DATE"],
-            "compensation": row[compensation_key],
+            compensation_key = 'ANNUAL RATE'
+        d['tx_salaries.Employee'] = {
+            'hire_date': row['HIRE DATE'],
+            'compensation': row[compensation_key],
         }
         data.append(d)
     return data
