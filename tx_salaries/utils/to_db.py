@@ -32,9 +32,9 @@ def save(data):
             person=person, organization=department, post=post,
             **data['tx_people.Membership'])
 
-    compensation_type, _ = models.CompensationType.objects.get_or_create(
-            **data['tx_salaries.CompensationType'])
-
-    compensation, _ = models.Employee.objects.get_or_create(
+    for compensation in data['compensations']:
+        compensation_type, _ = models.CompensationType.objects.get_or_create(
+                **compensation['tx_salaries.CompensationType'])
+        models.Employee.objects.get_or_create(
             position=membership, compensation_type=compensation_type,
-            **data['tx_salaries.Employee'])
+            **compensation['tx_salaries.Employee'])

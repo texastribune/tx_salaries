@@ -58,19 +58,27 @@ def transform(labels, source):
             'start_date': row['HIRE DATE'],
         }
 
-        d['tx_salaries.CompensationType'] = {
-            'name': '{0} Time'.format('Part' if row['PART FULL'].strip() == 'P'
-                    else 'Full'),
-        }
+        if row['PART FULL'].strip() == 'P':
+            compensation_type = 'Part Time'
+        else:
+            compensation_type = 'Full Time'
 
         if row['ANNUAL RATE'].strip() == '0':
             compensation_key = 'PAY RATE'
         else:
             compensation_key = 'ANNUAL RATE'
-        d['tx_salaries.Employee'] = {
-            'hire_date': row['HIRE DATE'],
-            'compensation': row[compensation_key],
-        }
+
+        d['compensations'] = [
+            {
+                'tx_salaries.CompensationType': {
+                    'name': compensation_type,
+                },
+                'tx_salaries.Employee': {
+                    'hire_date': row['HIRE DATE'],
+                    'compensation': row[compensation_key],
+                },
+            }
+        ]
         data.append(d)
     return data
 
