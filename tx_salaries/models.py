@@ -48,3 +48,7 @@ class Employee(mixins.TimeTrackingMixin, mixins.ReducedDateStartAndEndMixin,
     hire_date = fields.ReducedDateField()
     compensation = models.DecimalField(decimal_places=4, max_digits=12)
     compensation_type = models.ForeignKey(CompensationType)
+
+    def __unicode__(self):
+        return u'{title}, {person}'.format(title=self.position.post,
+                person=self.position.person)
