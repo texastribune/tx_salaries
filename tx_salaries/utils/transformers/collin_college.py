@@ -4,71 +4,92 @@ from . import base
 from .. import cleaver
 
 
-def transform(labels, source):
-    data = []
-    for raw_row in source:
-        row = dict(zip(labels, raw_row))
-        d = copy(base.DEFAULT_DATA_TEMPLATE)
+class TransformedRow(object):
+    def __init__(self, data):
+        self.data = data
+        self.compensation_key = 'ANNUAL SALARY (HOURLY RATE FOR PT)'
 
-        compensation_key = 'ANNUAL SALARY (HOURLY RATE FOR PT)'
+        self.process_compenstation_type_and_job_title()
 
-        job_title = row['JOB TITLE'].strip()
-        compensation_type = 'Full Time'
-        if job_title[-2:].upper() == 'PT':
-            compensation_type = 'Part Time'
-            job_title = job_title[:-2].strip()
+    @property
+    def is_valid(self):
+        return self.data['JOB TITLE'] != 'Continuing Ed Instructors'
 
-        job_title = job_title.title()
+    def process_compenstation_type_and_job_title(self):
+        self.compensation_type = 'Full Time'
+        self.job_title = self.data['JOB TITLE'].strip()
+        if self.job_title[-2:].upper() == 'PT':
+            self.compensation_type = 'Part Time'
+            self.job_title = self.job_title[:-2].strip()
 
+        self.job_title = self.job_title.title()
+
+    @property
+    def raw_name(self):
+        return '%s %s' % (self.data['FIRST NAME'], self.data['LAST NAME'])
+
+    def name(self):
+        return cleaver.EmployeeNameCleaver(self.raw_name).parse()
+
+    def department(self):
         # Clean up any issues with the '- PT' suffix, but do it by
         # splitting on '-' to ensure that we catch as many as possible
         #
         # TODO: Fix this so its actually correct
-        if '-' in row['DEPARTMENT']:
-            split_department = row['DEPARTMENT'].split('-')[:-1]
+        if '-' in self.data['DEPARTMENT']:
+            split_department = self.data['DEPARTMENT'].split('-')[:-1]
         else:
-            split_department = [row['DEPARTMENT'], ]
+            split_department = [self.data['DEPARTMENT'], ]
         raw_department = '-'.join([a.strip() for a in split_department]).title()
-        department = cleaver.DepartmentNameCleaver(raw_department).parse()
+        return cleaver.DepartmentNameCleaver(raw_department).parse()
 
-        raw_name = '%s %s' % (row['FIRST NAME'], row['LAST NAME'])
-        name = cleaver.EmployeeNameCleaver(raw_name).parse()
-
-        d['original'] = raw_row
-        d['tx_people.Identifier'] = {
+    @property
+    def identifier(self):
+        return {
             'scheme': 'tx_salaries_hash',
-            'identifier': base.create_hash_for_row(row,
-                    exclude=[compensation_key, ])
+            'identifier': base.create_hash_for_row(self.data,
+                    exclude=[self.compensation_key, ])
         }
 
-        d['tx_people.Person'] = {
+    @property
+    def person(self):
+        name = self.name()
+        return {
             'family_name': name.last,
             'given_name': name.first,
             'additional_name': name.middle,
             'name': unicode(name),
-            'gender': row['SEX'],
+            'gender': self.data['SEX'],
         }
 
-        d['tx_people.Organization'] = {
+    @property
+    def organization(self):
+        return {
             'name': 'Collin College',
             'children': [{
-                'name': unicode(department),
+                'name': unicode(self.department()),
             }],
         }
 
-        d['tx_people.Post'] = {
-            'label': job_title,
+    @property
+    def post(self):
+        return {
+            'label': self.job_title,
         }
 
-        d['tx_people.Membership'] = {
-            'start_date': row['CURRENT HIRE DATE'],
+    @property
+    def membership(self):
+        return {
+            'start_date': self.data['CURRENT HIRE DATE'],
         }
 
-        compensation = row[compensation_key]
-        hire_date = row['CURRENT HIRE DATE']
+    @property
+    def compensations(self):
+        compensation = self.data[self.compensation_key]
+        hire_date = self.data['CURRENT HIRE DATE']
         if compensation == 'See "Explanations" tab':
-            if row['JOB TITLE'] == 'Assoc Professor':
-                d['compensations'] = [
+            if self.data['JOB TITLE'] == 'Assoc Professor':
+                return [
                     {
                         'tx_salaries.CompensationType': {
                             'name': 'Associate Professor per Lecture',
@@ -88,18 +109,18 @@ def transform(labels, source):
                         }
                     }
                 ]
-            elif row['JOB TITLE'] == 'Continuing Ed Instructors':
+            elif self.data['JOB TITLE'] == 'Continuing Ed Instructors':
                 # This is someone who's salary we can't even really
                 # guess at as no rate is provided by Collin College.
-                continue
+                return None
             else:
                 raise Exception('Unable to process')
 
         else:
-            d['compensations'] = [
+            return [
                 {
                     'tx_salaries.CompensationType': {
-                        'name': compensation_type,
+                        'name': self.compensation_type,
                     },
                     'tx_salaries.Employee': {
                         'hire_date': hire_date,
@@ -107,5 +128,31 @@ def transform(labels, source):
                     },
                 },
             ]
-        data.append(d)
+
+
+def transform_row(row):
+    obj = TransformedRow(row)
+    # Stop early if this isn't valid
+    if not obj.is_valid:
+        return
+
+    d = copy(base.DEFAULT_DATA_TEMPLATE)
+    d['original'] = row
+
+    d['tx_people.Identifier'] = obj.identifier
+    d['tx_people.Person'] = obj.person
+    d['tx_people.Organization'] = obj.organization
+    d['tx_people.Post'] = obj.post
+    d['tx_people.Membership'] = obj.membership
+    d['compensations'] = obj.compensations
+    return d
+
+
+def transform(labels, source):
+    data = []
+    for raw_row in source:
+        row = dict(zip(labels, raw_row))
+        processed = transform_row(row)
+        if processed:
+            data.append(processed)
     return data
