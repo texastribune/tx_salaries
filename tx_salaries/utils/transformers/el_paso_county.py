@@ -35,7 +35,7 @@ def transform(labels, source):
         department = cleaver.DepartmentNameCleaver(row['DEPARTMENT'].title(),
                 object_class=ElPasoDepartmentName).parse()
         d["tx_people.Organization"] = {
-            "label": department,
+            "name": str(department),
         }
 
         d["tx_people.Post"] = {
