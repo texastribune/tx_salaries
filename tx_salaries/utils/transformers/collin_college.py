@@ -12,16 +12,16 @@ def transform(labels, source):
 
         compensation_key = 'ANNUAL SALARY (HOURLY RATE FOR PT)'
 
-        job_title = row["JOB TITLE"].strip()
-        compensation_type = "Full Time"
-        if job_title[-2:].upper() == "PT":
-            compensation_type = "Part Time"
+        job_title = row['JOB TITLE'].strip()
+        compensation_type = 'Full Time'
+        if job_title[-2:].upper() == 'PT':
+            compensation_type = 'Part Time'
             job_title = job_title[:-2].strip()
 
         job_title = job_title.title()
 
-        # Clean up any issues with the "- PT" suffix, but do it by
-        # splitting on "-" to ensure that we catch as many as possible
+        # Clean up any issues with the '- PT' suffix, but do it by
+        # splitting on '-' to ensure that we catch as many as possible
         #
         # TODO: Fix this so its actually correct
         if '-' in row['DEPARTMENT']:
@@ -31,43 +31,43 @@ def transform(labels, source):
         raw_department = '-'.join([a.strip() for a in split_department]).title()
         department = cleaver.DepartmentNameCleaver(raw_department).parse()
 
-        raw_name = "%s %s" % (row["FIRST NAME"], row["LAST NAME"])
+        raw_name = '%s %s' % (row['FIRST NAME'], row['LAST NAME'])
         name = cleaver.EmployeeNameCleaver(raw_name).parse()
 
-        d["original"] = raw_row
+        d['original'] = raw_row
         d['tx_people.Identifier'] = {
             'scheme': 'tx_salaries_hash',
             'identifier': base.create_hash_for_row(row,
                     exclude=[compensation_key, ])
         }
 
-        d["tx_people.Person"] = {
-            "family_name": name.last,
-            "given_name": name.first,
-            "additional_name": name.middle,
-            "name": unicode(name),
-            "gender": row["SEX"],
+        d['tx_people.Person'] = {
+            'family_name': name.last,
+            'given_name': name.first,
+            'additional_name': name.middle,
+            'name': unicode(name),
+            'gender': row['SEX'],
         }
 
-        d["tx_people.Organization"] = {
-            "name": "Collin College",
-            "children": [{
-                "name": unicode(department),
+        d['tx_people.Organization'] = {
+            'name': 'Collin College',
+            'children': [{
+                'name': unicode(department),
             }],
         }
 
-        d["tx_people.Post"] = {
-            "label": job_title,
+        d['tx_people.Post'] = {
+            'label': job_title,
         }
 
-        d["tx_people.Membership"] = {
-            "start_date": row["CURRENT HIRE DATE"],
+        d['tx_people.Membership'] = {
+            'start_date': row['CURRENT HIRE DATE'],
         }
 
         compensation = row[compensation_key]
         hire_date = row['CURRENT HIRE DATE']
         if compensation == 'See "Explanations" tab':
-            if row["JOB TITLE"] == "Assoc Professor":
+            if row['JOB TITLE'] == 'Assoc Professor':
                 d['compensations'] = [
                     {
                         'tx_salaries.CompensationType': {
