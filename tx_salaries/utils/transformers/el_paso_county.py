@@ -1,41 +1,19 @@
 from copy import copy
-import re
-
-from name_cleaver import cleaver, names
 
 from .import base
+from .. import cleaver
 
 
-regex_i = lambda a: re.compile(a, re.IGNORECASE)
-
-DEPARTMENT_NAME_MAP = (
-    (regex_i(r' OF '), ' of '),
-    (regex_i(r' AT '), ' at '),
-    (regex_i(r' THE '), ' the '),
-    (regex_i(r'ADM\.$'), 'Administration'),
-    (regex_i(r'DIST ATTY'), 'District Attorney'),
-    (regex_i(r'COATTYADM'), 'County Attorney Administration'),
-    (regex_i(r'COATTY'), 'County Attorney'),
-    (regex_i(r'\-TAIP'), '- Treatment Alternative to Incarceration Program'),
-    (regex_i(r'AP COMMUNITY INTERVENTION CTR'), 'Adult Probation Community Intervention Center'),
-    (regex_i(r'ADULT PROB-GANG INTERVENTION'), 'Adult Probation - Gang Intervention'),
-)
-
-
-class DepartmentName(names.OrganizationName):
-    def case_name_parts(self):
-        super(DepartmentName, self).case_name_parts()
-        self.expand_abbreviations()
-        return self
-
-    def expand_abbreviations(self):
-        for pattern, replacement in DEPARTMENT_NAME_MAP:
-            self.name = re.sub(pattern, replacement, self.name)
-
-
-class DepartmentNameCleaver(cleaver.OrganizationNameCleaver):
-    object_class = DepartmentName
-
+class ElPasoDepartmentName(cleaver.DepartmentName):
+    MAP = cleaver.DepartmentName.MAP + (
+        (cleaver.regex_i(r'ADM\.$'), 'Administration'),
+        (cleaver.regex_i(r'DIST ATTY'), 'District Attorney'),
+        (cleaver.regex_i(r'COATTYADM'), 'County Attorney Administration'),
+        (cleaver.regex_i(r'COATTY'), 'County Attorney'),
+        (cleaver.regex_i(r'\-TAIP'), '- Treatment Alternative to Incarceration Program'),
+        (cleaver.regex_i(r'AP COMMUNITY INTERVENTION CTR'), 'Adult Probation Community Intervention Center'),
+        (cleaver.regex_i(r'ADULT PROB-GANG INTERVENTION'), 'Adult Probation - Gang Intervention'),
+    )
 
 
 def transform(labels, source):
@@ -54,7 +32,8 @@ def transform(labels, source):
                     row["LAST NAME"]),
         }
 
-        department = DepartmentCleaver(row['DEPARTMENT'].title()).parse()
+        department = cleaver.DepartmentNameCleaver(row['DEPARTMENT'].title(),
+                object_class=ElPasoDepartmentName).parse()
         d["tx_people.Organization"] = {
             "label": department,
         }
