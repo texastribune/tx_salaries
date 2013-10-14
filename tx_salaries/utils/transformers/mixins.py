@@ -4,7 +4,7 @@ class OrganizationMixin(object):
 
     This requires that the class mixing it in adds an
     ``ORGANIZATION_NAME`` property of the main level agency or
-    department.
+    department and needs a ``department`` property.
     """
     @property
     def organization(self):
