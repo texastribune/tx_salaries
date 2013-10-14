@@ -1,13 +1,14 @@
 from copy import copy
 
 from . import base
+from . import mixins
 
 
 def title_case_property(key):
     return property(lambda self: self.get_mapped_value(key).title())
 
 
-class TransformedRow(base.BaseTransformedRow):
+class TransformedRow(mixins.OrganizationMixin, base.BaseTransformedRow):
     MAP = {
         'last_name': 'LAST NAME',
         'first_name': 'FIRST NAME',
@@ -19,6 +20,8 @@ class TransformedRow(base.BaseTransformedRow):
     }
 
     NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
+
+    ORGANIZATION_NAME = 'Brownsville ISD'
 
     @property
     def is_valid(self):
@@ -43,15 +46,6 @@ class TransformedRow(base.BaseTransformedRow):
             'given_name': name.first,
             'additional_name': name.middle,
             'name': unicode(name),
-        }
-
-    @property
-    def organization(self):
-        return {
-            'name': 'Brownsville ISD',
-            'children': [{
-                'name': unicode(self.department),
-            }],
         }
 
     # TODO Refactor into a mixin
