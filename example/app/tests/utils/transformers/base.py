@@ -11,7 +11,7 @@ class TestOfBaseTransformedRow(TestCase):
 
         class MyRow(base.BaseTransformedRow):
             MAP = {
-                'compensation_key': some_random_key
+                'compensation': some_random_key
             }
 
         instance = MyRow()
@@ -24,7 +24,7 @@ class TestOfBaseTransformedRow(TestCase):
 
         class MyRow(base.BaseTransformedRow):
             MAP = {
-                'compensation_key': some_random_key
+                'compensation': some_random_key
             }
 
         instance = MyRow(data)

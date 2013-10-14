@@ -21,12 +21,12 @@ class BaseTransformedRow(object):
         self.data = data
 
     def __getattr__(self, key):
-        if key in self.MAP:
-            return self.MAP[key]
-        else:
-            actual_key = "{key}_key".format(key=key)
+        if key[-4:] == '_key':
+            actual_key = key[:-4]
             if actual_key in self.MAP:
-                return self.data[self.MAP[actual_key]]
+                return self.MAP[actual_key]
+        elif key in self.MAP:
+            return self.data[self.MAP[key]]
 
         raise AttributeError("{key} is unknown".format(key=key))
 
