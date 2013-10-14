@@ -9,7 +9,7 @@ class TransformedRow(base.BaseTransformedRow):
         'compensation_key': 'ANNUAL SALARY (HOURLY RATE FOR PT)',
         'hire_date_key': 'CURRENT HIRE DATE',
         'first_name': 'FIRST NAME',
-        'last_name': 'LAST NAME,'
+        'last_name': 'LAST NAME'
     }
 
     def __init__(self, data):
