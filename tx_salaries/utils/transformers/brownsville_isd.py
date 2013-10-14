@@ -1,45 +1,115 @@
 from copy import copy
 
 from . import base
+# from .. import cleaver
+
+
+def title_case_property(key):
+    return property(lambda self: self.__getattr__(key).title())
+
+
+class TransformedRow(base.BaseTransformedRow):
+    MAP = {
+        'last_name': 'LAST NAME',
+        'first_name': 'FIRST NAME',
+        'middle_name': 'MI',
+        'department': 'CAMPUS/DEPT',
+        'job_title': 'POSITION',
+        'hire_date': 'HIRE_DATE',
+        'compensation': 'SALARY',
+    }
+
+    @property
+    def is_valid(self):
+        return self.last_name.upper().strip() != 'EMPLOYEE COUNT:'
+
+    @property
+    def raw_name(self):
+        return '%s %s %s' % (self.first_name, self.middle_name, self.last_name)
+
+    department = title_case_property('department')
+    job_title = title_case_property('job_title')
+
+    @property
+    def identifier(self):
+        return {
+            'scheme': 'tx_salaries_hash',
+            'identifier': base.create_hash_for_row(self.data,
+                    exclude=[self.compensation_key, ])
+        }
+
+    @property
+    def person(self):
+        name = self.get_name()
+        return {
+            'family_name': name.last,
+            'given_name': name.first,
+            'additional_name': name.middle,
+            'name': unicode(name),
+        }
+
+    @property
+    def organization(self):
+        return {
+            'name': 'Brownsville ISD',
+            'children': [{
+                'name': unicode(self.department),
+            }],
+        }
+
+    # TODO Refactor into a mixin
+    @property
+    def post(self):
+        return {
+            'label': self.job_title,
+        }
+
+    # TODO Refactor into a mixin
+    @property
+    def membership(self):
+        return {
+            'start_date': self.hire_date,
+        }
+
+    @property
+    def compensations(self):
+        # TODO: Is FT Teacher the correct everywhere?
+        return [
+            {
+                'tx_salaries.CompensationType': {
+                    'name': 'Full Time Teacher',
+                },
+                'tx_salaries.Employee': {
+                    'hire_date': self.hire_date,
+                    'compensation': self.compensation,
+                },
+            },
+        ]
+
+
+def transform_row(row):
+    obj = TransformedRow(row)
+    # Stop early if this isn't valid
+    if not obj.is_valid:
+        return
+
+    d = copy(base.DEFAULT_DATA_TEMPLATE)
+    d['original'] = row
+
+    d['tx_people.Identifier'] = obj.identifier
+    d['tx_people.Person'] = obj.person
+    d['tx_people.Organization'] = obj.organization
+    d['tx_people.Post'] = obj.post
+    d['tx_people.Membership'] = obj.membership
+    d['compensations'] = obj.compensations
+    return d
 
 
 def transform(labels, source):
     data = []
     for raw_row in source:
-        # Brownsville likes to include the employee count as a row by
-        # itself.  No need to process that.
-        if raw_row[0].strip() == "EMPLOYEE COUNT:":
-            continue
-
         row = dict(zip(labels, raw_row))
-        d = copy(base.DEFAULT_DATA_TEMPLATE)
-        d["original"] = raw_row
-        d["tx_people.Person"] = {
-            "family_name": row["LAST NAME"],
-            "given_name": row["FIRST NAME"],
-            "name": "%s %s %s" % (row["FIRST NAME"], row["MI"],
-                    row["LAST NAME"]),
-        }
-
-        d["tx_people.Organization"] = {
-            "label": row["CAMPUS/DEPT"],
-        }
-
-        d["tx_people.Post"] = {
-            "label": row["POSITION"],
-        }
-
-        d["tx_people.Membership"] = {
-            "start_date": row["HIRE_DATE"],
-        }
-
-        d["tx_salaries.CompensationType"] = {
-            "name": "Full Time Teacher",
-        }
-
-        d["tx_salaries.Employee"] = {
-            "hire_date": row["HIRE_DATE"],
-            "compensation": row["SALARY"],
-        }
-        data.append(d)
+        processed = transform_row(row)
+        if processed:
+            data.append(processed)
     return data
