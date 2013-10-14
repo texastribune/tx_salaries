@@ -5,7 +5,7 @@ from . import base
 
 
 def title_case_property(key):
-    return property(lambda self: self.__getattr__(key).title())
+    return property(lambda self: self.get_mapped_value(key).title())
 
 
 class TransformedRow(base.BaseTransformedRow):

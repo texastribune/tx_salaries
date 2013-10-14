@@ -20,14 +20,23 @@ class BaseTransformedRow(object):
     def __init__(self, data=None, **kwargs):
         self.data = data
 
-    def __getattr__(self, key):
-        if key[-4:] == '_key':
-            actual_key = key[:-4]
-            if actual_key in self.MAP:
-                return self.MAP[actual_key]
-        elif key in self.MAP:
-            return self.data[self.MAP[key]]
+    def get_mapped_value_key(self, key):
+        return self.MAP[key[:-4]]
 
+    def get_mapped_value(self, key):
+        return self.data[self.MAP[key]]
+
+    def is_mapped_value_key(self, key):
+        return key[-4:] == '_key' and key[:-4] in self.MAP
+
+    def is_mapped_value(self, key):
+        return key in self.MAP and self.MAP[key] in self.data
+
+    def __getattr__(self, key):
+        if self.is_mapped_value_key(key):
+            return self.get_mapped_value_key(key)
+        elif self.is_mapped_value(key):
+            return self.get_mapped_value(key)
         raise AttributeError("{key} is unknown".format(key=key))
 
     # TODO: Test
