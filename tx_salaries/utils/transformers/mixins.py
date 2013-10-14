@@ -15,3 +15,16 @@ class OrganizationMixin(object):
             }],
         }
 
+
+class PostMixin(object):
+    """
+    Adds a generic ``post`` property to the class
+
+    This requires that there is a ``job_title`` property be available
+    on the class above.
+    """
+    @property
+    def post(self):
+        return {
+            'label': self.job_title,
+        }

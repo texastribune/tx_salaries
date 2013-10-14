@@ -8,7 +8,8 @@ def title_case_property(key):
     return property(lambda self: self.get_mapped_value(key).title())
 
 
-class TransformedRow(mixins.OrganizationMixin, base.BaseTransformedRow):
+class TransformedRow(mixins.OrganizationMixin, mixins.PostMixin,
+        base.BaseTransformedRow):
     MAP = {
         'last_name': 'LAST NAME',
         'first_name': 'FIRST NAME',
@@ -46,13 +47,6 @@ class TransformedRow(mixins.OrganizationMixin, base.BaseTransformedRow):
             'given_name': name.first,
             'additional_name': name.middle,
             'name': unicode(name),
-        }
-
-    # TODO Refactor into a mixin
-    @property
-    def post(self):
-        return {
-            'label': self.job_title,
         }
 
     # TODO Refactor into a mixin
