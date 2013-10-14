@@ -1,3 +1,23 @@
+from . import base
+
+
+class GenericIdentifierMixin(object):
+    """
+    Adds a generic ``identifier`` property to the class
+
+    Requires a ``compensation`` value to be set if using the
+    ``BaseTransformedRow``, otherwise it requires a ``compensation_key``
+    property.
+    """
+    @property
+    def identifier(self):
+        return {
+            'scheme': 'tx_salaries_hash',
+            'identifier': base.create_hash_for_row(self.data,
+                    exclude=[self.compensation_key, ])
+        }
+
+
 class OrganizationMixin(object):
     """
     Adds a generic ``organization`` property to the class

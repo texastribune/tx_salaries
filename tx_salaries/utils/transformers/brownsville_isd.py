@@ -8,8 +8,8 @@ def title_case_property(key):
     return property(lambda self: self.get_mapped_value(key).title())
 
 
-class TransformedRow(mixins.OrganizationMixin, mixins.PostMixin,
-        base.BaseTransformedRow):
+class TransformedRow(mixins.GenericIdentifierMixin, mixins.OrganizationMixin,
+        mixins.PostMixin, base.BaseTransformedRow):
     MAP = {
         'last_name': 'LAST NAME',
         'first_name': 'FIRST NAME',
@@ -30,14 +30,6 @@ class TransformedRow(mixins.OrganizationMixin, mixins.PostMixin,
 
     department = title_case_property('department')
     job_title = title_case_property('job_title')
-
-    @property
-    def identifier(self):
-        return {
-            'scheme': 'tx_salaries_hash',
-            'identifier': base.create_hash_for_row(self.data,
-                    exclude=[self.compensation_key, ])
-        }
 
     @property
     def person(self):
