@@ -1,7 +1,6 @@
 from copy import copy
 
 from . import base
-# from .. import cleaver
 
 
 def title_case_property(key):
