@@ -12,8 +12,20 @@ class TransformedRow(object):
         self.process_compenstation_type_and_job_title()
 
     @property
+    def hire_date(self):
+        return self.data['CURRENT HIRE DATE']
+
+    @property
+    def compensation(self):
+        return self.data[self.compensation_key]
+
+    @property
     def is_valid(self):
-        return self.data['JOB TITLE'] != 'Continuing Ed Instructors'
+        return self.job_title != 'Continuing Ed Instructors'
+
+    @property
+    def is_special_case_compensation(self):
+        return self.compensation == 'See "Explanations" tab'
 
     def process_compenstation_type_and_job_title(self):
         self.compensation_type = 'Full Time'
@@ -80,15 +92,14 @@ class TransformedRow(object):
     @property
     def membership(self):
         return {
-            'start_date': self.data['CURRENT HIRE DATE'],
+            'start_date': self.hire_date,
         }
 
     @property
     def compensations(self):
-        compensation = self.data[self.compensation_key]
-        hire_date = self.data['CURRENT HIRE DATE']
-        if compensation == 'See "Explanations" tab':
-            if self.data['JOB TITLE'] == 'Assoc Professor':
+        hire_date = self.hire_date
+        if self.is_special_case_compensation:
+            if self.job_title == 'Assoc Professor':
                 return [
                     {
                         'tx_salaries.CompensationType': {
@@ -109,9 +120,11 @@ class TransformedRow(object):
                         }
                     }
                 ]
-            elif self.data['JOB TITLE'] == 'Continuing Ed Instructors':
+            elif self.is_valid:
                 # This is someone who's salary we can't even really
                 # guess at as no rate is provided by Collin College.
+                #
+                # NOTE: This should no longer be accessed
                 return None
             else:
                 raise Exception('Unable to process')
@@ -124,7 +137,7 @@ class TransformedRow(object):
                     },
                     'tx_salaries.Employee': {
                         'hire_date': hire_date,
-                        'compensation': compensation,
+                        'compensation': self.compensation,
                     },
                 },
             ]
