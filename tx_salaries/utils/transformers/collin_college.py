@@ -12,6 +12,8 @@ class TransformedRow(base.BaseTransformedRow):
         'last_name': 'LAST NAME'
     }
 
+    NAME_FIELDS = ('first_name', 'last_name', )
+
     def __init__(self, data):
         super(TransformedRow, self).__init__(data)
         self.process_compenstation_type_and_job_title()
@@ -32,10 +34,6 @@ class TransformedRow(base.BaseTransformedRow):
             self.job_title = self.job_title[:-2].strip()
 
         self.job_title = self.job_title.title()
-
-    @property
-    def raw_name(self):
-        return '%s %s' % (self.first_name, self.last_name)
 
     def department(self):
         # Clean up any issues with the '- PT' suffix, but do it by

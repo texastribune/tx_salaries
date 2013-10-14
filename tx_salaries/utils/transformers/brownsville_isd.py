@@ -19,13 +19,11 @@ class TransformedRow(base.BaseTransformedRow):
         'compensation': 'SALARY',
     }
 
+    NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
+
     @property
     def is_valid(self):
         return self.last_name.upper().strip() != 'EMPLOYEE COUNT:'
-
-    @property
-    def raw_name(self):
-        return '%s %s %s' % (self.first_name, self.middle_name, self.last_name)
 
     department = title_case_property('department')
     job_title = title_case_property('job_title')

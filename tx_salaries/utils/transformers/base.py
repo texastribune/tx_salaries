@@ -40,8 +40,21 @@ class BaseTransformedRow(object):
         raise AttributeError("{key} is unknown".format(key=key))
 
     # TODO: Test
+    def get_raw_name(self):
+        name_fields = [getattr(self, a) for a in self.NAME_FIELDS]
+        return u' '.join(name_fields)
+
+    # TODO: Test
     def get_name(self):
-        return cleaver.EmployeeNameCleaver(self.raw_name).parse()
+        return self.get_cleavered_name().parse()
+
+    # TODO: Test
+    def get_cleavered_name(self):
+        return self.get_name_cleaver()(self.get_raw_name())
+
+    # TODO: Test
+    def get_name_cleaver(self):
+        return cleaver.EmployeeNameCleaver
 
 
 def create_hash_for_row(row, exclude=None):
