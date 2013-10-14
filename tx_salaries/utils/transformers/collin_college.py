@@ -4,20 +4,17 @@ from . import base
 from .. import cleaver
 
 
-class TransformedRow(object):
+class TransformedRow(base.BaseTransformedRow):
+    MAP = {
+        'compensation_key': 'ANNUAL SALARY (HOURLY RATE FOR PT)',
+        'hire_date_key': 'CURRENT HIRE DATE',
+        'first_name': 'FIRST NAME',
+        'last_name': 'LAST NAME,'
+    }
+
     def __init__(self, data):
-        self.data = data
-        self.compensation_key = 'ANNUAL SALARY (HOURLY RATE FOR PT)'
-
+        super(TransformedRow, self).__init__(data)
         self.process_compenstation_type_and_job_title()
-
-    @property
-    def hire_date(self):
-        return self.data['CURRENT HIRE DATE']
-
-    @property
-    def compensation(self):
-        return self.data[self.compensation_key]
 
     @property
     def is_valid(self):
@@ -38,7 +35,7 @@ class TransformedRow(object):
 
     @property
     def raw_name(self):
-        return '%s %s' % (self.data['FIRST NAME'], self.data['LAST NAME'])
+        return '%s %s' % (self.first_name, self.last_name)
 
     def name(self):
         return cleaver.EmployeeNameCleaver(self.raw_name).parse()

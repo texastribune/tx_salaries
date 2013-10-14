@@ -14,6 +14,21 @@ DEFAULT_DATA_TEMPLATE = {
 }
 
 
+class BaseTransformedRow(object):
+    def __init__(self, data=None, **kwargs):
+        self.data = data
+
+    def __getattr__(self, key):
+        if key in self.MAP:
+            return self.MAP[key]
+        else:
+            actual_key = "{key}_key".format(key=key)
+            if actual_key in self.MAP:
+                return self.data[self.MAP[actual_key]]
+
+        raise AttributeError("{key} is unknown".format(key=key))
+
+
 def create_hash_for_row(row, exclude=None):
     """
     Returns a hash for a row to be used as its identifier.
