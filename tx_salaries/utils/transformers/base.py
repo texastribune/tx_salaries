@@ -2,6 +2,8 @@ from copy import copy
 import hashlib
 import re
 
+from .. import cleaver
+
 DEFAULT_DATA_TEMPLATE = {
     'tx_people.Person': {},
     'tx_people.Organization': {},
@@ -27,6 +29,10 @@ class BaseTransformedRow(object):
                 return self.data[self.MAP[actual_key]]
 
         raise AttributeError("{key} is unknown".format(key=key))
+
+    # TODO: Test
+    def get_name(self):
+        return cleaver.EmployeeNameCleaver(self.raw_name).parse()
 
 
 def create_hash_for_row(row, exclude=None):

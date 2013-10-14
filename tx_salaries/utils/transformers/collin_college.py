@@ -37,9 +37,6 @@ class TransformedRow(base.BaseTransformedRow):
     def raw_name(self):
         return '%s %s' % (self.first_name, self.last_name)
 
-    def name(self):
-        return cleaver.EmployeeNameCleaver(self.raw_name).parse()
-
     def department(self):
         # Clean up any issues with the '- PT' suffix, but do it by
         # splitting on '-' to ensure that we catch as many as possible
@@ -62,7 +59,7 @@ class TransformedRow(base.BaseTransformedRow):
 
     @property
     def person(self):
-        name = self.name()
+        name = self.get_name()
         return {
             'family_name': name.last,
             'given_name': name.first,
