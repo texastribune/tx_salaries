@@ -1,4 +1,11 @@
 class OrganizationMixin(object):
+    """
+    Adds a generic ``organization`` property to the class
+
+    This requires that the class mixing it in adds an
+    ``ORGANIZATION_NAME`` property of the main level agency or
+    department.
+    """
     @property
     def organization(self):
         return {
