@@ -6,8 +6,8 @@ from .. import cleaver
 
 class TransformedRow(base.BaseTransformedRow):
     MAP = {
-        'compensation_key': 'ANNUAL SALARY (HOURLY RATE FOR PT)',
-        'hire_date_key': 'CURRENT HIRE DATE',
+        'compensation': 'ANNUAL SALARY (HOURLY RATE FOR PT)',
+        'hire_date': 'CURRENT HIRE DATE',
         'first_name': 'FIRST NAME',
         'last_name': 'LAST NAME'
     }
