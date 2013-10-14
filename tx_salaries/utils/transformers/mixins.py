@@ -18,6 +18,19 @@ class GenericIdentifierMixin(object):
         }
 
 
+class MembershipMixin(object):
+    """
+    Adds a generic ``membership`` property to the class
+
+    Requires a ``hire_date`` property to be available.
+    """
+    @property
+    def membership(self):
+        return {
+            'start_date': self.hire_date,
+        }
+
+
 class OrganizationMixin(object):
     """
     Adds a generic ``organization`` property to the class
