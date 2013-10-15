@@ -1,5 +1,3 @@
-from copy import copy
-
 from . import base
 from . import mixins
 
@@ -50,22 +48,6 @@ class TransformedRecord(mixins.GenericDepartmentMixin,
                 },
             },
         ]
-
-    def as_dict(self):
-        # Stop early if this isn't valid
-        if not self.is_valid:
-            return
-
-        d = copy(base.DEFAULT_DATA_TEMPLATE)
-        d['original'] = self.data
-
-        d['tx_people.Identifier'] = self.identifier
-        d['tx_people.Person'] = self.person
-        d['tx_people.Organization'] = self.organization
-        d['tx_people.Post'] = self.post
-        d['tx_people.Membership'] = self.membership
-        d['compensations'] = self.compensations
-        return d
 
 
 transform = base.transform_factory(TransformedRecord)

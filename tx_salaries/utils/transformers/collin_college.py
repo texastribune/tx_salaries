@@ -1,5 +1,3 @@
-from copy import copy
-
 from . import base
 from .. import cleaver
 
@@ -135,29 +133,4 @@ class TransformedRecord(base.BaseTransformedRecord):
             ]
 
 
-def transform_record(record):
-    obj = TransformedRecord(record)
-    # Stop early if this isn't valid
-    if not obj.is_valid:
-        return
-
-    d = copy(base.DEFAULT_DATA_TEMPLATE)
-    d['original'] = record
-
-    d['tx_people.Identifier'] = obj.identifier
-    d['tx_people.Person'] = obj.person
-    d['tx_people.Organization'] = obj.organization
-    d['tx_people.Post'] = obj.post
-    d['tx_people.Membership'] = obj.membership
-    d['compensations'] = obj.compensations
-    return d
-
-
-def transform(labels, source):
-    data = []
-    for raw_record in source:
-        record = dict(zip(labels, raw_record))
-        processed = transform_record(record)
-        if processed:
-            data.append(processed)
-    return data
+transform = base.transform_factory(TransformedRecord)

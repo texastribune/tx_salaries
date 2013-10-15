@@ -56,6 +56,22 @@ class BaseTransformedRecord(object):
     def get_name_cleaver(self):
         return cleaver.EmployeeNameCleaver
 
+    def as_dict(self):
+        # Stop early if this isn't valid
+        if not self.is_valid:
+            return
+
+        d = copy(DEFAULT_DATA_TEMPLATE)
+        d['original'] = self.data
+
+        d['tx_people.Identifier'] = self.identifier
+        d['tx_people.Person'] = self.person
+        d['tx_people.Organization'] = self.organization
+        d['tx_people.Post'] = self.post
+        d['tx_people.Membership'] = self.membership
+        d['compensations'] = self.compensations
+        return d
+
 
 def create_hash_for_record(record, exclude=None):
     """
