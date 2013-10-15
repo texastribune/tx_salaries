@@ -4,12 +4,10 @@ from . import base
 from . import mixins
 
 
-def title_case_property(key):
-    return property(lambda self: self.get_mapped_value(key).title())
-
-
-class TransformedRow(mixins.GenericIdentifierMixin, mixins.MembershipMixin,
-        mixins.OrganizationMixin, mixins.PostMixin, base.BaseTransformedRow):
+class TransformedRow(mixins.GenericDepartmentMixin,
+        mixins.GenericIdentifierMixin, mixins.GenericJobTitleMixin,
+        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+        base.BaseTransformedRow):
     MAP = {
         'last_name': 'LAST NAME',
         'first_name': 'FIRST NAME',
@@ -27,9 +25,6 @@ class TransformedRow(mixins.GenericIdentifierMixin, mixins.MembershipMixin,
     @property
     def is_valid(self):
         return self.last_name.upper().strip() != 'EMPLOYEE COUNT:'
-
-    department = title_case_property('department')
-    job_title = title_case_property('job_title')
 
     @property
     def person(self):

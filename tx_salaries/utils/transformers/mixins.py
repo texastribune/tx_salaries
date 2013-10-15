@@ -1,6 +1,31 @@
 from . import base
 
 
+def title_case_property(key):
+    """Simple property for title casing a mapped value"""
+    return property(lambda self: self.get_mapped_value(key).title())
+
+
+class GenericDepartmentMixin(object):
+    """
+    Adds a generic ``department`` property that is title cased
+
+    This requires a ``department`` property to be specified as a mapped
+    value.
+    """
+    department = title_case_property('department')
+
+
+class GenericJobTitleMixin(object):
+    """
+    Adds a generic ``job_title`` property that is title cased
+
+    This requires a ``job_title`` property to be specified as a mapped
+    value.
+    """
+    job_title = title_case_property('job_title')
+
+
 class GenericIdentifierMixin(object):
     """
     Adds a generic ``identifier`` property to the class
