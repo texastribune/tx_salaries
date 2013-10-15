@@ -16,7 +16,7 @@ DEFAULT_DATA_TEMPLATE = {
 }
 
 
-class BaseTransformedRow(object):
+class BaseTransformedRecord(object):
     def __init__(self, data=None, **kwargs):
         self.data = data
 
@@ -57,11 +57,11 @@ class BaseTransformedRow(object):
         return cleaver.EmployeeNameCleaver
 
 
-def create_hash_for_row(row, exclude=None):
+def create_hash_for_record(record, exclude=None):
     """
-    Returns a hash for a row to be used as its identifier.
+    Returns a hash for a record to be used as its identifier.
 
-    This takes a dictionary called ``row`` and turns it into a SHA-1
+    This takes a dictionary called ``record`` and turns it into a SHA-1
     hash while excluding any fields that might vary (such as pay rate).
     Each data source is responsible for determining what fields are
     unique and immutable.
@@ -70,7 +70,7 @@ def create_hash_for_row(row, exclude=None):
     next.
     """
 
-    data_for_hash = copy(row)
+    data_for_hash = copy(record)
     if exclude:
         for key in exclude:
             del data_for_hash[key]

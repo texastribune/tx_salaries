@@ -5,16 +5,16 @@ from django.test import TestCase
 from tx_salaries.utils.transformers import base
 
 
-class TestOfBaseTransformedRow(TestCase):
+class TestOfBaseTransformedRecord(TestCase):
     def test_returns_mapped_value_as_an_attribute(self):
         some_random_key = 'some-key-{0}'.format(random.randint)
 
-        class MyRow(base.BaseTransformedRow):
+        class MyRecord(base.BaseTransformedRecord):
             MAP = {
                 'compensation': some_random_key
             }
 
-        instance = MyRow()
+        instance = MyRecord()
         self.assertEqual(instance.compensation_key, some_random_key)
 
     def test_returns_actual_data_if_mapped(self):
@@ -22,10 +22,10 @@ class TestOfBaseTransformedRow(TestCase):
         some_random_value = random.randint(100000, 2000000)
         data = {some_random_key: some_random_value}
 
-        class MyRow(base.BaseTransformedRow):
+        class MyRecord(base.BaseTransformedRecord):
             MAP = {
                 'compensation': some_random_key
             }
 
-        instance = MyRow(data)
+        instance = MyRecord(data)
         self.assertEqual(instance.compensation, some_random_value)

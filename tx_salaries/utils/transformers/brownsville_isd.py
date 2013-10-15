@@ -4,10 +4,10 @@ from . import base
 from . import mixins
 
 
-class TransformedRow(mixins.GenericDepartmentMixin,
+class TransformedRecord(mixins.GenericDepartmentMixin,
         mixins.GenericIdentifierMixin, mixins.GenericJobTitleMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-        base.BaseTransformedRow):
+        base.BaseTransformedRecord):
     MAP = {
         'last_name': 'LAST NAME',
         'first_name': 'FIRST NAME',
@@ -52,14 +52,14 @@ class TransformedRow(mixins.GenericDepartmentMixin,
         ]
 
 
-def transform_row(row):
-    obj = TransformedRow(row)
+def transform_record(record):
+    obj = TransformedRecord(record)
     # Stop early if this isn't valid
     if not obj.is_valid:
         return
 
     d = copy(base.DEFAULT_DATA_TEMPLATE)
-    d['original'] = row
+    d['original'] = record
 
     d['tx_people.Identifier'] = obj.identifier
     d['tx_people.Person'] = obj.person
@@ -72,9 +72,9 @@ def transform_row(row):
 
 def transform(labels, source):
     data = []
-    for raw_row in source:
-        row = dict(zip(labels, raw_row))
-        processed = transform_row(row)
+    for raw_record in source:
+        record = dict(zip(labels, raw_record))
+        processed = transform_record(record)
         if processed:
             data.append(processed)
     return data

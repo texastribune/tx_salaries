@@ -4,7 +4,7 @@ from . import base
 from .. import cleaver
 
 
-class TransformedRow(base.BaseTransformedRow):
+class TransformedRecord(base.BaseTransformedRecord):
     MAP = {
         'compensation': 'ANNUAL SALARY (HOURLY RATE FOR PT)',
         'hire_date': 'CURRENT HIRE DATE',
@@ -15,7 +15,7 @@ class TransformedRow(base.BaseTransformedRow):
     NAME_FIELDS = ('first_name', 'last_name', )
 
     def __init__(self, data):
-        super(TransformedRow, self).__init__(data)
+        super(TransformedRecord, self).__init__(data)
         self.process_compenstation_type_and_job_title()
 
     @property
@@ -51,7 +51,7 @@ class TransformedRow(base.BaseTransformedRow):
     def identifier(self):
         return {
             'scheme': 'tx_salaries_hash',
-            'identifier': base.create_hash_for_row(self.data,
+            'identifier': base.create_hash_for_record(self.data,
                     exclude=[self.compensation_key, ])
         }
 
@@ -135,14 +135,14 @@ class TransformedRow(base.BaseTransformedRow):
             ]
 
 
-def transform_row(row):
-    obj = TransformedRow(row)
+def transform_record(record):
+    obj = TransformedRecord(record)
     # Stop early if this isn't valid
     if not obj.is_valid:
         return
 
     d = copy(base.DEFAULT_DATA_TEMPLATE)
-    d['original'] = row
+    d['original'] = record
 
     d['tx_people.Identifier'] = obj.identifier
     d['tx_people.Person'] = obj.person
@@ -155,9 +155,9 @@ def transform_row(row):
 
 def transform(labels, source):
     data = []
-    for raw_row in source:
-        row = dict(zip(labels, raw_row))
-        processed = transform_row(row)
+    for raw_record in source:
+        record = dict(zip(labels, raw_record))
+        processed = transform_record(record)
         if processed:
             data.append(processed)
     return data
