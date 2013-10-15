@@ -1,48 +1,86 @@
-from copy import copy
+from . import base
+from . import mixins
 
-from .import base
 
+class TransformedRecord(mixins.GenericDepartmentMixin,
+        mixins.GenericIdentifierMixin,
+        mixins.GenericJobTitleMixin,
+        mixins.MembershipMixin,
+        mixins.OrganizationMixin,
+        mixins.PostMixin,
+        base.BaseTransformedRecord):
+    MAP = {
+        'department': 'Department',
+        'first_name': 'First Name',
+        'job_title': 'Position Title',
+        'last_name': 'Last Name',
+        'hire_date': 'Hire Date',
+        'pay_status': 'FT or PT Status'
+    }
 
-def transform(labels, source):
-    data = []
-    for raw_row in source:
-        # Check to see if the row contains a status column as those are
-        # always included in a valid record.  This ignores various theh
-        if len(raw_row[2].strip()) is 0:
-            continue
+    NAME_FIELDS = ('first_name', 'last_name', )
+    ORGANIZATION_NAME = 'Alamo College'
 
-        row = dict(zip(labels, raw_row))
-        d = copy(base.DEFAULT_DATA_TEMPLATE)
-        d["original"] = raw_row
-        d["tx_people.Person"] = {
-            "family_name": row["Last Name"],
-            "given_name": row["First Name"],
-            "name": "%s %s" % (row["First Name"], row["Last Name"]),
+    POSSIBLE_COMPENSATION_KEYS = ('FT  or PT Semester Salary', 'Hourly Rate', )
+
+    @property
+    def is_valid(self):
+        return len(self.pay_status.strip()) > 1
+
+    @property
+    def part_time(self):
+        return self.pay_status.upper() == 'PT'
+
+    @property
+    def full_time(self):
+        return not self.part_time
+
+    @property
+    def has_hourly_rate(self):
+        return bool(self.data['Hourly Rate'].strip())
+
+    @property
+    def compensation_key(self):
+        return self.POSSIBLE_COMPENSATION_KEYS[int(self.has_hourly_rate)]
+
+    @property
+    def compensation(self):
+        return self.data[self.compensation_key]
+
+    @property
+    def compensation_type(self):
+        return '%s Time' % 'Part' if self.part_time else 'Full'
+
+    @property
+    def identifier(self):
+        return {
+            'scheme': 'tx_salaries_hash',
+            'identifier': base.create_hash_for_record(self.data,
+                    exclude=self.POSSIBLE_COMPENSATION_KEYS)
         }
 
-        d["tx_people.Organization"] = {
-            "label": row["Department"],
+    @property
+    def person(self):
+        name = self.get_name()
+        return {
+            'family_name': name.last,
+            'given_name': name.first,
+            'additional_name': name.middle,
+            'name': unicode(name),
         }
 
-        d["tx_people.Post"] = {
-            "label": row["Position Title"],
-        }
+    @property
+    def compensations(self):
+        return [
+            {
+                'tx_salaries.CompensationType': {
+                    'name': self.compensation_type,
+                },
+                'tx_salaries.Employee': {
+                    'hire_date': self.hire_date,
+                    'compensation': self.compensation,
+                },
+            }
+        ]
 
-        d["tx_people.Membership"] = {
-            "start_date": row["Hire Date"],
-        }
-
-        d["tx_salaries.CompensationType"] = {
-            "name": "%s Time" % "Part" if row["FT or PT Status"] == "PT" else "Full",
-        }
-
-        if row["Hourly Rate"].strip():
-            compensation_key = "Hourly Rate"
-        else:
-            compensation_key = "FT  or PT Semester Salary"
-        d["tx_salaries.Employee"] = {
-            "hire_date": row["Hire Date"],
-            "compensation": row[compensation_key],
-        }
-        data.append(d)
-    return data
+transform = base.transform_factory(TransformedRecord)
