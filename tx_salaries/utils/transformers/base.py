@@ -77,3 +77,28 @@ def create_hash_for_record(record, exclude=None):
 
     hash_string = re.sub('[\s.,-]', '', "::".join(data_for_hash.values()))
     return hashlib.sha1(hash_string).hexdigest()
+
+
+def generic_transform(labels, source, record_class):
+    """
+    General purpose transform function that is provided the record_class
+
+    To use this, provide a ``record_class`` for a given
+    ``TransformedRecord``.  Note that this can not be used directly
+    as a transform function as it takes three parameters, not two.  It
+    is meant to be used to build a transform function and is normally
+    used directly via ``transform_factory``.
+    """
+    data = []
+    for raw_record in source:
+        record = record_class(dict(zip(labels, raw_record)))
+        if record.is_valid:
+            data.append(record.as_dict())
+    return data
+
+
+def transform_factory(record_class):
+    """Simple factory for building a generic transformmer"""
+    def transform(labels, source):
+        return generic_transform(labels, source, record_class=record_class)
+    return transform
