@@ -91,8 +91,8 @@ def create_hash_for_record(record, exclude=None):
         for key in exclude:
             del data_for_hash[key]
 
-    hash_string = re.sub('[\s.,-]', '', "::".join(data_for_hash.values()))
-    return hashlib.sha1(hash_string).hexdigest()
+    hash_string = re.sub(u'[\s.,-]', u'', u"::".join(data_for_hash.values()))
+    return hashlib.sha1(hash_string.encode('utf-8')).hexdigest()
 
 
 def generic_transform(labels, source, record_class):
