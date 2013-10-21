@@ -2,7 +2,8 @@ from . import base
 from . import mixins
 
 
-class TransformedRecord(mixins.GenericDepartmentMixin,
+class TransformedRecord(mixins.GenericCompensationMixin,
+        mixins.GenericDepartmentMixin,
         mixins.GenericIdentifierMixin,
         mixins.GenericJobTitleMixin,
         mixins.MembershipMixin,
@@ -68,19 +69,5 @@ class TransformedRecord(mixins.GenericDepartmentMixin,
             'additional_name': name.middle,
             'name': unicode(name),
         }
-
-    @property
-    def compensations(self):
-        return [
-            {
-                'tx_salaries.CompensationType': {
-                    'name': self.compensation_type,
-                },
-                'tx_salaries.Employee': {
-                    'hire_date': self.hire_date,
-                    'compensation': self.compensation,
-                },
-            }
-        ]
 
 transform = base.transform_factory(TransformedRecord)

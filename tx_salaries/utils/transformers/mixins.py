@@ -6,6 +6,32 @@ def title_case_property(key):
     return property(lambda self: self.get_mapped_value(key).title())
 
 
+class GenericCompensationMixin(object):
+    """
+    Adds a generic ``compensations`` property
+
+    This expects a single compensation to be present and requires the
+    following properties be available:
+
+    * ``compensation_type``
+    * ``hire_date``
+    * ``compensation``
+    """
+    @property
+    def compensations(self):
+        return [
+            {
+                'tx_salaries.CompensationType': {
+                    'name': self.compensation_type,
+                },
+                'tx_salaries.Employee': {
+                    'hire_date': self.hire_date,
+                    'compensation': self.compensation,
+                },
+            }
+        ]
+
+
 class GenericDepartmentMixin(object):
     """
     Adds a generic ``department`` property that is title cased
