@@ -113,8 +113,20 @@ def generic_transform(labels, source, record_class):
     return data
 
 
-def transform_factory(record_class):
-    """Simple factory for building a generic transformmer"""
+def transform_factory(record_class, transform_func=None):
+    """
+    Simple factory for building a generic transformmer
+
+    The second argument is used as the actual transform function, if
+    provided, otherwise this dispatches to ``generic_transform``.  The
+    provided ``transform_func`` is supposed to take three arguments,
+    the ``labels`` and ``source`` that a transform function is supposed
+    to take, along with a ``record_class`` argument that specifies which
+    class is supposed to be used.
+    """
+    if transform_func is None:
+        transform_func = generic_transform
+
     def transform(labels, source):
-        return generic_transform(labels, source, record_class=record_class)
+        return transform_func(labels, source, record_class=record_class)
     return transform
