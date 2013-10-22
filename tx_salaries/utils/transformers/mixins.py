@@ -94,10 +94,12 @@ class OrganizationMixin(object):
     def organization(self):
         return {
             'name': self.ORGANIZATION_NAME,
-            'children': [{
-                'name': unicode(self.department),
-            }],
+            'children': self.department_as_child,
         }
+
+    @property
+    def department_as_child(self):
+        return [{'name': unicode(self.department), }, ]
 
 
 class PostMixin(object):
