@@ -1,5 +1,3 @@
-from copy import copy
-
 from . import base
 from . import mixins
 
