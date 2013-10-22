@@ -28,3 +28,7 @@ class Command(BaseCommand):
                 if verbosity >= 2:
                     sys.stdout.write('.')
                     sys.stdout.flush()
+
+            if verbosity >= 2:
+                sys.stdout.write('\n')
+                sys.stdout.flush()
