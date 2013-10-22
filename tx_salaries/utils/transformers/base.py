@@ -113,6 +113,31 @@ def generic_transform(labels, source, record_class):
     return data
 
 
+def generic_merge_cell_transform(labels, source, record_class):
+    """
+    General purpose transform function for data sources with merge-cells
+
+    Spreadsheets with merge cells, such as those provided by the Texas
+    Tech System, require that data from the previous row be merged into
+    the new row.  The CSV reader that we currently use can not handle
+    these rows, so we must do it ourselves.
+    """
+    data = []
+    last_row = None
+    for raw_row in source:
+        row = dict(zip(labels, raw_row))
+        if not raw_row[0].strip() and last_row:
+            for key, value in last_row.items():
+                if not row[key]:
+                    row[key] = last_row[key]
+
+        record = record_class(row)
+        if record.is_valid:
+            data.append(record.as_dict())
+        last_row = row
+    return data
+
+
 def transform_factory(record_class, transform_func=None):
     """
     Simple factory for building a generic transformmer

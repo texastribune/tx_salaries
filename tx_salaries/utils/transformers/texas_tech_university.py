@@ -57,26 +57,5 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         }
 
 
-def transform(labels, source):
-    """
-    Custom transform parser for Texas Tech Universities
-
-    Texas Tech Systems provide spreadsheets with merge cells in them.
-    This means that a row might not include all of the information
-    required to build a record.
-    """
-    data = []
-    counter = 0
-    last_row = None
-    for raw_row in source:
-        counter += 1
-        row = dict(zip(labels, raw_row))
-        if not raw_row[0].strip() and last_row:
-            for key, value in last_row.items():
-                if not row[key]:
-                    row[key] = last_row[key]
-
-        record = TransformedRecord(row)
-        data.append(record.as_dict())
-        last_row = row
-    return data
+transform = base.transform_factory(record_class=TransformedRecord,
+        transform_func=base.generic_merge_cell_transform)
