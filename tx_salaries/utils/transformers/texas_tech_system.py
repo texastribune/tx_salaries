@@ -24,11 +24,12 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     NAME_FIELDS = ('name', )
     ORGANIZATION_NAME = 'Texas Tech University{suffix}'
 
-    # The data we get for Texas Tech System is always valid
-    is_valid = True
-
     # All employees are full-time right now
     compensation_type = 'Full Time'
+
+    @property
+    def is_valid(self):
+        return bool(self.race.strip())
 
     @property
     def is_system(self):
