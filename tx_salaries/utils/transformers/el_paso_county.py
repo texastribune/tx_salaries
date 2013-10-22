@@ -30,7 +30,7 @@ def transform(labels, source):
 
         d['tx_people.Identifier'] = {
             'scheme': 'tx_salaries_hash',
-            'identifier': base.create_hash_for_row(row, exclude=['PAY RATE', ]),
+            'identifier': base.create_hash_for_record(row, exclude=['PAY RATE', ]),
         }
         name = cleaver.EmployeeNameCleaver(raw_name).parse()
         d['tx_people.Person'] = {
