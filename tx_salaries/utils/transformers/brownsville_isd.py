@@ -4,7 +4,8 @@ from . import mixins
 
 class TransformedRecord(mixins.GenericDepartmentMixin,
         mixins.GenericIdentifierMixin, mixins.GenericJobTitleMixin,
-        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+        mixins.GenericPersonMixin, mixins.MembershipMixin,
+        mixins.OrganizationMixin, mixins.PostMixin,
         base.BaseTransformedRecord):
     MAP = {
         'last_name': 'LAST NAME',
@@ -23,16 +24,6 @@ class TransformedRecord(mixins.GenericDepartmentMixin,
     @property
     def is_valid(self):
         return self.last_name.upper().strip() != 'EMPLOYEE COUNT:'
-
-    @property
-    def person(self):
-        name = self.get_name()
-        return {
-            'family_name': name.last,
-            'given_name': name.first,
-            'additional_name': name.middle,
-            'name': unicode(name),
-        }
 
     @property
     def compensations(self):

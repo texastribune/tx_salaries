@@ -69,6 +69,23 @@ class GenericIdentifierMixin(object):
         }
 
 
+class GenericPersonMixin(object):
+    """
+    Adds a generic ``person`` property that assumes only a simple name
+
+    """
+    @property
+    def person(self):
+        name = self.get_name()
+        return {
+            'family_name': name.last,
+            'given_name': name.first,
+            'additional_name': name.middle,
+            'name': unicode(name),
+        }
+
+
+
 class MembershipMixin(object):
     """
     Adds a generic ``membership`` property to the class
