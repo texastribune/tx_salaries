@@ -89,8 +89,8 @@ this::
             base.BaseTransformedRecord):
         MAP = {
             'last_name': 'LABEL FOR LAST NAME',
-            'first_name': 'LABEL FOR FIRST NAME'
-            'department': 'LABEL FOR DEPTARTMENT'
+            'first_name': 'LABEL FOR FIRST NAME',
+            'department': 'LABEL FOR DEPTARTMENT',
             'job_title': 'LABEL FOR JOB TITLE',
             'hire_date': 'LABEL FOR HIRE DATE',
             'status': 'LABEL FOR FT/PT STATUS',
