@@ -33,4 +33,11 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         else:
             return 'Part Time'
 
+    @property
+    def compensation(self):
+        raw = self.get_mapped_value('compensation')
+        # TODO: clean the raw variable
+        cleaned = raw
+        return cleaned
+
 transform = base.transform_factory(TransformedRecord)
