@@ -110,7 +110,7 @@ this::
         def compensation_type(self):
             if self.status.upper() == 'FT':
                 return 'Full Time'
-            else
+            else:
                 return 'Part Time'
 
 Each of the ``LABEL FOR XXX`` fields should be adjusted to match the
