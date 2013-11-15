@@ -34,6 +34,9 @@ setup(
     url='http://github.com/texastribune/tx_salaries/',
     packages=packages,
     package_data={'tx_salaries': data_files},
+    install_requires=[
+        'tx_people>=0.1.0',
+    ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
