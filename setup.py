@@ -35,7 +35,7 @@ setup(
     packages=packages,
     package_data={'tx_salaries': data_files},
     install_requires=[
-        'tx_people>=0.1.0',
+        'tx_people>=0.3.0',
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
