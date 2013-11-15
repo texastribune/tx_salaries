@@ -73,6 +73,7 @@ class GenericPersonMixin(object):
     """
     Adds a generic ``person`` property that assumes only a simple name
 
+    Note, this will add ``gender`` if that is a mapped value.
     """
     @property
     def person(self):
@@ -88,7 +89,6 @@ class GenericPersonMixin(object):
             r['gender'] = self.get_mapped_value('gender')
 
         return r
-
 
 
 class MembershipMixin(object):
