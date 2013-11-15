@@ -8,3 +8,4 @@ csvkit==0.6.1
 name-cleaver==0.5.2
 detox>=0.9.3
 tx-people==0.2.0
+South>=0.8.3

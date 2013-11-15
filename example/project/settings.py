@@ -123,6 +123,7 @@ INSTALLED_APPS = (
 
     # Third-party dependencies
     'tx_people',
+    'south',  # Required for migrations
 
     # Custom application being tested
     'tx_salaries',
