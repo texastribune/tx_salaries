@@ -15,6 +15,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'job_title': 'Emp Type Code',
         'hire_date': 'Hire Date',
         'compensation': 'Actual Calc Contract Pay',
+        'gender': 'Gender',
     }
 
     NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
@@ -28,16 +29,11 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     @property
     def compensation_type(self):
-        if self.status.upper() == 'FT':
-            return 'Full Time'
-        else:
-            return 'Part Time'
+        return 'Full Time'
 
     @property
     def compensation(self):
         raw = self.get_mapped_value('compensation')
-        # TODO: clean the raw variable
-        cleaned = raw
-        return cleaned
+        return raw.strip(' $').replace(',', '')
 
 transform = base.transform_factory(TransformedRecord)
