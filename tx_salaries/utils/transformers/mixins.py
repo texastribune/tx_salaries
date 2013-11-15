@@ -77,12 +77,17 @@ class GenericPersonMixin(object):
     @property
     def person(self):
         name = self.get_name()
-        return {
+        r = {
             'family_name': name.last,
             'given_name': name.first,
             'additional_name': name.middle,
             'name': unicode(name),
         }
+
+        if self.is_mapped_value('gender'):
+            r['gender'] = self.get_mapped_value('gender')
+
+        return r
 
 
 
