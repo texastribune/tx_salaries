@@ -1,7 +1,7 @@
 from django.db import models
 from tx_people import fields
 from tx_people import mixins
-from tx_people.models import Membership
+from tx_people.models import Membership, Post
 
 
 class CompensationType(models.Model):
@@ -52,3 +52,21 @@ class Employee(mixins.TimeTrackingMixin, mixins.ReducedDateStartAndEndMixin,
     def __unicode__(self):
         return u'{title}, {person}'.format(title=self.position.post,
                 person=self.position.person)
+
+    def save(self, denormalize=True, *args, **kwargs):
+        obj = super(Employee, self).save(*args, **kwargs)
+        if denormalize:
+            position_cohort = Employee.objects.filter(
+                    position__organization=self.position.organization)
+            stats, created = PositionStats.objects.get_or_create(
+                    position=self.position.post)
+            stats.highest_paid = position_cohort.order_by('-compensation')[0]
+            stats.lowest_paid = position_cohort.order_by('compensation')[0]
+            stats.save()
+        return obj
+
+
+class PositionStats(models.Model):
+    position = models.ForeignKey(Post, related_name='stats')
+    highest_paid = models.ForeignKey(Employee, related_name='stats_highest', null=True)
+    lowest_paid = models.ForeignKey(Employee, related_name='stats_lowest', null=True)
