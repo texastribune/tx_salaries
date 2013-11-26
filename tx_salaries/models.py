@@ -3,6 +3,8 @@ from tx_people import fields
 from tx_people import mixins
 from tx_people.models import Membership, Post
 
+from . import managers
+
 
 class CompensationType(models.Model):
     name = models.CharField(max_length=250)
@@ -55,18 +57,31 @@ class Employee(mixins.TimeTrackingMixin, mixins.ReducedDateStartAndEndMixin,
 
     def save(self, denormalize=True, *args, **kwargs):
         obj = super(Employee, self).save(*args, **kwargs)
+        # TODO: Abstract into a general library
         if denormalize:
-            position_cohort = Employee.objects.filter(
-                    position__organization=self.position.organization)
-            stats, created = PositionStats.objects.get_or_create(
-                    position=self.position.post)
-            stats.highest_paid = position_cohort.order_by('-compensation')[0]
-            stats.lowest_paid = position_cohort.order_by('compensation')[0]
-            stats.save()
+            for a in self._meta.get_all_related_objects():
+                if hasattr(a.model.objects, 'denormalize'):
+                    a.model.objects.denormalize(self)
         return obj
 
 
-class PositionStats(models.Model):
+def create_highest_lowest_mixin(prefix):
+    def generate_kwargs(field):
+        return {
+            'related_name': '{0}_stats_{1}'.format(prefix, field),
+            'null': True,
+            'blank': True,
+        }
+
+    class HighestLowestMixin(models.Model):
+        highest_paid = models.ForeignKey('Employee', **generate_kwargs('highest'))
+        lowest_paid = models.ForeignKey('Employee', **generate_kwargs('lowest'))
+
+        class Meta:
+            abstract = True
+
+
+class PositionStats(create_highest_lowest_mixin('position'), models.Model):
     position = models.ForeignKey(Post, related_name='stats')
-    highest_paid = models.ForeignKey(Employee, related_name='stats_highest', null=True)
-    lowest_paid = models.ForeignKey(Employee, related_name='stats_lowest', null=True)
+
+    objects = managers.PositionStatsManager()
