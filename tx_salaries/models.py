@@ -1,9 +1,9 @@
 from django.db import models
 from tx_people import fields
-from tx_people import mixins
 from tx_people.models import Membership, Post
 
 from . import managers
+from . import mixins
 
 
 class CompensationType(models.Model):
@@ -16,8 +16,8 @@ class CompensationType(models.Model):
         return self.name
 
 
-class Employee(mixins.TimeTrackingMixin, mixins.ReducedDateStartAndEndMixin,
-        models.Model):
+class Employee(mixins.DenormalizeOnSaveMixin, mixins.TimeTrackingMixin,
+        mixins.ReducedDateStartAndEndMixin, models.Model):
     """
     # TODO
 
@@ -55,15 +55,6 @@ class Employee(mixins.TimeTrackingMixin, mixins.ReducedDateStartAndEndMixin,
         return u'{title}, {person}'.format(title=self.position.post,
                 person=self.position.person)
 
-    def save(self, denormalize=True, *args, **kwargs):
-        obj = super(Employee, self).save(*args, **kwargs)
-        # TODO: Abstract into a general library
-        if denormalize:
-            for a in self._meta.get_all_related_objects():
-                if hasattr(a.model.objects, 'denormalize'):
-                    a.model.objects.denormalize(self)
-        return obj
-
 
 def create_highest_lowest_mixin(prefix):
     def generate_kwargs(field):
@@ -79,6 +70,8 @@ def create_highest_lowest_mixin(prefix):
 
         class Meta:
             abstract = True
+
+    return HighestLowestMixin
 
 
 class PositionStats(create_highest_lowest_mixin('position'), models.Model):
