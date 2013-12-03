@@ -1,6 +1,6 @@
 from django.db import models
 from tx_people import fields
-from tx_people.models import Membership, Post
+from tx_people.models import Membership, Organization, Post
 
 from . import managers
 from . import mixins
@@ -78,3 +78,10 @@ class PositionStats(create_highest_lowest_mixin('position'), models.Model):
     position = models.ForeignKey(Post, related_name='stats')
 
     objects = managers.PositionStatsManager()
+
+
+class OrganizationStats(create_highest_lowest_mixin('organization'),
+        models.Model):
+    organization = models.ForeignKey(Organization, related_name='stats')
+
+    objects = managers.OrganizationStatsManager()
