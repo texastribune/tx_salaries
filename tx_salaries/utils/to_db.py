@@ -25,6 +25,7 @@ def save(data):
         department, _ = tx_people.Organization.objects.get_or_create(
                 parent=source_department, **child)
 
+    # TODO: Remove post entirely
     post, _ = tx_people.Post.objects.get_or_create(organization=department,
             **data['tx_people.Post'])
 
