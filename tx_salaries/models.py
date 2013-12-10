@@ -6,6 +6,24 @@ from . import managers
 from . import mixins
 
 
+def get_top_level_departments():
+    """
+    Utility function for getting top-level organizations
+
+    This is a helper for querying the tx_people.Organization model.  It
+    simply looks for all top-level organizations that have at least one
+    employee associated with one of their children.  Once the queryset
+    is retrieved, you can continue filtering, ordering, and so as you
+    please.
+
+    Note: This only works for the current situation of non-nested
+    departments.
+    """
+    return (Organization.objects
+            .filter(parent=None)
+            .exclude(children__members__employee=None))
+
+
 class CompensationType(models.Model):
     name = models.CharField(max_length=250)
     description = models.TextField()
