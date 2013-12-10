@@ -34,6 +34,22 @@ class CompensationType(models.Model):
         return self.name
 
 
+class EmployeeTitle(models.Model):
+    """
+    Provides a unique title that there will only be one of.
+
+    Unlike the tx_people `Membership` and `Post` models, this model is
+    completely independent of any organization.  This allows comparison
+    between and Associate Professor at El Paso Community College and
+    Collin College without having to do aggregate queries across their
+    respective memberships or posts.
+    """
+    name = models.CharField(max_length=250)
+
+    def __unicode__(self):
+        return self.name
+
+
 class Employee(mixins.DenormalizeOnSaveMixin, mixins.TimeTrackingMixin,
         mixins.ReducedDateStartAndEndMixin, models.Model):
     """
@@ -65,6 +81,7 @@ class Employee(mixins.DenormalizeOnSaveMixin, mixins.TimeTrackingMixin,
         appropriate ``CompensationType``.
     """
     position = models.ForeignKey(Membership)
+    title = models.ForeignKey(EmployeeTitle, related_name='employees')
     hire_date = fields.ReducedDateField()
     compensation = models.DecimalField(decimal_places=4, max_digits=12)
     compensation_type = models.ForeignKey(CompensationType)
