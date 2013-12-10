@@ -9,7 +9,7 @@ class DenormalizeManagerMixin(object):
         stats.save()
 
 
-class OrganizationStatsManager(models.Manager):
+class OrganizationStatsManager(DenormalizeManagerMixin, models.Manager):
     use_for_related_manager = True
 
     def denormalize(self, obj):
@@ -25,19 +25,16 @@ class OrganizationStatsManager(models.Manager):
             organization = organization.parent
 
         if use_children:
-            kwargs = {
-                'parent': None,
-                'children__members__employee': obj,
-            }
+            kwargs = {'position__organization__parent': organization, }
         else:
-            kwargs = {'members__employee': obj, }
+            kwargs = {'position__organization': organization, }
 
         cohort = Employee.objects.filter(**kwargs)
 
         self.update_cohort(cohort, organization=organization)
 
 
-class PositionStatsManager(models.Manager):
+class PositionStatsManager(DenormalizeManagerMixin, models.Manager):
     use_for_related_manager = True
 
     def denormalize(self, obj):
