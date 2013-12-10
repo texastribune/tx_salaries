@@ -24,18 +24,6 @@ def get_top_level_departments():
             .exclude(children__members__employee=None))
 
 
-def get_top_level_departments_with_stats():
-    """
-    Get top-level organizations with annotated stats
-
-    This is a convenience function that adds stats to the returned
-    ``get_top_level_departments`` QuerySet.
-    """
-    number_of_employees = models.Count('children__members__employee')
-    return (get_top_level_departments()
-            .annotate(number_of_employees=number_of_employees))
-
-
 class CompensationType(models.Model):
     name = models.CharField(max_length=250)
     description = models.TextField()
