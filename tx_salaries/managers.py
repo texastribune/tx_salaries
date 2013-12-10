@@ -6,6 +6,7 @@ class DenormalizeManagerMixin(object):
         stats, created = self.get_or_create(**kwargs)
         stats.highest_paid = cohort.order_by('-compensation')[0]
         stats.lowest_paid = cohort.order_by('compensation')[0]
+        stats.total_number = cohort.count()
         stats.save()
 
 

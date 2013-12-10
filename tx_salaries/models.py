@@ -97,6 +97,7 @@ def create_stats_mixin(prefix):
     class StatisticsMixin(models.Model):
         highest_paid = models.ForeignKey('Employee', **generate_kwargs('highest'))
         lowest_paid = models.ForeignKey('Employee', **generate_kwargs('lowest'))
+        total_number = models.PositiveIntegerField(default=0)
 
         class Meta:
             abstract = True
