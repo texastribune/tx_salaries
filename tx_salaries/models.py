@@ -86,7 +86,7 @@ class Employee(mixins.DenormalizeOnSaveMixin, mixins.TimeTrackingMixin,
                 person=self.position.person)
 
 
-def create_highest_lowest_mixin(prefix):
+def create_stats_mixin(prefix):
     def generate_kwargs(field):
         return {
             'related_name': '{0}_stats_{1}'.format(prefix, field),
@@ -94,23 +94,23 @@ def create_highest_lowest_mixin(prefix):
             'blank': True,
         }
 
-    class HighestLowestMixin(models.Model):
+    class StatisticsMixin(models.Model):
         highest_paid = models.ForeignKey('Employee', **generate_kwargs('highest'))
         lowest_paid = models.ForeignKey('Employee', **generate_kwargs('lowest'))
 
         class Meta:
             abstract = True
 
-    return HighestLowestMixin
+    return StatisticsMixin
 
 
-class PositionStats(create_highest_lowest_mixin('position'), models.Model):
+class PositionStats(create_stats_mixin('position'), models.Model):
     position = models.ForeignKey(Post, related_name='stats')
 
     objects = managers.PositionStatsManager()
 
 
-class OrganizationStats(create_highest_lowest_mixin('organization'),
+class OrganizationStats(create_stats_mixin('organization'),
         models.Model):
     organization = models.ForeignKey(Organization, related_name='stats')
 
