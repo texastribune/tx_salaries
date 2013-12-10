@@ -106,13 +106,13 @@ def create_stats_mixin(prefix):
 
 
 class PositionStats(create_stats_mixin('position'), models.Model):
-    position = models.ForeignKey(Post, related_name='stats')
+    position = models.OneToOneField(Post, related_name='stats')
 
     objects = managers.PositionStatsManager()
 
 
 class OrganizationStats(create_stats_mixin('organization'),
         models.Model):
-    organization = models.ForeignKey(Organization, related_name='stats')
+    organization = models.OneToOneField(Organization, related_name='stats')
 
     objects = managers.OrganizationStatsManager()
