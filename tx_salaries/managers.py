@@ -41,5 +41,6 @@ class PositionStatsManager(DenormalizeManagerMixin, models.Manager):
     def denormalize(self, obj):
         Employee = obj._meta.concrete_model
         position_cohort = Employee.objects.filter(
-                position__organization=obj.position.organization)
+                position__organization=obj.position.organization,
+                position__post=obj.position.post)
         self.update_cohort(position_cohort, position=obj.position.post)
