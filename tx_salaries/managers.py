@@ -4,7 +4,9 @@ from django.db import models
 class DenormalizeManagerMixin(object):
     def update_cohort(self, cohort, **kwargs):
         stats, created = self.get_or_create(**kwargs)
+        total_in_cohort = cohort.count()
         stats.highest_paid = cohort.order_by('-compensation')[0]
+        stats.median_paid = cohort.order_by('-compensation')[(total_in_cohort - 1) / 2]
         stats.lowest_paid = cohort.order_by('compensation')[0]
         stats.total_number = cohort.count()
         stats.save()
