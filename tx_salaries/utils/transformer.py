@@ -11,10 +11,13 @@ from .transformers import TRANSFORMERS
 def convert_to_csv_reader(filename, sheet=None):
     format = convert.guess_format(filename)
     f = open(filename, "rb")
-    if sheet is None:
-        converted = StringIO(convert.convert(f, format))
-    else:
-        converted = StringIO(convert.convert(f, format, sheet=sheet))
+    convert_kwargs = {}
+    if sheet is not None:
+        # Only pass `sheet` to the `convert` function when its set to
+        # a non-None value.  This is done to satisfy csvkit which checks
+        # for the presence of `sheet`, not whether it's valid.
+        convert_kwargs['sheet'] = sheet
+    converted = StringIO(convert.convert(f, format, **convert_kwargs))
     reader = UnicodeCSVReader(converted)
     return reader
 
