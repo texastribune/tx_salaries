@@ -1,10 +1,10 @@
 PIL==1.1.7
 django-appconf==0.6
-Django>=1.4.2
 dj-database-url==0.2.1
 dj-settings-helpers==1.0.0
 mock>=1.0.1
 csvkit==0.6.1
 name-cleaver==0.5.2
 detox>=0.9.3
-tx-people==0.2.0
+tx-people>=0.3.0
+South>=0.8.3

@@ -7,6 +7,11 @@ from os.path import basename
 from ...utils import to_db, transformer
 
 
+def out(s):
+    sys.stdout.write(s)
+    sys.stdout.flush()
+
+
 # TODO: Display help if unable to transform a file
 # TODO: Switch to logging rather than direct output
 class Command(BaseCommand):
@@ -31,9 +36,7 @@ class Command(BaseCommand):
         for record in records:
             to_db.save(record)
             if verbosity >= 2:
-                sys.stdout.write('.')
-                sys.stdout.flush()
+                out('.')
 
         if verbosity >= 2:
-            sys.stdout.write('\n')
-            sys.stdout.flush()
+            out('\n')
