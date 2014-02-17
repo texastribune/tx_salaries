@@ -17,7 +17,7 @@ class Migration(SchemaMigration):
 
         # Adding field 'Employee.title'
         db.add_column(u'tx_salaries_employee', 'title',
-                      self.gf('django.db.models.fields.related.ForeignKey')(default=None, related_name='employees', to=orm['tx_salaries.EmployeeTitle']),
+                      self.gf('django.db.models.fields.related.ForeignKey')(default=None, null=True, related_name='employees', to=orm['tx_salaries.EmployeeTitle']),
                       keep_default=False)
 
 
