@@ -24,6 +24,9 @@ class GenericCompensationMixin(object):
                 'tx_salaries.CompensationType': {
                     'name': self.compensation_type,
                 },
+                'tx_salaries.EmployeeTitle': {
+                    'name': self.job_title,
+                },
                 'tx_salaries.Employee': {
                     'hire_date': self.hire_date,
                     'compensation': self.compensation,
