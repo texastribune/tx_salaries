@@ -1,7 +1,27 @@
 from django.db import models
 from tx_people import fields
-from tx_people import mixins
-from tx_people.models import Membership
+from tx_people.models import Membership, Organization, Post
+
+from . import managers
+from . import mixins
+
+
+def get_top_level_departments():
+    """
+    Utility function for getting top-level organizations
+
+    This is a helper for querying the tx_people.Organization model.  It
+    simply looks for all top-level organizations that have at least one
+    employee associated with one of their children.  Once the queryset
+    is retrieved, you can continue filtering, ordering, and so as you
+    please.
+
+    Note: This only works for the current situation of non-nested
+    departments.
+    """
+    return (Organization.objects.select_related('stats')
+            .filter(parent=None)
+            .exclude(children__members__employee=None))
 
 
 class CompensationType(models.Model):
@@ -14,8 +34,24 @@ class CompensationType(models.Model):
         return self.name
 
 
-class Employee(mixins.TimeTrackingMixin, mixins.ReducedDateStartAndEndMixin,
-        models.Model):
+class EmployeeTitle(models.Model):
+    """
+    Provides a unique title that there will only be one of.
+
+    Unlike the tx_people `Membership` and `Post` models, this model is
+    completely independent of any organization.  This allows comparison
+    between and Associate Professor at El Paso Community College and
+    Collin College without having to do aggregate queries across their
+    respective memberships or posts.
+    """
+    name = models.CharField(max_length=250)
+
+    def __unicode__(self):
+        return self.name
+
+
+class Employee(mixins.DenormalizeOnSaveMixin, mixins.TimeTrackingMixin,
+        mixins.ReducedDateStartAndEndMixin, models.Model):
     """
     # TODO
 
@@ -45,6 +81,7 @@ class Employee(mixins.TimeTrackingMixin, mixins.ReducedDateStartAndEndMixin,
         appropriate ``CompensationType``.
     """
     position = models.ForeignKey(Membership)
+    title = models.ForeignKey(EmployeeTitle, related_name='employees', null=True)
     hire_date = fields.ReducedDateField()
     compensation = models.DecimalField(decimal_places=4, max_digits=12)
     compensation_type = models.ForeignKey(CompensationType)
@@ -52,3 +89,42 @@ class Employee(mixins.TimeTrackingMixin, mixins.ReducedDateStartAndEndMixin,
     def __unicode__(self):
         return u'{title}, {person}'.format(title=self.position.post,
                 person=self.position.person)
+
+
+def create_stats_mixin(prefix):
+    def generate_kwargs(field):
+        return {
+            'related_name': '{0}_stats_{1}'.format(prefix, field),
+            'null': True,
+            'blank': True,
+        }
+
+    class StatisticsMixin(models.Model):
+        highest_paid = models.ForeignKey('Employee', **generate_kwargs('highest'))
+        median_paid = models.ForeignKey('Employee', **generate_kwargs('median'))
+        lowest_paid = models.ForeignKey('Employee', **generate_kwargs('lowest'))
+        total_number = models.PositiveIntegerField(default=0)
+
+        class Meta:
+            abstract = True
+
+    return StatisticsMixin
+
+
+class EmployeeTitleStats(create_stats_mixin('title'), models.Model):
+    title = models.OneToOneField(EmployeeTitle, related_name='stats')
+
+    objects = managers.EmployeeTitleStatsManager()
+
+
+class PositionStats(create_stats_mixin('position'), models.Model):
+    position = models.OneToOneField(Post, related_name='stats')
+
+    objects = managers.PositionStatsManager()
+
+
+class OrganizationStats(create_stats_mixin('organization'),
+        models.Model):
+    organization = models.OneToOneField(Organization, related_name='stats')
+
+    objects = managers.OrganizationStatsManager()
