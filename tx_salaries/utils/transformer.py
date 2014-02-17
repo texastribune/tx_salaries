@@ -8,7 +8,7 @@ from django.core import exceptions
 from .transformers import TRANSFORMERS
 
 
-def convert_to_csv_reader(filename, sheet):
+def convert_to_csv_reader(filename, sheet=None):
     format = convert.guess_format(filename)
     f = open(filename, "rb")
     if sheet is None:
@@ -19,7 +19,7 @@ def convert_to_csv_reader(filename, sheet):
     return reader
 
 
-def transform(filename, sheet):
+def transform(filename, sheet=None):
     reader = convert_to_csv_reader(filename, sheet=sheet)
     labels = reader.next()
     transformers = get_transformers(labels)
