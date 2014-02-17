@@ -58,7 +58,7 @@ transform it.
 
 To generate a key, run the following command on your spreadsheet::
 
-    python manage generate_transformer_hash /path/to/rio_grande_county.xls
+    python manage generate_transformer_hash --file=/path/to/rio_grande_county.xls --sheet="sheet name"
 
 The output should be a 40 character string.  Copy that value and open the
 ``tx_salaries/utils/transformers/__init__.py`` file which contains all of the
@@ -131,7 +131,7 @@ that you just created.  Now you're ready to run the importer.
 
 Back on the command line, run this::
 
-    python manage import_salary_data /path/to/rio_grande_county.xls
+    python manage import_salary_data --file=/path/to/rio_grande_county.xls --sheet="sheet name"
 
 Pay attention to any error messages you receive and make the appropriate
 adjustments.  Congratulations!  You just completed your first salary

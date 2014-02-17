@@ -8,16 +8,19 @@ from django.core import exceptions
 from .transformers import TRANSFORMERS
 
 
-def convert_to_csv_reader(filename):
+def convert_to_csv_reader(filename, sheet):
     format = convert.guess_format(filename)
     f = open(filename, "rb")
-    converted = StringIO(convert.convert(f, format))
+    if sheet is None:
+        converted = StringIO(convert.convert(f, format))
+    else:
+        converted = StringIO(convert.convert(f, format, sheet=sheet))
     reader = UnicodeCSVReader(converted)
     return reader
 
 
-def transform(filename):
-    reader = convert_to_csv_reader(filename)
+def transform(filename, sheet):
+    reader = convert_to_csv_reader(filename, sheet=sheet)
     labels = reader.next()
     transformers = get_transformers(labels)
 
