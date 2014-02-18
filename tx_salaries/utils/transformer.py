@@ -19,8 +19,10 @@ def convert_to_csv_reader(filename, sheet):
     return reader
 
 
-def transform(filename, sheet):
+def transform(filename, sheet, label_row):
     reader = convert_to_csv_reader(filename, sheet=sheet)
+    for i in range(1, int(label_row)):
+        reader.next()
     labels = reader.next()
     transformers = get_transformers(labels)
 
