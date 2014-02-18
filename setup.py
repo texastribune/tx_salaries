@@ -27,7 +27,7 @@ for dirpath, dirnames, filenames in os.walk('tx_salaries'):
 
 setup(
     name='tx_salaries',
-    version='0.1.0',
+    version='0.3alpha.0',
     description='Texas Tribune: tx_salaries',
     author='Tribune Tech',
     author_email='tech@texastribune.org',
@@ -35,7 +35,8 @@ setup(
     packages=packages,
     package_data={'tx_salaries': data_files},
     install_requires=[
-        'tx_people>=0.1.0',
+        'name_cleaver==0.6.0',
+        'tx_people>=0.3.0',
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',

@@ -7,6 +7,11 @@ from os.path import basename
 from ...utils import to_db, transformer
 
 
+def out(s):
+    sys.stdout.write(s)
+    sys.stdout.flush()
+
+
 # TODO: Display help if unable to transform a file
 # TODO: Switch to logging rather than direct output
 class Command(BaseCommand):
@@ -33,13 +38,11 @@ class Command(BaseCommand):
                 to_db.save(record)
                 records_remaining -= 1
                 if kwargs['verbosity'] == 1:
-                    sys.stdout.write('.')
-                    sys.stdout.flush()
+                    out('.')
                 elif kwargs['verbosity'] == 2 and records_remaining % 100 == 0:
                     print "%s records remaining" % records_remaining
                 elif kwargs['verbosity'] >= 3 and records_remaining % 500 == 0:
                     print "%s records remaining" % records_remaining
 
             if kwargs['verbosity'] == 1:
-                sys.stdout.write('\n')
-                sys.stdout.flush()
+                out('\n')
