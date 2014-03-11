@@ -14,7 +14,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'department': 'Department',
         'job_title': 'Emp Type Code',
         'hire_date': 'Hire Date',
-        'compensation': 'Actual Calc Contract Pay',
+        'compensation': 'Actual Calc\' Contract Pay',
         'gender': 'Gender',
     }
 
