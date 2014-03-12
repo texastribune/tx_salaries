@@ -6,7 +6,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
         mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-        base.BaseTransformedRecord):
+        mixins.RaceMixin, base.BaseTransformedRecord):
     MAP = {
         'last_name': 'Last Name',
         'first_name': 'First Name',

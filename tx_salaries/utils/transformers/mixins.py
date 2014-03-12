@@ -101,7 +101,7 @@ class RaceMixin(object):
     Requires a ``race`` property to be available.
     """
     @property
-    def race(self):
+    def given_race(self):
         return {
             'name': self.race
         }
