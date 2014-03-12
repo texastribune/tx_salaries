@@ -15,13 +15,15 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'hire_date': 'Hire Date',
         'status': 'LABEL FOR FT/PT STATUS',
         'compensation': 'Annualized',
+        'race': 'Race',
+        'gender': 'Gender'
     }
 
     NAME_FIELDS = ('first_name', 'last_name', )
 
     ORGANIZATION_NAME = 'University of Texas at Brownsville'
 
-    # All employees are full-time right now
+    # TODO not given on spreadsheet, but they appear to give part time
     compensation_type = 'Full Time'
 
     @property

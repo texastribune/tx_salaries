@@ -13,6 +13,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'department': 'Department',
         'job_title': 'Job Description',
         'hire_date': 'Start Date',
+        'race': 'Ethnic Group',
+        'gender': 'Sex',
         'status': 'LABEL FOR FT/PT STATUS',
         'compensation': 'Annual Rate if Applicable',
         'hourly': 'Hourly Rate if Applicable'

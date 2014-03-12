@@ -12,15 +12,19 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'first_name': 'NAME FIRST',
         'department': 'DEPARTMENT TITLE',
         'job_title': 'JOB TITLE',
+        'race': 'ETHNICITY',
+        'gender': 'GENDER',
         'hire_date': 'CONTINUOUS EMPLOYMENT DATE',
         'compensation': 'FY ALLOCATIONS',
     }
 
     NAME_FIELDS = ('first_name', 'last_name', )
 
+    gender_map = {'FEMALE': 'F', 'MALE': 'M'}
+
     ORGANIZATION_NAME = 'University of Texas at Arlington'
 
-    # All employees are full-time right now
+    # TODO not given on spreadsheet, but they appear to give part time. 14 people earn < 4000
     compensation_type = 'Full Time'
 
     @property
@@ -28,5 +32,44 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         # Adjust to return False on invalid fields.  For example:
         return self.last_name.strip() != ''
 
+    @property
+    def person(self):
+        data = {
+            'family_name': self.last_name,
+            'given_name': self.first_name,
+            'name': self.get_raw_name(),
+        }
+        try:
+            data.update({
+                'gender': self.gender_map[self.gender.strip()]
+            })
+            return data
+        except KeyError:
+            return data
+
+    def process_hire_date(self, hire_date):
+        # TODO five people don't have hire dates given
+        year = hire_date[0:4]
+        month = hire_date[4:6]
+        day = hire_date[6:8]
+        return "-".join([year, month, day])
+
+    @property
+    def compensations(self):
+        hire_date = self.process_hire_date(self.hire_date)
+        return [
+            {
+                'tx_salaries.CompensationType': {
+                    'name': self.compensation_type,
+                },
+                'tx_salaries.Employee': {
+                    'hire_date': hire_date,
+                    'compensation': self.compensation,
+                },
+                'tx_salaries.EmployeeTitle': {
+                    'name': self.job_title,
+                },
+            }
+        ]
 
 transform = base.transform_factory(TransformedRecord)

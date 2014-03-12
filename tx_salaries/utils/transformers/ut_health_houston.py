@@ -12,6 +12,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'first_name': 'First Name',
         'department': 'Dept',
         'job_title': 'Job Title',
+        'gender': 'Sex',
+        'race': 'Ethnic Grp',
         'hire_date': 'Current Hire Date',
         'compensation': 'Total Comp Rate',
     }
@@ -20,7 +22,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_NAME = 'The University of Texas Health Science Center at Houston'
 
-    # All employees are full-time right now
+    # TODO not given on spreadsheet, but they appear to give part time
     compensation_type = 'Full Time'
 
     @property

@@ -13,16 +13,16 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'department': 'Dept',
         'job_title': 'Job Title',
         'hire_date': 'Rehire Dt',
+        'gender': 'Sex',
+        'race': 'Ethnic Grp',
         'status': 'LABEL FOR FT/PT STATUS',
         'compensation': 'Annual Rt',
+        'FTE': 'FTE'
     }
 
     NAME_FIELDS = ('first_name', 'last_name', )
 
     ORGANIZATION_NAME = 'University of Texas Health Science Center at Tyler'
-
-    # All employees are full-time right now
-    compensation_type = 'Full Time'
 
     @property
     def is_valid(self):
@@ -33,6 +33,14 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             return self.hire_date.strip() != ''
         except AttributeError:
             return False
+
+    @property
+    def compensation_type(self):
+        if self.FTE.strip() == "1.0":
+            return 'Full Time'
+        else:
+            return 'Part Time'
+        # TODO ask about FTE, FTSA and Annual Rt
 
 
 transform = base.transform_factory(TransformedRecord)
