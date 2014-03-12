@@ -94,6 +94,19 @@ class GenericPersonMixin(object):
         return r
 
 
+class RaceMixin(object):
+    """
+    Adds a generic ``race`` property that assumes only a simple race name
+
+    Requires a ``race`` property to be available.
+    """
+    @property
+    def race(self):
+        return {
+            'name': self.race
+        }
+
+
 class MembershipMixin(object):
     """
     Adds a generic ``membership`` property to the class

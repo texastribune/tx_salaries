@@ -7,7 +7,8 @@ def save(data):
     # TODO: Save source data
     identifier, id_created = tx_people.Identifier.objects.get_or_create(
             **data['tx_people.Identifier'])
-    race, race_created = tx_people.Race.objects.get_or_create(name=data['tx_people.Race'])
+
+    race, _ = tx_people.Race.objects.get_or_create(**data['tx_people.Race'])
 
     if id_created:
         person = tx_people.Person.objects.create(**data['tx_people.Person'])
