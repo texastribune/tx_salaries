@@ -19,6 +19,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_NAME = 'The University of Texas-Pan American'
 
+    ORGANIZATION_CLASSIFICATION = 'University'
+
     # TODO not given on spreadsheet
     compensation_type = 'Full Time'
 

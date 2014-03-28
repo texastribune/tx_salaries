@@ -24,6 +24,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_NAME = 'The University of Texas at Tyler'
 
+    ORGANIZATION_CLASSIFICATION = 'University'
+
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:

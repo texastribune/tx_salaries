@@ -24,6 +24,9 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_NAME = 'University of Texas Health Science Center at Tyler'
 
+    # TODO current app uses University Hospital
+    ORGANIZATION_CLASSIFICATION = 'University Hospital'
+
     @property
     def is_valid(self):
         # be sure to use --sheet="sheet1"

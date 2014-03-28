@@ -26,6 +26,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_NAME = 'University of Texas at El Paso'
 
+    ORGANIZATION_CLASSIFICATION = 'University'
+
     # TODO not given on spreadsheet, 40 earn < 4000
     compensation_type = 'Full Time'
 

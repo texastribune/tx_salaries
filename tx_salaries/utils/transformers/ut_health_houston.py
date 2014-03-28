@@ -22,6 +22,9 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_NAME = 'The University of Texas Health Science Center at Houston'
 
+    # TODO current app uses University Hospital
+    ORGANIZATION_CLASSIFICATION = 'University Hospital'
+
     # TODO not given on spreadsheet, but they appear to give part time
     compensation_type = 'Full Time'
 

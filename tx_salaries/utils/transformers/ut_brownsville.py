@@ -23,6 +23,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_NAME = 'University of Texas at Brownsville'
 
+    ORGANIZATION_CLASSIFICATION = 'University'
+
     # TODO not given on spreadsheet, but they appear to give part time
     compensation_type = 'Full Time'
 

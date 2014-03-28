@@ -25,8 +25,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_NAME = 'The University of Texas Health Science Center at San Antonio'
 
-    # NEED EDITORIAL INPUT
-    # compensation_type = 'Full Time'
+    # TODO current app uses University Hospital
+    ORGANIZATION_CLASSIFICATION = 'University Hospital'
 
     @property
     def is_valid(self):

@@ -23,6 +23,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_NAME = 'University of Texas at Austin'
 
+    ORGANIZATION_CLASSIFICATION = 'University'
+
     # TODO not given, 29 < 4000
     compensation_type = 'Full Time'
 

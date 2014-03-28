@@ -24,6 +24,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_NAME = 'University of Texas at Arlington'
 
+    ORGANIZATION_CLASSIFICATION = 'University'
+
     # TODO not given on spreadsheet, but they appear to give part time. 14 people earn < 4000
     compensation_type = 'Full Time'
 

@@ -25,6 +25,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_NAME = 'University of Texas System Administration'
 
+    ORGANIZATION_CLASSIFICATION = 'University'
+
     # All employees are full-time right now
     compensation_type = 'Full Time'
 
