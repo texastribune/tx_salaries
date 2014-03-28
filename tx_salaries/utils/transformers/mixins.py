@@ -103,7 +103,7 @@ class RaceMixin(object):
     @property
     def given_race(self):
         return {
-            'name': self.race
+            'name': self.get_mapped_value('race')
         }
 
 
@@ -124,14 +124,15 @@ class OrganizationMixin(object):
     """
     Adds a generic ``organization`` property to the class
 
-    This requires that the class mixing it in adds an
-    ``ORGANIZATION_NAME`` property of the main level agency or
-    department and needs a ``department`` property.
+    This requires that the class mixing it in adds ``ORGANIZATION_NAME``
+    and ``CLASSICATION_TYPE`` properties of the main level agency or
+    department and needs a``department`` property.
     """
     @property
     def organization(self):
         return {
             'name': self.ORGANIZATION_NAME,
+            'classification': self.ORGANIZATION_CLASSIFICATION,
             'children': self.department_as_child,
         }
 
