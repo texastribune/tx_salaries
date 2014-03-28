@@ -16,7 +16,6 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'race': 'RACE/ETHNICITY',
         'hire_date': 'LAST_HIRE_DT',
         'compensation': 'ANNUAL_PAY',
-        #TODO ask what this is, include in compensation
         'longevity': 'ANNUALIZED_LONGEVITY'
     }
 
@@ -48,6 +47,33 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             return data
         except KeyError:
             return data
+
+    def process_compensation(self):
+        #TODO longevity is in addition to base annual_pay, add if applicable
+        if self.longevity.strip() == '0':
+            return self.compensation
+        else:
+            longevity = self.longevity.strip().replace(',', '')
+            salary = self.compensation.strip().replace(',', '')
+            return float(salary) + float(longevity)
+
+    @property
+    def compensations(self):
+        compensation = self.process_compensation()
+        return [
+            {
+                'tx_salaries.CompensationType': {
+                    'name': self.compensation_type,
+                },
+                'tx_salaries.Employee': {
+                    'hire_date': self.hire_date,
+                    'compensation': compensation,
+                },
+                'tx_salaries.EmployeeTitle': {
+                    'name': self.job_title,
+                },
+            }
+        ]
 
 
 transform = base.transform_factory(TransformedRecord)
