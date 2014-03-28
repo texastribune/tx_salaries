@@ -34,6 +34,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         if self.compensation.strip() != '':
             return 'Full Time'
         else:
+            # TODO need hours worked
             return 'Part Time'
 
     @property

@@ -13,7 +13,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'department': 'Department',
         'job_title': 'Title',
         'hire_date': 'Hire Date',
-        'status': 'FT/PT',
+        'compensation_type': 'FT/PT',
         'race': 'Race',
         'gender': 'Gender',
         'compensation': 'Gross Annual Salary',
@@ -23,13 +23,14 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     gender_map = {'Female': 'F', 'Male': 'M'}
 
-    ORGANIZATION_NAME = 'University of Texas Health Science Center at San Antonio'
+    ORGANIZATION_NAME = 'The University of Texas Health Science Center at San Antonio'
 
     # NEED EDITORIAL INPUT
     # compensation_type = 'Full Time'
 
     @property
     def is_valid(self):
+        # TODO clarification needed on FT/PT
         if self.data['Gross Annual Salary'] == 'VARIES' or self.data['FT/PT'] == 'WOS':
             return False
         # Adjust to return False on invalid fields.  For example:
@@ -50,4 +51,5 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         except KeyError:
             return data
 
+#TODO needs custom identifier, people with multiple positions
 transform = base.transform_factory(TransformedRecord)

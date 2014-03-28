@@ -26,7 +26,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     @property
     def is_valid(self):
-        #it's the wrong sheet!
+        # be sure to use --sheet="sheet1"
 
         # Adjust to return False on invalid fields.  For example:
         try:
