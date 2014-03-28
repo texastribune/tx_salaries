@@ -43,5 +43,5 @@ TRANSFORMERS = {
     'a700c57e47d4c5ae5ec1d2354a0c0ce461c53869': [ut_medical_branch.transform, ],
     'bf2d8d6cad54567327b44050c507096885f925b7': [ut_pan_american.transform, ],
     '3eede716c96db3c302eaa2b9b3af6e176daf7727': [ut_san_antonio.transform, ],
-    '6d3cee10b59033351fa76e27b4adda15be873881': [ut_tyler.transform, ],
+    '068d88f0ea10973339f5a4d57c8d806686d2df40': [ut_tyler.transform, ],
 }
