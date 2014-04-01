@@ -30,10 +30,13 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         return self.full_name.strip() != ''
 
     def process_name(self, name):
-        split_name = name.split(',')
+        # TODO parse middle names
+        comma_split = name.split(',')
+        space_split = comma_split[1].strip().split(' ')
+        given_name = u' '.join(space_split[1:])
         return {
-            'given_name': split_name[1].strip(),
-            'family_name': split_name[0].strip()
+            'given_name': given_name.strip(),
+            'family_name': comma_split[0].strip()
         }
 
     @property
@@ -42,7 +45,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         data = {
             'family_name': names['family_name'],
             'given_name': names['given_name'],
-            'name': " ".join([names['family_name'], names['given_name']]),
+            'name': " ".join([names['given_name'], names['family_name']]),
             'gender': self.gender,
         }
         return data
