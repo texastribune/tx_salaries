@@ -10,6 +10,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     MAP = {
         'last_name': 'NAME LAST',
         'first_name': 'NAME FIRST',
+        'middle_name': 'NAME MIDDLE',
+        'suffix_name': 'NAME SUFFIX',
         'department': 'DEPARTMENT TITLE',
         'job_title': 'JOB TITLE',
         'hire_date': 'CONTINUOUS EMPLOYMENT DATE',
@@ -19,7 +21,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'compensation': 'FY ALLOCATIONS',
     }
 
-    NAME_FIELDS = ('first_name', 'last_name', )
+    NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
 
     gender_map = {'FEMALE': 'F', 'MALE': 'M'}
 
@@ -36,11 +38,19 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         return self.last_name.strip() != ''
 
     @property
+    def get_raw_name(self):
+        # TODO include suffix
+        if self.middle_name.strip() == '':
+            self.NAME_FIELDS = ('first_name', 'last_name')
+        name_fields = [getattr(self, a).strip() for a in self.NAME_FIELDS]
+        return u' '.join(name_fields)
+
+    @property
     def person(self):
         data = {
-            'family_name': self.last_name,
-            'given_name': self.first_name,
-            'name': self.get_raw_name(),
+            'family_name': self.last_name.strip(),
+            'given_name': self.first_name.strip(),
+            'name': self.get_raw_name,
         }
         try:
             data.update({
@@ -73,6 +83,10 @@ class TransformedRecord(mixins.GenericCompensationMixin,
                 },
             }
         ]
+
+    @property
+    def given_race(self):
+        return {'name': self.race.strip()}
 
 
 transform = base.transform_factory(TransformedRecord)
