@@ -27,6 +27,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     gender_map = {'FEMALE': 'F', 'MALE': 'M'}
 
+    status_map = {'F': 'Full Time', 'P': 'Part Time'}
+
     ORGANIZATION_NAME = 'State of Texas'
 
     ORGANIZATION_CLASSIFICATION = 'State'
@@ -55,9 +57,21 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             return data
 
     def process_compensation_type(self):
-        # only grab "Full Time" or "Part Time" subsets
-        return u' '.join(self.compensation_type.strip()[-9:].title().split('-'))
+        '''
+        Use the last letter of the code to determine part time or full time
+        State of Texas uses these employment status codes:
 
+        URP - UNCLASSIFIED REGULAR PART-TIME
+        URF - UNCLASSIFIED REGULAR FULL-TIME
+        UTP - UNCLASSIFIED TEMPORARY PART-TIME
+        UTF - UNCLASSIFIED TEMPORARY FULL-TIME
+        ERF - EXEMPT REGULAR FULL-TIME
+        CRF - CLASSIFIED REGULAR FULL-TIME
+        CRP - CLASSIFIED REGULAR PART-TIME
+        CTF - CLASSIFIED TEMPORARY FULL-TIME
+        CTP - CLASSIFIED TEMPORARY PART-TIME
+        '''
+        return self.status_map[self.compensation_type[-1]]
 
     @property
     def compensations(self):
