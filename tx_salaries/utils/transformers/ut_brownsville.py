@@ -10,10 +10,10 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     MAP = {
         'last_name': 'Last Name',
         'first_name': 'First Name',
+        'middle_name': 'Middle Name',
         'department': 'Department',
         'job_title': 'Title',
         'hire_date': 'Hire Date',
-        'status': 'LABEL FOR FT/PT STATUS',
         'compensation': 'Annualized',
         'race': 'Race',
         'gender': 'Gender'
@@ -32,6 +32,19 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.last_name.strip() != ''
+
+    @property
+    def identifier(self):
+        """
+        Identifier for UT Brownsville
+        """
+        excluded = [self.department_key, self.job_title_key,
+                    self.hire_date_key, self.compensation_key]
+        return {
+            'scheme': 'tx_salaries_hash',
+            'identifier': base.create_hash_for_record(self.data,
+                    exclude=excluded)
+        }
 
 
 transform = base.transform_factory(TransformedRecord)
