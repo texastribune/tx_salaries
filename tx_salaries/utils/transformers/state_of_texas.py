@@ -41,7 +41,6 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     @property
     def person(self):
-        # import ipdb; ipdb.set_trace()
         data = {
             'family_name': self.get_cleaved_first_or_last(self.last_name.strip()),
             'given_name': self.get_cleaved_first_or_last(self.first_name.strip()),
@@ -97,7 +96,11 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     @property
     # department names have trailing whitespace
     def department_as_child(self):
-        return [{'name': unicode(self.department.strip()), }, ]
+        if self.department == "Governor'S Office, Trustee Programs":
+            # TODO make dept name cleaver handle this case
+            return [{'name': "Governor's Office, Trustee Programs", }, ]
+        return [{'name': unicode(cleaver.DepartmentNameCleaver(self.department)
+                                        .parse()), }, ]
 
 
 transform = base.transform_factory(TransformedRecord)
