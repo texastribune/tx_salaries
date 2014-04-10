@@ -128,3 +128,32 @@ class OrganizationStats(create_stats_mixin('organization'),
     organization = models.OneToOneField(Organization, related_name='stats')
 
     objects = managers.OrganizationStatsManager()
+
+    def generate_stats(self, cohort):
+        # this dict is not ideal
+        return {
+            'highest_paid': self.get_employee(cohort
+                                .order_by('-employee__compensation')
+                                .values('employee__id')[0]),
+            'median_paid': self.get_employee(cohort
+                                .order_by('-employee__compensation')
+                                .values('employee__id')[(cohort.count() - 1) / 2]),
+            'lowest_paid': self.get_employee(cohort
+                                .order_by('employee__compensation')
+                                .values('employee__id')[0]),
+            'total_number': cohort.count()
+        }
+
+    def get_employee(self, employee):
+        # TODO this lookup is also not ideal
+        return Employee.objects.get(id=employee['employee__id'])
+
+    @property
+    def female(self):
+        females = self.organization.members.filter(person__gender='F')
+        return self.generate_stats(females)
+
+    @property
+    def male(self):
+        males = self.organization.members.filter(person__gender='M')
+        return self.generate_stats(males)
