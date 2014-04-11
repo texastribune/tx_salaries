@@ -124,18 +124,22 @@ class PositionStats(create_stats_mixin('position'), models.Model):
 
     def generate_stats(self, cohort):
         # TODO this dict is not ideal
-        return {
-            'highest_paid': self.get_employee(cohort
-                                .order_by('-employee__compensation')
-                                .values('employee__id')[0]),
-            'median_paid': self.get_employee(cohort
-                                .order_by('-employee__compensation')
-                                .values('employee__id')[(cohort.count() - 1) / 2]),
-            'lowest_paid': self.get_employee(cohort
-                                .order_by('employee__compensation')
-                                .values('employee__id')[0]),
-            'total_number': cohort.count()
-        }
+        total_number = cohort.count()
+        if total_number > 0:
+            return {
+                'highest_paid': self.get_employee(cohort
+                                    .order_by('-employee__compensation')
+                                    .values('employee__id')[0]),
+                'median_paid': self.get_employee(cohort
+                                    .order_by('-employee__compensation')
+                                    .values('employee__id')[(cohort.count() - 1) / 2]),
+                'lowest_paid': self.get_employee(cohort
+                                    .order_by('employee__compensation')
+                                    .values('employee__id')[0]),
+                'total_number': cohort.count()
+            }
+        # return false if cohort is empty because stats cannot be calculated
+        return False
 
     def get_employee(self, employee):
         # TODO this lookup is also not ideal
@@ -160,18 +164,22 @@ class OrganizationStats(create_stats_mixin('organization'),
 
     def generate_stats(self, cohort):
         # TODO this dict is not ideal
-        return {
-            'highest_paid': self.get_employee(cohort
-                                .order_by('-employee__compensation')
-                                .values('employee__id')[0]),
-            'median_paid': self.get_employee(cohort
-                                .order_by('-employee__compensation')
-                                .values('employee__id')[(cohort.count() - 1) / 2]),
-            'lowest_paid': self.get_employee(cohort
-                                .order_by('employee__compensation')
-                                .values('employee__id')[0]),
-            'total_number': cohort.count()
-        }
+        total_number = cohort.count()
+        if total_number > 0:
+            return {
+                'highest_paid': self.get_employee(cohort
+                                    .order_by('-employee__compensation')
+                                    .values('employee__id')[0]),
+                'median_paid': self.get_employee(cohort
+                                    .order_by('-employee__compensation')
+                                    .values('employee__id')[(cohort.count() - 1) / 2]),
+                'lowest_paid': self.get_employee(cohort
+                                    .order_by('employee__compensation')
+                                    .values('employee__id')[0]),
+                'total_number': cohort.count()
+            }
+        # return false if cohort is empty because stats cannot be calculated
+        return False
 
     def get_employee(self, employee):
         # TODO this lookup is also not ideal
