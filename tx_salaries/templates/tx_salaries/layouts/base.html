@@ -1,0 +1,38 @@
+{% extends "layouts/base.html" %}
+
+{% block body_id %}tx_salaries{% endblock %}
+{% block body_class %}{{ block.super }} explorer responsive{% endblock %}
+
+{% block content_class %} tx-salaries{% endblock %}
+
+{% block main %}
+    <div id="schools-header" class="explorer_header">
+      {% block facebook_recommend %}
+      <div class="pull-right fb-recommend">
+        {% include "includes/facebook_like_sidebar.html" %}
+      </div>
+      {% endblock %}
+
+      <h1>
+        <a href="{% url 'tx_salaries:landing' %}">Government Employee Salaries</a>
+        <small>FOIA-ing all the things</small>
+      </h1>
+
+    </div>
+
+    {% block breadcrumb %}
+    <div class="bootstrap">
+      <ul class="breadcrumb well">
+        <li>
+          <a href="{% url 'tx_salaries:landing' %}">Home</a> <span class="divider">/</span>
+        </li>
+        {% block breadcrumb_items %}{% endblock %}
+      </ul>
+    </div>
+    {% endblock %}
+
+  <div class="grid">
+    {% block main_content %}{% endblock %}
+  </div>
+
+{% endblock %}

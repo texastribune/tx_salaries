@@ -1,0 +1,23 @@
+{% extends "layouts/data/landing.html" %}
+
+{% block title %}Government Employee Salaries{{ block.super }}{% endblock %}
+
+
+{% block data_app_header_id %}schools-header{% endblock %}
+{% block body_class %}explorer {{ block.super }}{% endblock %}
+{% block content_class %} tx-salaries {{ block.super }}{% endblock %}
+
+{% block main_body %}
+
+  <section id="intro">
+    <div class="prose">
+      <p>These have <a href="eve/">attorneys</a>:</p>
+    </div>
+    <div class="grid">
+      <ul>
+        {% for org in orgs %}<li><a href="org/{{ org.id }}">{{ org.name }}</a></li>{% endfor %}
+      </ul>
+    </div>
+  </section>
+
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "tx_salaries/layouts/base.html" %}
+
+{% block title %}{{ org.name }}{{ block.super }}{% endblock %}
+
+{% load humanize %}
+
+{% block breadcrumb_items %}
+<li>{{ org.agency }}</li>
+{% endblock %}
+
+{% block main_content %}
+
+<div class="grid overview">
+
+  <div id="main-content" class="cell w-9">
+    <h1>{{ org.name }}</h1>
+    <ul>
+      <li>{{ org.emp_count }} employees</li>
+      <li>Updated: {{ org.updated }}</li>
+    </ul>
+    <h2>{{ org.stats.female.total_number|intcomma }} female employees</h2>
+  </div>
+
+  <div class="cell w-3 explorer_rail">
+    <p>Todo: search</p>
+  </div>
+{% endblock %}

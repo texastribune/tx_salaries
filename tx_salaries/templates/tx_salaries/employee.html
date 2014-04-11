@@ -1,0 +1,35 @@
+{% extends "tx_salaries/layouts/base.html" %}
+
+{% block title %}{{ employee.name }}{{ block.super }}{% endblock %}
+
+{% load humanize %}
+
+{% block breadcrumb_items %}
+  <li>{{ employee.agency }}</li>
+  <span class="divider">/</span>
+  <li>{{ employee.department }}</li>
+  <span class="divider">/</span>
+  <li>{{ employee.title }}</li>
+{% endblock %}
+
+{% block main_content %}
+
+<div class="grid overview">
+
+  <div id="main-content" class="cell w-9">
+    <h1>{{ employee.name }}</h1>
+    <ul>
+      <li>Title: {{ employee.title }}</li>
+      <li>Agency: {{ employee.agency }}</li>
+      <li>Department: {{ employee.department }}</li>
+      <li>Gender: {{ employee.gender }}</li>
+      <li>Hire Date: {{ employee.hire_date }}</li>
+      <li>Salary: ${{ employee.salary|intcomma }}</li>
+      <li>Status: {{ employee.ft }}</li>
+    </ul>
+  </div>
+
+  <div class="cell w-3 explorer_rail">
+    <p>Todo: search</p>
+  </div>
+{% endblock %}
