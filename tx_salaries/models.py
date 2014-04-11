@@ -122,6 +122,35 @@ class PositionStats(create_stats_mixin('position'), models.Model):
 
     objects = managers.PositionStatsManager()
 
+    def generate_stats(self, cohort):
+        # TODO this dict is not ideal
+        return {
+            'highest_paid': self.get_employee(cohort
+                                .order_by('-employee__compensation')
+                                .values('employee__id')[0]),
+            'median_paid': self.get_employee(cohort
+                                .order_by('-employee__compensation')
+                                .values('employee__id')[(cohort.count() - 1) / 2]),
+            'lowest_paid': self.get_employee(cohort
+                                .order_by('employee__compensation')
+                                .values('employee__id')[0]),
+            'total_number': cohort.count()
+        }
+
+    def get_employee(self, employee):
+        # TODO this lookup is also not ideal
+        return Employee.objects.get(id=employee['employee__id'])
+
+    @property
+    def female(self):
+        females = self.position.members.filter(person__gender='F')
+        return self.generate_stats(females)
+
+    @property
+    def male(self):
+        males = self.position.members.filter(person__gender='M')
+        return self.generate_stats(males)
+
 
 class OrganizationStats(create_stats_mixin('organization'),
         models.Model):
@@ -130,7 +159,7 @@ class OrganizationStats(create_stats_mixin('organization'),
     objects = managers.OrganizationStatsManager()
 
     def generate_stats(self, cohort):
-        # this dict is not ideal
+        # TODO this dict is not ideal
         return {
             'highest_paid': self.get_employee(cohort
                                 .order_by('-employee__compensation')
