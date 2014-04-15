@@ -3,6 +3,7 @@
 {% block title %}{{ employee.name }}{{ block.super }}{% endblock %}
 
 {% load humanize %}
+{% load static from staticfiles %}
 
 {% block breadcrumb_items %}
   <li>{{ employee.agency }}</li>
@@ -14,10 +15,12 @@
 
 {% block main_content %}
 
+<link rel="stylesheet" href="{% static "tx_salaries/css/app.css" %}">
+
 <div class="grid overview">
 
   <div id="main-content" class="cell w-9">
-    <h1>{{ employee.name }}</h1>
+    <h3>{{ employee.name }}</h3>
     <ul>
       <li>Title: {{ employee.title }}</li>
       <li>Agency: {{ employee.agency }}</li>
