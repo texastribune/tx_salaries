@@ -3,6 +3,7 @@
 {% block title %}{{ org.name }}{{ block.super }}{% endblock %}
 
 {% load humanize %}
+{% load static from staticfiles %}
 
 {% block breadcrumb_items %}
 <li>{{ org.agency }}</li>
@@ -10,16 +11,47 @@
 
 {% block main_content %}
 
+<link rel="stylesheet" href="{% static "tx_salaries/css/app.css" %}">
+
 <div class="grid overview">
 
   <div id="main-content" class="cell w-9">
-    <h1>{{ org.name }}</h1>
-    <ul>
-      <li>{{ org.emp_count }} employees</li>
-      <li>Updated: {{ org.updated }}</li>
-    </ul>
-    <h2>{{ org.stats.female.total_number|intcomma }} female employees</h2>
-  </div>
+    <div class="grid">
+      <h3>{{ org.name }}</h3>
+      <ul>
+        <li>{{ org.agency }}</li>
+        <li>Data received on {{ org.updated }}</li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <div class="grid">
+      <div class="cell w-3 agency-stats">
+        <ul>
+          <li>
+            <h3>{{ org.emp_count|intcomma }}</h3>
+            <p>employees</p>
+          </li>
+          <li>
+            <h3>{{ org.stats.female.total_number|intcomma }}</h3>
+            <p>female employees</p>
+          </li>
+          <li>
+            <h3>{{ org.stats.male.total_number|intcomma }}</h3>
+            <p>male employees</p>
+          </li>
+        </ul>
+      </div>
+
+      <div class="cell w-3">
+        <img class="pie-chart" src="https://chart.googleapis.com/chart?cht=p&chd=t:{{ org.stats.female.total_number }},{{ org.stats.male.total_number}}&chs=150x100&chdl=Female|Male">
+      </div>
+
+      <div class="cell w-6">TODO histogram</div>
+    </div>
+
+  </div><!-- end main -->
 
   <div class="cell w-3 explorer_rail">
     <p>Todo: search</p>
