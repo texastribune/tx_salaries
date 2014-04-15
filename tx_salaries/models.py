@@ -132,11 +132,11 @@ class PositionStats(create_stats_mixin('position'), models.Model):
                                     .values('employee__id')[0]),
                 'median_paid': self.get_employee(cohort
                                     .order_by('-employee__compensation')
-                                    .values('employee__id')[(cohort.count() - 1) / 2]),
+                                    .values('employee__id')[(total_number - 1) / 2]),
                 'lowest_paid': self.get_employee(cohort
                                     .order_by('employee__compensation')
                                     .values('employee__id')[0]),
-                'total_number': cohort.count()
+                'total_number': total_number
             }
         # return false if cohort is empty because stats cannot be calculated
         return False
@@ -172,11 +172,11 @@ class OrganizationStats(create_stats_mixin('organization'),
                                     .values('employee__id')[0]),
                 'median_paid': self.get_employee(cohort
                                     .order_by('-employee__compensation')
-                                    .values('employee__id')[(cohort.count() - 1) / 2]),
+                                    .values('employee__id')[(total_number - 1) / 2]),
                 'lowest_paid': self.get_employee(cohort
                                     .order_by('employee__compensation')
                                     .values('employee__id')[0]),
-                'total_number': cohort.count()
+                'total_number': total_number
             }
         # return false if cohort is empty because stats cannot be calculated
         return False
