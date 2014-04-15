@@ -156,6 +156,26 @@ class PositionStats(create_stats_mixin('position'), models.Model):
         males = self.position.members.filter(person__gender='M')
         return self.generate_stats(males)
 
+    @property
+    def white(self):
+        cohort = self.organization.members.filter(person__races__name='WHITE')
+        return self.generate_stats(cohort)
+
+    @property
+    def black(self):
+        cohort = self.organization.members.filter(person__races__name='BLACK')
+        return self.generate_stats(cohort)
+
+    @property
+    def asian(self):
+        cohort = self.organization.members.filter(person__races__name='ASIAN')
+        return self.generate_stats(cohort)
+
+    @property
+    def am_indian(self):
+        cohort = self.organization.members.filter(person__races__name='AM INDIAN')
+        return self.generate_stats(cohort)
+
 
 class OrganizationStats(create_stats_mixin('organization'),
         models.Model):
@@ -243,10 +263,30 @@ class OrganizationStats(create_stats_mixin('organization'),
 
     @property
     def female(self):
-        females = self.organization.members.filter(person__gender='F')
-        return self.generate_stats(females)
+        cohort = self.organization.members.filter(person__gender='F')
+        return self.generate_stats(cohort)
 
     @property
     def male(self):
-        males = self.organization.members.filter(person__gender='M')
-        return self.generate_stats(males)
+        cohort = self.organization.members.filter(person__gender='M')
+        return self.generate_stats(cohort)
+
+    @property
+    def white(self):
+        cohort = self.organization.members.filter(person__races__name='WHITE')
+        return self.generate_stats(cohort)
+
+    @property
+    def black(self):
+        cohort = self.organization.members.filter(person__races__name='BLACK')
+        return self.generate_stats(cohort)
+
+    @property
+    def asian(self):
+        cohort = self.organization.members.filter(person__races__name='ASIAN')
+        return self.generate_stats(cohort)
+
+    @property
+    def am_indian(self):
+        cohort = self.organization.members.filter(person__races__name='AM INDIAN')
+        return self.generate_stats(cohort)
