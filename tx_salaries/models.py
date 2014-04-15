@@ -138,8 +138,9 @@ class PositionStats(create_stats_mixin('position'), models.Model):
                                     .values('employee__id')[0]),
                 'total_number': total_number
             }
-        # return false if cohort is empty because stats cannot be calculated
-        return False
+        else:
+            return {'total_number': 0}
+
 
     def get_employee(self, employee):
         # TODO this lookup is also not ideal
@@ -178,8 +179,8 @@ class OrganizationStats(create_stats_mixin('organization'),
                                     .values('employee__id')[0]),
                 'total_number': total_number
             }
-        # return false if cohort is empty because stats cannot be calculated
-        return False
+        else:
+            return {'total_number': 0}
 
     def get_employee(self, employee):
         # TODO this lookup is also not ideal
