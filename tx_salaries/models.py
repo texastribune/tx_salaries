@@ -177,10 +177,65 @@ class OrganizationStats(create_stats_mixin('organization'),
                 'lowest_paid': self.get_employee(cohort
                                     .order_by('employee__compensation')
                                     .values('employee__id')[0]),
-                'total_number': total_number
+                'total_number': total_number,
+                'distribution': self.get_distribution(cohort)
             }
         else:
             return {'total_number': 0}
+
+    def round_nearest(self, num, target, ceil=False, floor=False):
+        num = int(num)
+        if floor or (not ceil and num % target < target / 2):
+            return num - (num % target)
+        else:
+            return num + (target - num % target)
+
+    def get_distribution(self, cohort):
+        if cohort.count() <= 1:
+            return None
+        # Set bounds of buckets using all employees so breakdowns are comparable
+        salaries = self.organization.members.aggregate(
+                        max=models.Max('employee__compensation'),
+                        min=models.Min('employee__compensation'))
+        diff = salaries['max'] - salaries['min']
+        step = diff / 10
+        start = salaries['min']
+
+        # Round start and step to nice numbers, and make the step bigger if
+        # it would create more than 12 bars on the graph.
+        if step > 70000 or diff / 50000 > 12:
+            step = self.round_nearest(step, 100000, ceil=True)
+            start = self.round_nearest(start, 100000, floor=True)
+        elif step > 30000 or diff / 20000 > 12:
+            step = 50000
+            start = self.round_nearest(start, 10000, floor=True)
+        elif step > 15000 or diff / 10000 > 12:
+            step = 20000
+            start = self.round_nearest(start, 10000, floor=True)
+        elif step > 8000 or diff / 5000 > 12:
+            step = 10000
+            start = self.round_nearest(start, 10000, floor=True)
+        elif step > 3000:
+            step = 5000
+            start = self.round_nearest(start, 1000, floor=True)
+        elif step > 70:
+            step = self.round_nearest(step, 100)
+            start = self.round_nearest(start, 100, floor=True)
+
+        slices = []
+        while start < salaries['max']:
+            slices.append({
+                'start': start,
+                'end': start + step,
+                'count': cohort.filter(employee__compensation__gt=start,
+                                        employee__compensation__lte=start+step).count(),
+            })
+            start += step
+        if not slices:
+            return None
+        slices[0]['count'] += cohort.filter(employee__compensation=salaries['min']).count()
+
+        return {'step': step, 'slices': slices}
 
     def get_employee(self, employee):
         # TODO this lookup is also not ideal
