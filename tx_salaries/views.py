@@ -40,6 +40,16 @@ class EmployeeView(TemplateView):
 class OrganizationView(TemplateView):
     template_name = 'tx_salaries/organization.html'
 
+    def get_top_salaries(self, org):
+        return (models.Employee.objects
+                                .filter(position__post__organization=org)
+                                .order_by('-compensation')[:10])
+
+    def get_top_jobs(self, org):
+        return (models.PositionStats.objects.filter(position__organization=org)
+                                            .order_by('-median_paid__compensation')
+                                            [:10])
+
     def get_context_data(self, **kwargs):
         context = super(OrganizationView, self).get_context_data(**kwargs)
         o = models.Organization.objects.get(id=self.kwargs['org_id'])
@@ -51,6 +61,8 @@ class OrganizationView(TemplateView):
             'updated': u"{0}/{1}/{2}".format(o.updated_at.month,
                                             o.updated_at.day, o.updated_at.year)
         }
+        context['top_salaries'] = self.get_top_salaries(o)
+        context['top_jobs'] = self.get_top_jobs(o)
         return context
 
 

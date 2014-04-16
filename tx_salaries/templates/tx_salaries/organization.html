@@ -71,6 +71,48 @@
           {% endfor %}
         </div>
       </div>
+
+      <div class="grid">
+        <div class="cell w-8">
+          <h3>Top salaries in {{ org.name }}</h3>
+          <table class="tt-table striped">
+            <thead>
+              <th>Name</th>
+              <th>Title</th>
+              <th>Department</th>
+              <th>Salary</th>
+            </thead>
+            <tbody>
+              {% for employee in top_salaries %}
+                <tr>
+                  <td><a href="employee/{{ employee.id }}">{{ employee.position.person.name }}</a></td>
+                  <td>{{ employee.title.name }}</td>
+                  <td>{{ employee.position.organization.name }}</td>
+                  <td>${{ employee.compensation|intcomma }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="cell w-4">
+          <h3>Top job titles in {{ org.name }}</h3>
+          <table class="tt-table striped">
+            <thead>
+              <th>Title</th>
+              <th>Median Salary</th>
+            </thead>
+            <tbody>
+              {% for job in top_jobs %}
+                <tr>
+                  <td>{{ job.position.label }} </td>
+                  <td>${{ job.median_paid.compensation|intcomma }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
   </div><!-- end main -->
