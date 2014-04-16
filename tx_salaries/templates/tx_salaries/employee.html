@@ -20,7 +20,73 @@
 <div class="grid overview">
 
   <div id="main-content" class="cell w-9">
-    <h3>{{ employee.name }}</h3>
+    <div class="grid">
+      <div class="cell w-12">
+        <h3>{{ employee.name }}</h3>
+        <p><strong>{{ employee.title }}</strong> in <strong>{{ employee.department }}</strong> department of <strong>{{ employee.agency }}</strong></p>
+        <p>Data received on 4/11/2014</p>
+      </div>
+    </div>
+
+    <hr>
+    <span style="float:left;">
+      <p><strong>{{ employee.gender }}</strong></p>
+      <p>Gender</p>
+    </span>
+
+    <span style="float:right;">
+      <p><strong>{{ employee.hire_date }}</strong></p>
+      <p>Hire date</p>
+    </span>
+
+    <span style="text-align:center;">
+      <p><strong>${{ employee.salary|intcomma }}</strong></p>
+      <p>Salary</p>
+    </span>
+
+    <div class="grid">
+      <div class="cell w-6">
+        <h3>Top salaries in {{ employee.department }}</h3>
+        <table class="tt-table striped">
+          <thead>
+            <th>Name</th>
+            <th>Hire Date</th>
+            <th>Salary</th>
+          </thead>
+          <tbody>
+            {% for employee in top_dept %}
+              <tr>
+                <td><a href="employee/{{ employee.id }}">{{ employee.position.person.name }}</a></td>
+                <td>{{ employee.hire_date }}</td>
+                <td>${{ employee.compensation|intcomma }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="cell w-6">
+        <h3>Top {{ employee.title }} salaries at {{ employee.department }}</h3>
+        <table class="tt-table striped">
+          <thead>
+            <th>Name</th>
+            <th>Hire Date</th>
+            <th>Salary</th>
+          </thead>
+          <tbody>
+            {% for peer in peers %}
+              <tr>
+                <td><a href="employee/{{ peer.id }}">{{ peer.position.person.name }}</a></td>
+                <td>{{ peer.hire_date }}</td>
+                <td>${{ peer.compensation|intcomma }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
     <ul>
       <li>Title: {{ employee.title }}</li>
       <li>Agency: {{ employee.agency }}</li>
@@ -32,7 +98,4 @@
     </ul>
   </div>
 
-  <div class="cell w-3 explorer_rail">
-    <p>Todo: search</p>
-  </div>
 {% endblock %}
