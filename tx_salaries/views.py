@@ -71,7 +71,18 @@ class LandingView(base.LandingView):
     app_tagline = "FOIA-ing all the things"
     data_app_name = "tx_salaries"
 
+    def get_top_salaries(self, **kwargs):
+        return (models.Employee.objects.all()
+                                .order_by('-compensation')[:10])
+
+    def get_recent_orgs(self, **kwargs):
+        return (models.Organization.objects.all()
+                                .order_by('-updated_at')[:10])
+
     def get_context_data(self, **kwargs):
         context = super(LandingView, self).get_context_data(**kwargs)
-        context['orgs'] = [o for o in models.Organization.objects.all()]
+        context['org_count'] = models.Organization.objects.count()
+        context['employee_count'] = models.Employee.objects.count()
+        context['top_salaries'] = self.get_top_salaries()
+        context['recent_orgs'] = self.get_recent_orgs()
         return context
