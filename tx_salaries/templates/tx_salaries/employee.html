@@ -21,7 +21,7 @@
 
   <div id="main-content" class="cell w-9">
     <div class="grid">
-      <div class="cell w-12">
+      <div class="cell w-12 header-stats">
         <h3>{{ employee.name }}</h3>
         <p><strong>{{ employee.title }}</strong> in <strong>{{ employee.department }}</strong> department of <strong>{{ employee.agency }}</strong></p>
         <p>Data received on 4/11/2014</p>
@@ -29,24 +29,24 @@
     </div>
 
     <hr>
-    <span style="float:left;">
+    <span class="header-stats" style="float:left;">
       <p><strong>{{ employee.gender }}</strong></p>
       <p>Gender</p>
     </span>
 
-    <span style="float:right;">
+    <span class="header-stats" style="float:right; text-align:right;">
       <p><strong>{{ employee.hire_date }}</strong></p>
       <p>Hire date</p>
     </span>
 
-    <span style="text-align:center;">
+    <span class="header-stats" style="text-align:center;">
       <p><strong>${{ employee.salary|intcomma }}</strong></p>
       <p>Salary</p>
     </span>
 
     <div class="grid">
       <div class="cell w-6">
-        <h3>Top salaries in {{ employee.department }}</h3>
+        <strong>Top salaries in {{ employee.department }}</strong>
         <table class="tt-table striped">
           <thead>
             <th>Name</th>
@@ -66,7 +66,7 @@
       </div>
 
       <div class="cell w-6">
-        <h3>Top {{ employee.title }} salaries at {{ employee.department }}</h3>
+        <strong>Top {{ employee.title }} salaries at {{ employee.department }}</strong>
         <table class="tt-table striped">
           <thead>
             <th>Name</th>
