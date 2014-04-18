@@ -53,14 +53,7 @@ class OrganizationView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(OrganizationView, self).get_context_data(**kwargs)
         o = models.Organization.objects.get(id=self.kwargs['org_id'])
-        context['org'] = {
-            'name': o.name,
-            'emp_count': o.members.count(),
-            'agency': o.parent.name,
-            'stats': o.stats,
-            'updated': u"{0}/{1}/{2}".format(o.updated_at.month,
-                                            o.updated_at.day, o.updated_at.year)
-        }
+        context['org'] = o
         context['top_salaries'] = self.get_top_salaries(o)
         context['top_jobs'] = self.get_top_jobs(o)
         return context
