@@ -32,7 +32,7 @@
     <div class="grid">
       <div class="cell w-8">
         <h3>Top salaries in {{ org.name }}</h3>
-        <table class="tt-table striped">
+        <table class="tt-table striped condensed">
           <thead>
             <th>Name</th>
             <th>Title</th>
@@ -54,7 +54,7 @@
 
       <div class="cell w-4">
         <h3>Top job titles in {{ org.name }}</h3>
-        <table class="tt-table striped">
+        <table class="tt-table striped condensed">
           <thead>
             <th>Title</th>
             <th>Median Salary</th>
@@ -140,10 +140,11 @@
         <div class="bar-m" style="width:{% widthratio org.stats.black.total_number 500 200 %}px"></div>
         <div class="bar-m" style="width:{% widthratio org.stats.hispanic.total_number 500 200 %}px"></div>
         <div class="bar-m" style="width:{% widthratio org.stats.asian.total_number 500 200 %}px"></div>
+        <div class="bar-m" style="width:{% widthratio org.stats.am_indian.total_number 500 200 %}px"></div>
       </div>
       <div class="cell w-4 agency-stats">
         <h3>Salaries by ethnicity</h3>
-        <table class="tt-table striped">
+        <table class="tt-table striped condensed">
           <thead>
             <th>Ethnicity</th>
             <th>Median Salary</th>
@@ -165,6 +166,10 @@
               <td>Asian</td>
               <td>${{ org.stats.asian.median_paid.compensation|intcomma }}</td>
             </tr>
+            <tr>
+              <td>American Indian</td>
+              <td>${{ org.stats.am_indian.median_paid.compensation|intcomma }}</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -173,7 +178,30 @@
     <hr>
 
     <div class="grid">
-
+    <h3>Length of employment</h3>
+      <div class="cell w-8 agency-stats">
+        <h3>Employees by length of employment</h3>
+        {% for o in org.stats.time_employed %}
+          <div class="bar-m" style="width:{% widthratio o.stats.total_number 500 200 %}px"></div>
+        {% endfor %}
+      </div>
+      <div class="cell w-4 agency-stats">
+        <h3>Salaries by length of employment</h3>
+        <table class="tt-table striped condensed">
+          <thead>
+            <th>Length of employment</th>
+            <th>Median Salary</th>
+          </thead>
+          <tbody>
+            {% for o in org.stats.time_employed %}
+              <tr>
+                <td>{{ o.time }}</td>
+                <td>${{ o.stats.median_paid.compensation|intcomma }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
 
   </div><!-- end main -->

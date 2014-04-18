@@ -290,3 +290,19 @@ class OrganizationStats(create_stats_mixin('organization'),
     def am_indian(self):
         cohort = self.organization.members.filter(person__races__name='AM INDIAN')
         return self.generate_stats(cohort)
+
+    @property
+    def time_employed(self):
+        # TODO
+        one_year = self.organization.members.filter(employee__hire_date__gte='2014-01-01')
+        five_years = (self.organization.members.filter(employee__hire_date__lte='2014-01-01')
+                            .filter(employee__hire_date__gte='2009-01-01'))
+        ten_years = (self.organization.members.filter(employee__hire_date__lte='2009-01-01')
+                            .filter(employee__hire_date__gte='2004-01-01'))
+        twenty_years = self.organization.members.filter(employee__hire_date__lte='2004-01-01')
+        return [
+            {'time': '1 year', 'stats': self.generate_stats(one_year)},
+            {'time': '5-10 years', 'stats': self.generate_stats(five_years)},
+            {'time': '10-20 years', 'stats': self.generate_stats(ten_years)},
+            {'time': '20+ years', 'stats': self.generate_stats(twenty_years)},
+        ]
