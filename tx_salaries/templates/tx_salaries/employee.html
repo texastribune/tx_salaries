@@ -29,20 +29,22 @@
     </div>
 
     <hr>
-    <span class="header-stats" style="float:left;">
-      <p><strong>{{ employee.gender }}</strong></p>
-      <p>Gender</p>
-    </span>
+    <div class="grid">
+      <div class="cell w-4 header-stats" style="float:left;">
+        <p><strong>{{ employee.race }} {{ employee.gender }}</strong></p>
+      </div>
 
-    <span class="header-stats" style="float:right; text-align:right;">
-      <p><strong>{{ employee.hire_date }}</strong></p>
-      <p>Hire date</p>
-    </span>
+      <div class="cell w-4 header-stats" style="float:right; text-align:right;">
+        <p><strong>{{ employee.hire_date }}</strong></p>
+        <p>Hire date</p>
+      </div>
 
-    <span class="header-stats" style="text-align:center;">
-      <p><strong>${{ employee.salary|intcomma }}</strong></p>
-      <p>Salary</p>
-    </span>
+      <div class="cell w-4 header-stats" style="text-align:center;">
+        <p><strong>${{ employee.salary|intcomma }}</strong></p>
+        <p>Annual Salary</p>
+        <p>{{ employee.ft }}</p>
+      </div>
+    </div>
 
     <div class="grid">
       <div class="cell w-6">

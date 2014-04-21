@@ -28,6 +28,7 @@ class EmployeeView(TemplateView):
             'department': p.position.organization.name,
             'agency': p.position.organization.parent.name,
             'gender': self.gender_map[p.position.person.gender],
+            'race': p.position.person.races.values('name')[0]['name'],
             'hire_date': p.hire_date,
             'salary': p.compensation,
             'ft': p.compensation_type,
