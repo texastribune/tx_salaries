@@ -22,7 +22,6 @@
         <li>Department of <strong>{{ org.parent.name }}</strong></li>
         <li><strong>{{ org.stats.total_number }}</strong> employees</li>
         <li><strong>${{ org.stats.median_paid.compensation|intcomma }}</strong> median salary</li>
-        <li><strong></strong></li>
         <li>Data provided by {{ org.parent.name }} TPIA office on {{ org.updated_at }}</li>
       </ul>
       <div class="grid overview_header">
@@ -136,15 +135,13 @@
       </div>
 
       <div class="cell w-4">
-        <!-- <div class="middle-text">
-          {% for slice in org.stats.female.distribution.slices %}
-            <p>${{ slice.start|intcomma }} &#8212; ${{ slice.end|intcomma }}</p>
-          {% endfor %}
-        </div> -->
+        <strong>Number of women/men</strong>
         <div class="bars-container" style="float:left;">
           {% for slice in org.stats.female.distribution.slices %}
           <p>
+            <!-- TODO these should be responsive -->
             <div class="bar-w" style="width:{% widthratio slice.count 160 100 %}px"></div>
+            <span><small>${{ slice.start|intcomma }} &#8212; ${{ slice.end|intcomma }}</small></span>
             <span style="float:right; line-height:0.5; padding-right: 5px;">{{ slice.count }}</span>
           </p>
           {% endfor %}
@@ -167,11 +164,26 @@
       <a name="ethnicity" id="ethnicity"></a>
       <div class="cell w-8 agency-stats">
         <h3>Employees by ethnicity</h3>
-        <div class="bar-m" style="width:{% widthratio org.stats.white.total_number 500 200 %}px"></div>
-        <div class="bar-m" style="width:{% widthratio org.stats.black.total_number 500 200 %}px"></div>
-        <div class="bar-m" style="width:{% widthratio org.stats.hispanic.total_number 500 200 %}px"></div>
-        <div class="bar-m" style="width:{% widthratio org.stats.asian.total_number 500 200 %}px"></div>
-        <div class="bar-m" style="width:{% widthratio org.stats.am_indian.total_number 500 200 %}px"></div>
+        <div class="histogram-container">
+          <div class="bar-m" style="width:{% widthratio org.stats.white.total_number 500 200 %}px"></div>
+          <span>{{ org.stats.white.total_number|intcomma }}</span>
+        </div>
+        <div class="histogram-container">
+          <div class="bar-m" style="width:{% widthratio org.stats.black.total_number 500 200 %}px"></div>
+          <span>{{ org.stats.black.total_number|intcomma }}</span>
+        </div>
+        <div class="histogram-container">
+          <div class="bar-m" style="width:{% widthratio org.stats.hispanic.total_number 500 200 %}px"></div>
+          <span>{{ org.stats.hispanic.total_number|intcomma }}</span>
+        </div>
+        <div class="histogram-container">
+          <div class="bar-m" style="width:{% widthratio org.stats.asian.total_number 500 200 %}px"></div>
+          <span>{{ org.stats.asian.total_number|intcomma }}</span>
+        </div>
+        <div class="histogram-container">
+          <div class="bar-m" style="width:{% widthratio org.stats.am_indian.total_number 500 200 %}px"></div>
+          <span>{{ org.stats.am_indian.total_number|intcomma }}</span>
+        </div>
       </div>
       <div class="cell w-4 agency-stats">
         <h3>Salaries by ethnicity</h3>
@@ -214,7 +226,10 @@
       <div class="cell w-8 agency-stats">
         <h3>Employees by length of employment</h3>
         {% for o in org.stats.time_employed %}
-          <div class="bar-m" style="width:{% widthratio o.stats.total_number 500 200 %}px"></div>
+          <div class="histogram-container">
+            <div class="bar-m" style="width:{% widthratio o.stats.total_number 500 200 %}px"></div>
+            <span>{{ o.stats.total_number|intcomma }}</span>
+          </div>
         {% endfor %}
       </div>
       <div class="cell w-4 agency-stats">
