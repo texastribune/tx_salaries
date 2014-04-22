@@ -58,7 +58,7 @@
           <tbody>
             {% for employee in top_dept %}
               <tr>
-                <td><a href="employee/{{ employee.id }}">{{ employee.position.person.name }}</a></td>
+                <td><a href="{% url 'tx_salaries:employee' employee.id %}">{{ employee.position.person.name }}</a></td>
                 <td>{{ employee.hire_date }}</td>
                 <td>${{ employee.compensation|intcomma }}</td>
               </tr>
@@ -78,7 +78,7 @@
           <tbody>
             {% for peer in peers %}
               <tr>
-                <td><a href="employee/{{ peer.id }}">{{ peer.position.person.name }}</a></td>
+                <td><a href="{% url 'tx_salaries:employee' peer.id %}">{{ peer.position.person.name }}</a></td>
                 <td>{{ peer.hire_date }}</td>
                 <td>${{ peer.compensation|intcomma }}</td>
               </tr>

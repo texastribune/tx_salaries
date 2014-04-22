@@ -46,7 +46,7 @@
         <tbody>
           {% for org in recent_orgs %}
             <tr>
-              <td><a href="org/{{ org.id }}">{{ org.name }}</a></td>
+              <td><a href="{% url 'tx_salaries:organization' org.id %}">{{ org.name }}</a></td>
               <td>{{ org.stats.total_number|intcomma }}</td>
               <td>${{ org.stats.median_paid.compensation|intcomma }}</td>
               <td>{{ org.updated_at }}</td>
@@ -68,7 +68,7 @@
         <tbody>
           {% for employee in top_salaries %}
             <tr>
-              <td><a href="employee/{{ employee.id }}">{{ employee.position.person.name }}</a></td>
+              <td><a href="{% url 'tx_salaries:employee' employee.id %}">{{ employee.position.person.name }}</a></td>
               <td>{{ employee.title.name }}</td>
               <td>{{ employee.position.organization.name }}</td>
               <td>${{ employee.compensation|intcomma }}</td>
