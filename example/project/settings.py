@@ -125,6 +125,7 @@ INSTALLED_APPS = (
     # Third-party dependencies
     'tx_people',
     'south',  # Required for migrations
+    'haystack',
 
     # Custom application being tested
     'tx_salaries',
@@ -132,6 +133,15 @@ INSTALLED_APPS = (
     # The app with all of the tests and any example customizations
     'app',
 )
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'haystack',
+        'INCLUDE_SPELLING': True,
+    },
+}
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
