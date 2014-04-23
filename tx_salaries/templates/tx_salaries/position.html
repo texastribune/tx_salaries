@@ -96,7 +96,7 @@
         </ul>
       </div>
 
-      <div class="cell w-4">
+      <div class="cell w-2">
         <img class="pie-chart" src="https://chart.googleapis.com/chart?cht=p&chd=t:{{ position.stats.female.total_number }},{{ position.stats.male.total_number}}&chs=150x100&chdl=Female|Male">
       </div>
 
@@ -113,13 +113,12 @@
         </ul>
       </div>
 
-      <div class="cell w-4">
+      <div class="cell w-6">
         <strong>Number of women/men</strong>
         <div class="bars-container" style="float:left;">
           {% for slice in position.stats.female.distribution.slices %}
           <p>
-            <!-- TODO these should be responsive -->
-            <div class="bar-w" style="width:{% widthratio slice.count 160 100 %}px"></div>
+            <div class="bar-w" style="width:{% widthratio slice.count 160 100 %}%"></div>
             <span><small>${{ slice.start|intcomma }} &#8212; ${{ slice.end|intcomma }}</small></span>
             <span style="float:right; line-height:0.5; padding-right: 5px;">{{ slice.count }}</span>
           </p>
@@ -128,7 +127,7 @@
         <div class="bars-container" style="float:right;">
           {% for slice in position.stats.male.distribution.slices %}
           <p>
-            <div class="bar-m" style="width:{% widthratio slice.count 160 100 %}px"></div>
+            <div class="bar-m" style="width:{% widthratio slice.count 160 100 %}%"></div>
             {{ slice.count }}
           </p>
           {% endfor %}
@@ -144,23 +143,23 @@
       <div class="cell w-8 agency-stats">
         <h3>Employees by ethnicity</h3>
         <div class="histogram-container">
-          <div class="bar-m" style="width:{% widthratio position.stats.white.total_number 500 200 %}px"></div>
+          <div class="bar-m" style="width:{% widthratio position.stats.white.total_number 500 100 %}%"></div>
           <span>{{ position.stats.white.total_number|intcomma }}</span>
         </div>
         <div class="histogram-container">
-          <div class="bar-m" style="width:{% widthratio position.stats.black.total_number 500 200 %}px"></div>
+          <div class="bar-m" style="width:{% widthratio position.stats.black.total_number 500 100 %}%"></div>
           <span>{{ position.stats.black.total_number|intcomma }}</span>
         </div>
         <div class="histogram-container">
-          <div class="bar-m" style="width:{% widthratio position.stats.hispanic.total_number 500 200 %}px"></div>
+          <div class="bar-m" style="width:{% widthratio position.stats.hispanic.total_number 500 100 %}%"></div>
           <span>{{ position.stats.hispanic.total_number|intcomma }}</span>
         </div>
         <div class="histogram-container">
-          <div class="bar-m" style="width:{% widthratio position.stats.asian.total_number 500 200 %}px"></div>
+          <div class="bar-m" style="width:{% widthratio position.stats.asian.total_number 500 100 %}%"></div>
           <span>{{ position.stats.asian.total_number|intcomma }}</span>
         </div>
         <div class="histogram-container">
-          <div class="bar-m" style="width:{% widthratio position.stats.am_indian.total_number 500 200 %}px"></div>
+          <div class="bar-m" style="width:{% widthratio position.stats.am_indian.total_number 500 100 %}%"></div>
           <span>{{ position.stats.am_indian.total_number|intcomma }}</span>
         </div>
       </div>
@@ -206,7 +205,7 @@
         <h3>Employees by length of employment</h3>
         {% for o in position.stats.time_employed %}
           <div class="histogram-container">
-            <div class="bar-m" style="width:{% widthratio o.stats.total_number 500 200 %}px"></div>
+            <div class="bar-m" style="width:{% widthratio o.stats.total_number 500 100 %}%"></div>
             <span>{{ o.stats.total_number|intcomma }}</span>
           </div>
         {% endfor %}
