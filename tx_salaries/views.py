@@ -60,6 +60,22 @@ class OrganizationView(TemplateView):
         return context
 
 
+class PositionView(TemplateView):
+    template_name = 'tx_salaries/position.html'
+
+    def get_top_salaries(self, position):
+        return (models.Employee.objects
+                                .filter(position__post=position)
+                                .order_by('-compensation')[:10])
+
+    def get_context_data(self, **kwargs):
+        context = super(PositionView, self).get_context_data(**kwargs)
+        position = models.Post.objects.get(id=self.kwargs['post_id'])
+        context['position'] = position
+        context['top_salaries'] = self.get_top_salaries(position)
+        return context
+
+
 class LandingView(base.LandingView):
     app_title = "Government Employee Salaries"
     app_tagline = "FOIA-ing all the things"

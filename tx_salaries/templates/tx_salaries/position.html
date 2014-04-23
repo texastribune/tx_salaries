@@ -1,0 +1,237 @@
+{% extends "tx_salaries/layouts/base.html" %}
+
+{% block title %}{{ position.label }}{{ block.super }}{% endblock %}
+
+{% load humanize %}
+{% load static from staticfiles %}
+
+{% block breadcrumb_items %}
+  <li>{{ position.organization.parent.name }}</li>
+  <span class="divider">/</span>
+  <li>{{ position.organization.name }}</li>
+{% endblock %}
+
+{% block main_content %}
+
+<link rel="stylesheet" href="{% static "tx_salaries/css/app.css" %}">
+
+<div class="grid overview">
+
+  <div id="main-content" class="cell w-9">
+    <div class="grid">
+      <h3>{{ position.label }} at {{ position.organization.name }}</h3>
+      <ul>
+        <li><strong>{{ position.stats.total_number }}</strong> employees</li>
+        <li><strong>${{ position.stats.median_paid.compensation|intcomma }}</strong> median salary</li>
+        <li>Data provided by {{ position.organization.parent.name }} TPIA office on {{ position.organization.updated_at }}</li>
+      </ul>
+      <div class="grid overview_header">
+        <ul class="nav nav-list">
+          <div class="cell w-3">
+            <li class="active yellow" id="overview-arrow">
+                <div class="pointer"></div>
+                <a href="#overview">Overview</a>
+            </li>
+          </div>
+          <div class="cell w-3">
+            <li class="purple" id="gender-arrow">
+              <div class="pointer"></div>
+              <a href="#gender">Gender</a>
+            </li>
+          </div>
+          <div class="cell w-3">
+            <li class="green" id="ethnicity-arrow">
+              <div class="pointer"></div>
+              <a href="#ethnicity">Ethnicity</a>
+            </li>
+          </div>
+          <div class="cell w-3">
+            <li class="orange" id="employment-arrow">
+              <div class="pointer"></div>
+              <a href="#employment">Length of employment</a>
+            </li>
+          </div>
+        </ul>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="grid">
+      <a name="overview"></a>
+      <div class="cell w-8">
+        <h3>Top {{ position.label }} salaries at {{ position.organizaton.name }}</h3>
+        <table class="tt-table striped condensed">
+          <thead>
+            <th>Name</th>
+            <th>Salary</th>
+          </thead>
+          <tbody>
+            {% for employee in top_salaries %}
+              <tr>
+                <td><a href="{% url 'tx_salaries:employee' employee.id %}">{{ employee.position.person.name }}</a></td>
+                <td>${{ employee.compensation|intcomma }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="grid">
+      <h3>Gender</h3>
+      <a name="gender" id="gender"></a>
+      <div class="cell w-2 agency-stats">
+        <ul>
+          <li>
+            <h3>{{ position.stats.female.total_number|intcomma }}</h3>
+            <p>female employees</p>
+          </li>
+          <li>
+            <h3>{{ position.stats.male.total_number|intcomma }}</h3>
+            <p>male employees</p>
+          </li>
+        </ul>
+      </div>
+
+      <div class="cell w-4">
+        <img class="pie-chart" src="https://chart.googleapis.com/chart?cht=p&chd=t:{{ position.stats.female.total_number }},{{ position.stats.male.total_number}}&chs=150x100&chdl=Female|Male">
+      </div>
+
+      <div class="cell w-2 agency-stats">
+        <ul>
+          <li>
+            <h3>${{ position.stats.female.median_paid.compensation|intcomma }}</h3>
+            <p>Median female salary</p>
+          </li>
+          <li>
+            <h3>${{ position.stats.male.median_paid.compensation|intcomma }}</h3>
+            <p>Median male salary</p>
+          </li>
+        </ul>
+      </div>
+
+      <div class="cell w-4">
+        <strong>Number of women/men</strong>
+        <div class="bars-container" style="float:left;">
+          {% for slice in position.stats.female.distribution.slices %}
+          <p>
+            <!-- TODO these should be responsive -->
+            <div class="bar-w" style="width:{% widthratio slice.count 160 100 %}px"></div>
+            <span><small>${{ slice.start|intcomma }} &#8212; ${{ slice.end|intcomma }}</small></span>
+            <span style="float:right; line-height:0.5; padding-right: 5px;">{{ slice.count }}</span>
+          </p>
+          {% endfor %}
+        </div>
+        <div class="bars-container" style="float:right;">
+          {% for slice in position.stats.male.distribution.slices %}
+          <p>
+            <div class="bar-m" style="width:{% widthratio slice.count 160 100 %}px"></div>
+            {{ slice.count }}
+          </p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="grid">
+      <h3>Ethnicity</h3>
+      <a name="ethnicity" id="ethnicity"></a>
+      <div class="cell w-8 agency-stats">
+        <h3>Employees by ethnicity</h3>
+        <div class="histogram-container">
+          <div class="bar-m" style="width:{% widthratio position.stats.white.total_number 500 200 %}px"></div>
+          <span>{{ position.stats.white.total_number|intcomma }}</span>
+        </div>
+        <div class="histogram-container">
+          <div class="bar-m" style="width:{% widthratio position.stats.black.total_number 500 200 %}px"></div>
+          <span>{{ position.stats.black.total_number|intcomma }}</span>
+        </div>
+        <div class="histogram-container">
+          <div class="bar-m" style="width:{% widthratio position.stats.hispanic.total_number 500 200 %}px"></div>
+          <span>{{ position.stats.hispanic.total_number|intcomma }}</span>
+        </div>
+        <div class="histogram-container">
+          <div class="bar-m" style="width:{% widthratio position.stats.asian.total_number 500 200 %}px"></div>
+          <span>{{ position.stats.asian.total_number|intcomma }}</span>
+        </div>
+        <div class="histogram-container">
+          <div class="bar-m" style="width:{% widthratio position.stats.am_indian.total_number 500 200 %}px"></div>
+          <span>{{ position.stats.am_indian.total_number|intcomma }}</span>
+        </div>
+      </div>
+      <div class="cell w-4 agency-stats">
+        <h3>Salaries by ethnicity</h3>
+        <table class="tt-table striped condensed">
+          <thead>
+            <th>Ethnicity</th>
+            <th>Median Salary</th>
+          </thead>
+          <tbody>
+            <tr>
+              <td>White</td>
+              <td>${{ position.stats.white.median_paid.compensation|intcomma }}</td>
+            </tr>
+            <tr>
+              <td>Black</td>
+              <td>${{ position.stats.black.median_paid.compensation|intcomma }}</td>
+            </tr>
+            <tr>
+              <td>Hispanic</td>
+              <td>${{ position.stats.hispanic.median_paid.compensation|intcomma }}</td>
+            </tr>
+            <tr>
+              <td>Asian</td>
+              <td>${{ position.stats.asian.median_paid.compensation|intcomma }}</td>
+            </tr>
+            <tr>
+              <td>American Indian</td>
+              <td>${{ position.stats.am_indian.median_paid.compensation|intcomma }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="grid">
+    <h3>Length of employment</h3>
+    <a name="employement" id="employment"></a>
+      <div class="cell w-8 agency-stats">
+        <h3>Employees by length of employment</h3>
+        {% for o in position.stats.time_employed %}
+          <div class="histogram-container">
+            <div class="bar-m" style="width:{% widthratio o.stats.total_number 500 200 %}px"></div>
+            <span>{{ o.stats.total_number|intcomma }}</span>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="cell w-4 agency-stats">
+        <h3>Salaries by length of employment</h3>
+        <table class="tt-table striped condensed">
+          <thead>
+            <th>Length of employment</th>
+            <th>Median Salary</th>
+          </thead>
+          <tbody>
+            {% for o in position.stats.time_employed %}
+              <tr>
+                <td>{{ o.time }}</td>
+                <td>${{ o.stats.median_paid.compensation|intcomma }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- end main -->
+<script src="{% static "tx_salaries/js/app.js" %}"></script>
+</div>
+
+{% endblock %}
