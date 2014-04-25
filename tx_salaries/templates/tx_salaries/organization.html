@@ -227,15 +227,19 @@
 
     <div class="grid">
     <h3>Length of employment</h3>
-    <a name="employement" id="employment"></a>
+    <a name="employment"></a>
       <div class="cell w-8 agency-stats">
         <h3>Employees by length of employment</h3>
+        <div class="chart length-chart">
         {% for o in org.stats.time_employed %}
-          <div class="histogram-container">
-            <div class="bar-m" style="width:{% widthratio o.stats.total_number 500 100 %}%"></div>
-            <span>{{ o.stats.total_number|intcomma }}</span>
+          <div class="bar-box">
+            <div class="bar" style="width: {% widthratio o.stats.total_number org.stats.total_number 100 %}%"></div>
+            <div class="label">
+              <span class="name">{{ o.time }}</span> {{ o.stats.total_number|intcomma }}
+            </div>
           </div>
         {% endfor %}
+        </div>
       </div>
       <div class="cell w-4 agency-stats">
         <h3>Salaries by length of employment</h3>
