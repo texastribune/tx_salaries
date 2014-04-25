@@ -221,6 +221,11 @@ class PositionStats(create_stats_mixin('position'), models.Model):
         return self.generate_stats(cohort)
 
     @property
+    def hispanic(self):
+        cohort = self.position.organization.members.filter(person__races__name='HISPANIC')
+        return self.generate_stats(cohort)
+
+    @property
     def asian(self):
         cohort = self.position.organization.members.filter(person__races__name='ASIAN')
         return self.generate_stats(cohort)
@@ -349,6 +354,11 @@ class OrganizationStats(create_stats_mixin('organization'),
     @property
     def black(self):
         cohort = self.organization.members.filter(person__races__name='BLACK')
+        return self.generate_stats(cohort)
+
+    @property
+    def hispanic(self):
+        cohort = self.organization.members.filter(person__races__name='HISPANIC')
         return self.generate_stats(cohort)
 
     @property
