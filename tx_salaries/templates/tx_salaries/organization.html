@@ -117,10 +117,6 @@
         </ul>
       </div>
 
-      <div class="cell w-2">
-        <img class="pie-chart" src="https://chart.googleapis.com/chart?cht=p&chd=t:{{ org.stats.female.total_number }},{{ org.stats.male.total_number}}&chs=150x100&chdl=Female|Male">
-      </div>
-
       <div class="cell w-2 agency-stats">
         <ul>
           <li>
@@ -134,24 +130,23 @@
         </ul>
       </div>
 
-      <div class="cell w-6">
+      <div class="cell w-8">
         <strong>Number of women/men</strong>
-        <div class="bars-container" style="float:left;">
-          {% for slice in org.stats.female.distribution.slices %}
-          <p>
-            <div class="bar-w" style="width:{% widthratio slice.count 160 100 %}%"></div>
-            <span><small>${{ slice.start|intcomma }} &#8212; ${{ slice.end|intcomma }}</small></span>
-            <span style="float:right; line-height:0.5; padding-right: 5px;">{{ slice.count }}</span>
-          </p>
-          {% endfor %}
-        </div>
-        <div class="bars-container" style="float:right;">
-          {% for slice in org.stats.male.distribution.slices %}
-          <p>
-            <div class="bar-m" style="width:{% widthratio slice.count 160 100 %}%"></div>
-            {{ slice.count }}
-          </p>
-          {% endfor %}
+        <div class="distribution-chart">
+          <div style="width: 50%; float: left; border-right: 1px solid #222222;">
+            {% for slice in org.stats.male.distribution.slices %}
+            <div class="bar-box">
+              <div class="bar bar-male" style="width: {% widthratio slice.count org.stats.total_number 100 %}%; float: right;"></div>
+            </div>
+            {% endfor %}
+          </div>
+          <div style="width: 50%; float: right;">
+            {% for slice in org.stats.female.distribution.slices %}
+            <div class="bar-box">
+              <div class="bar bar-female" style="width: {% widthratio slice.count org.stats.total_number 100 %}%; float: left;"></div>
+            </div>
+            {% endfor %}
+          </div>
         </div>
       </div>
     </div>
