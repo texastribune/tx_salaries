@@ -122,11 +122,11 @@ class PositionStats(create_stats_mixin('position'), models.Model):
 
     objects = managers.PositionStatsManager()
 
-    def generate_stats(self, cohort):
+    def generate_stats(self, cohort, get_slices=False):
         # TODO this dict is not ideal
         total_number = cohort.count()
         if total_number > 0:
-            return {
+            data = {
                 'highest_paid': self.get_employee(cohort
                                     .order_by('-employee__compensation')
                                     .values('employee__id')[0]),
@@ -136,9 +136,11 @@ class PositionStats(create_stats_mixin('position'), models.Model):
                 'lowest_paid': self.get_employee(cohort
                                     .order_by('employee__compensation')
                                     .values('employee__id')[0]),
-                'total_number': total_number,
-                'distribution': self.get_distribution(cohort)
+                'total_number': total_number
             }
+            if get_slices:
+                data.update({'distribution': self.get_distribution(cohort)})
+            return data
         else:
             return {'total_number': 0}
 
@@ -203,12 +205,12 @@ class PositionStats(create_stats_mixin('position'), models.Model):
     @property
     def female(self):
         females = self.position.members.filter(person__gender='F')
-        return self.generate_stats(females)
+        return self.generate_stats(females, True)
 
     @property
     def male(self):
         males = self.position.members.filter(person__gender='M')
-        return self.generate_stats(males)
+        return self.generate_stats(males, True)
 
     @property
     def white(self):
@@ -258,11 +260,11 @@ class OrganizationStats(create_stats_mixin('organization'),
 
     objects = managers.OrganizationStatsManager()
 
-    def generate_stats(self, cohort):
+    def generate_stats(self, cohort, get_slices=False):
         # TODO this dict is not ideal
         total_number = cohort.count()
         if total_number > 0:
-            return {
+            data = {
                 'highest_paid': self.get_employee(cohort
                                     .order_by('-employee__compensation')
                                     .values('employee__id')[0]),
@@ -272,9 +274,11 @@ class OrganizationStats(create_stats_mixin('organization'),
                 'lowest_paid': self.get_employee(cohort
                                     .order_by('employee__compensation')
                                     .values('employee__id')[0]),
-                'total_number': total_number,
-                'distribution': self.get_distribution(cohort)
+                'total_number': total_number
             }
+            if get_slices:
+                data.update({'distribution': self.get_distribution(cohort)})
+            return data
         else:
             return {'total_number': 0}
 
@@ -339,12 +343,12 @@ class OrganizationStats(create_stats_mixin('organization'),
     @property
     def female(self):
         cohort = self.organization.members.filter(person__gender='F')
-        return self.generate_stats(cohort)
+        return self.generate_stats(cohort, True)
 
     @property
     def male(self):
         cohort = self.organization.members.filter(person__gender='M')
-        return self.generate_stats(cohort)
+        return self.generate_stats(cohort, True)
 
     @property
     def white(self):
