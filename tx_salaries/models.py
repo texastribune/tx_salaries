@@ -213,29 +213,18 @@ class PositionStats(create_stats_mixin('position'), models.Model):
         return self.generate_stats(males, True)
 
     @property
-    def white(self):
-        cohort = self.position.organization.members.filter(person__races__name='WHITE')
-        return self.generate_stats(cohort)
-
-    @property
-    def black(self):
-        cohort = self.position.organization.members.filter(person__races__name='BLACK')
-        return self.generate_stats(cohort)
-
-    @property
-    def hispanic(self):
-        cohort = self.position.organization.members.filter(person__races__name='HISPANIC')
-        return self.generate_stats(cohort)
-
-    @property
-    def asian(self):
-        cohort = self.position.organization.members.filter(person__races__name='ASIAN')
-        return self.generate_stats(cohort)
-
-    @property
-    def am_indian(self):
-        cohort = self.position.organization.members.filter(person__races__name='AM INDIAN')
-        return self.generate_stats(cohort)
+    def races(self):
+        unique_races = (self.position.members
+                                .values_list('person__races__name', flat=True)
+                                .distinct())
+        data = []
+        for race in unique_races:
+            race_cohort = self.position.members.filter(person__races__name=race)
+            data.append({
+                'race': race,
+                'stats': self.generate_stats(race_cohort)
+            })
+        return data
 
     @property
     def time_employed(self):
@@ -351,29 +340,18 @@ class OrganizationStats(create_stats_mixin('organization'),
         return self.generate_stats(cohort, True)
 
     @property
-    def white(self):
-        cohort = self.organization.members.filter(person__races__name='WHITE')
-        return self.generate_stats(cohort)
-
-    @property
-    def black(self):
-        cohort = self.organization.members.filter(person__races__name='BLACK')
-        return self.generate_stats(cohort)
-
-    @property
-    def hispanic(self):
-        cohort = self.organization.members.filter(person__races__name='HISPANIC')
-        return self.generate_stats(cohort)
-
-    @property
-    def asian(self):
-        cohort = self.organization.members.filter(person__races__name='ASIAN')
-        return self.generate_stats(cohort)
-
-    @property
-    def am_indian(self):
-        cohort = self.organization.members.filter(person__races__name='AM INDIAN')
-        return self.generate_stats(cohort)
+    def races(self):
+        unique_races = (self.organization.members
+                                .values_list('person__races__name', flat=True)
+                                .distinct())
+        data = []
+        for race in unique_races:
+            race_cohort = self.organization.members.filter(person__races__name=race)
+            data.append({
+                'race': race,
+                'stats': self.generate_stats(race_cohort)
+            })
+        return data
 
     @property
     def time_employed(self):

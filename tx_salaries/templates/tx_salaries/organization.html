@@ -159,30 +159,14 @@
       <div class="cell w-8 agency-stats">
         <h3>Employees by ethnicity</h3>
         <div class="chart ethnicity-chart">
+        {% for race in org.stats.races %}
           <div class="bar-box">
-            <div class="bar" style="width: {% widthratio org.stats.white.total_number org.stats.total_number 100 %}%"></div>
+            <div class="bar" style="width: {% widthratio race.stats.total_number org.stats.total_number 100 %}%"></div>
             <div class="label">
-              <span class="name">White</span> {% widthratio org.stats.white.total_number org.stats.total_number 100 %}% | {{ org.stats.white.total_number|intcomma }} employees
+              <span class="name">{{ race.race }}</span> {% widthratio race.stats.total_number org.stats.total_number 100 %}% | {{ race.stats.total_number|intcomma }} employees
             </div>
           </div>
-          <div class="bar-box">
-            <div class="bar" style="width: {% widthratio org.stats.black.total_number org.stats.total_number 100 %}%"></div>
-            <div class="label">
-              <span class="name">Black</span> {% widthratio org.stats.black.total_number org.stats.total_number 100 %}% | {{ org.stats.black.total_number|intcomma }}
-            </div>
-          </div>
-          <div class="bar-box">
-            <div class="bar" style="width: {% widthratio org.stats.hispanic.total_number org.stats.total_number 100 %}%"></div>
-            <div class="label">
-              <span class="name">Hispanic</span> {% widthratio org.stats.hispanic.total_number org.stats.total_number 100 %}% | {{ org.stats.hispanic.total_number|intcomma }}
-            </div>
-          </div>
-          <div class="bar-box">
-            <div class="bar" style="width: {% widthratio org.stats.asian.total_number org.stats.total_number 100 %}%"></div>
-            <div class="label">
-              <span class="name">Asian</span> {% widthratio org.stats.asian.total_number org.stats.total_number 100 %}% | {{ org.stats.asian.total_number|intcomma }}
-            </div>
-          </div>
+        {% endfor %}
         </div>
       </div>
       <div class="cell w-4 agency-stats">
@@ -193,26 +177,12 @@
             <th>Median Salary</th>
           </thead>
           <tbody>
-            <tr>
-              <td>White</td>
-              <td>${{ org.stats.white.median_paid.compensation|intcomma }}</td>
-            </tr>
-            <tr>
-              <td>Black</td>
-              <td>${{ org.stats.black.median_paid.compensation|intcomma }}</td>
-            </tr>
-            <tr>
-              <td>Hispanic</td>
-              <td>${{ org.stats.hispanic.median_paid.compensation|intcomma }}</td>
-            </tr>
-            <tr>
-              <td>Asian</td>
-              <td>${{ org.stats.asian.median_paid.compensation|intcomma }}</td>
-            </tr>
-            <tr>
-              <td>American Indian</td>
-              <td>${{ org.stats.am_indian.median_paid.compensation|intcomma }}</td>
-            </tr>
+            {% for race in org.stats.races %}
+              <tr>
+                <td>{{ race.race }}</td>
+                <td>${{ race.stats.median_paid.compensation|intcomma }}</td>
+              </tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
