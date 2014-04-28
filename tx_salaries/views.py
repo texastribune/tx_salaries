@@ -1,78 +1,86 @@
-from django.views.generic import TemplateView
+from django.views.generic import DetailView, TemplateView
 from tt_dataviews.views import base
 
 from . import models
 
 
-class EmployeeView(TemplateView):
+class EmployeeView(DetailView):
     template_name = 'tx_salaries/employee.html'
+    queryset = (models.Employee.objects.all()
+                .select_related('position__person', 'compensation_type',
+                                'position__organization__parent', 'title',)
+                .prefetch_related('position__person__races'))
+    context_object_name = 'employee'
 
-    gender_map = {'M': 'Male', 'F': 'Female'}
-
-    def get_top_peers(self, employee):
-        return (models.Employee.objects
-                                .filter(position__post=employee.position.post)
-                                .order_by('-compensation')[:5])
-
-    def get_top_dept(self, employee):
-        return (models.Employee.objects
-                                .filter(position__post__organization=employee.position.post.organization)
-                                .order_by('-compensation')[:5])
 
     def get_context_data(self, **kwargs):
         context = super(EmployeeView, self).get_context_data(**kwargs)
-        p = models.Employee.objects.get(id=self.kwargs['employee_id'])
-        context['employee'] = {
-            'name': p.position.person.name,
-            'title': p.title.name,
-            'department': p.position.organization.name,
-            'agency': p.position.organization.parent.name,
-            'gender': self.gender_map[p.position.person.gender],
-            'race': p.position.person.races.values('name')[0]['name'],
-            'hire_date': p.hire_date,
-            'salary': p.compensation,
-            'ft': p.compensation_type,
-        }
-        context['peers'] = self.get_top_peers(p)
-        context['top_dept'] = self.get_top_dept(p)
+        context['highest_salaries_in_department'] = (
+                self.get_queryset().filter(
+                            position__post__organization=context['employee'].position.post.organization)
+                            .order_by('-compensation')[:5])
+        context['highest_salaries_peers'] = (
+            self.get_queryset().filter(
+                position__post=context['employee'].position.post)
+                .order_by('-compensation')[:5])
+
         return context
 
 
-class OrganizationView(TemplateView):
+class OrganizationView(DetailView):
     template_name = 'tx_salaries/organization.html'
+    model = models.Organization
+    queryset = (models.Organization.objects
+                .select_related('parent__name',
+                                'stats__median_paid__compensation',
+                                'stats__male__distribution__slices',
+                                'stats__female__distribution__slices',
+                                'stats__male__median_paid___compensation',
+                                'stats__female__median_paid__compensation',
+                                'stats__time_employed'))
+    context_object_name = 'org'
 
-    def get_top_salaries(self, org):
+    def get_top_salaries(self):
         return (models.Employee.objects
-                                .filter(position__post__organization=org)
-                                .order_by('-compensation')[:10])
+                .filter(position__post__organization__pk=self.kwargs['pk'])
+                .select_related('position__person', 'position__organization',
+                                'position__stats__median_paid__compensation',
+                                'title__name')
+                .order_by('-compensation')[:10])
 
-    def get_top_jobs(self, org):
-        return (models.PositionStats.objects.filter(position__organization=org)
-                                            .order_by('-median_paid__compensation')
-                                            [:10])
+    def get_top_jobs(self):
+        return (models.PositionStats.objects
+                .filter(position__organization__pk=self.kwargs['pk'])
+                .select_related('position__label', 'median_paid__compensation')
+                .order_by('-median_paid__compensation')[:10])
 
     def get_context_data(self, **kwargs):
         context = super(OrganizationView, self).get_context_data(**kwargs)
-        o = models.Organization.objects.get(id=self.kwargs['org_id'])
-        context['org'] = o
-        context['top_salaries'] = self.get_top_salaries(o)
-        context['top_jobs'] = self.get_top_jobs(o)
+        context['top_salaries'] = self.get_top_salaries()
+        context['top_jobs'] = self.get_top_jobs()
         return context
 
 
-class PositionView(TemplateView):
+class PositionView(DetailView):
     template_name = 'tx_salaries/position.html'
+    model = models.Post
+    queryset = (models.Post.objects
+                .select_related('stats__median_paid__compensation',
+                                'stats__female__total_number',
+                                'stats__male__total_number',
+                                'organization__parent__name'))
+    context_object_name = 'position'
 
-    def get_top_salaries(self, position):
-        return (models.Employee.objects
-                                .filter(position__post=position)
-                                .order_by('-compensation')[:10])
+    def get_top_salaries(self):
+        return (models.Employee.objects.filter(position__post=self.kwargs['pk'])
+                .select_related('position__person', 'position__organization',
+                                'position__stats__median_paid__compensation')
+                .order_by('-compensation')[:10]
+                .select_related('title'))
 
     def get_context_data(self, **kwargs):
         context = super(PositionView, self).get_context_data(**kwargs)
-        position = models.Post.objects.get(id=self.kwargs['post_id'])
-        context['position'] = position
-        context['top_salaries'] = self.get_top_salaries(position)
+        context['top_salaries'] = self.get_top_salaries()
         return context
 
 

@@ -1,14 +1,14 @@
 {% extends "tx_salaries/layouts/base.html" %}
 
-{% block title %}{{ employee.name }}{{ block.super }}{% endblock %}
+{% block title %}{{ employee.position.person.name }}{{ block.super }}{% endblock %}
 
 {% load humanize %}
 {% load static from staticfiles %}
 
 {% block breadcrumb_items %}
-  <li>{{ employee.agency }}</li>
+  <li>{{ employee.position.organization.parent.name }}</li>
   <span class="divider">/</span>
-  <li>{{ employee.department }}</li>
+  <li>{{ employee.position.organization.name }}</li>
   <span class="divider">/</span>
   <li>{{ employee.title }}</li>
 {% endblock %}
@@ -22,8 +22,8 @@
   <div id="main-content" class="cell w-9">
     <div class="grid">
       <div class="cell w-12 header-stats">
-        <h3>{{ employee.name }}</h3>
-        <p><strong>{{ employee.title }}</strong> in <strong>{{ employee.department }}</strong> department of <strong>{{ employee.agency }}</strong></p>
+        <h3>{{ employee.position.person.name }}</h3>
+        <p><strong>{{ employee.title }}</strong> in <strong>{{ employee.position.organization.name }}</strong> department of <strong>{{ employee.position.organization.parent.name }}</strong></p>
         <p>Data received on 4/11/2014</p>
       </div>
     </div>
@@ -31,7 +31,12 @@
     <hr>
     <div class="grid">
       <div class="cell w-4 header-stats" style="float:left;">
-        <p><strong>{{ employee.race }} {{ employee.gender }}</strong></p>
+        <p><strong>
+          {% for race in employee.position.person.races.all %}
+            {{ race.name }}
+          {% endfor %}
+          {{ employee.position.person.gender }}
+        </strong></p>
       </div>
 
       <div class="cell w-4 header-stats" style="float:right; text-align:right;">
@@ -40,7 +45,7 @@
       </div>
 
       <div class="cell w-4 header-stats" style="text-align:center;">
-        <p><strong>${{ employee.salary|intcomma }}</strong></p>
+        <p><strong>${{ employee.compensation|intcomma }}</strong></p>
         <p>Annual Salary</p>
         <p>{{ employee.ft }}</p>
       </div>
@@ -56,7 +61,7 @@
             <th>Salary</th>
           </thead>
           <tbody>
-            {% for employee in top_dept %}
+            {% for employee in highest_salaries_in_department %}
               <tr>
                 <td><a href="{% url 'tx_salaries:employee' employee.id %}">{{ employee.position.person.name }}</a></td>
                 <td>{{ employee.hire_date }}</td>
@@ -76,7 +81,7 @@
             <th>Salary</th>
           </thead>
           <tbody>
-            {% for peer in peers %}
+            {% for peer in highest_salaries_peers %}
               <tr>
                 <td><a href="{% url 'tx_salaries:employee' peer.id %}">{{ peer.position.person.name }}</a></td>
                 <td>{{ peer.hire_date }}</td>
