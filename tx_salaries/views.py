@@ -83,11 +83,14 @@ class LandingView(base.LandingView):
 
     def get_top_salaries(self, **kwargs):
         return (models.Employee.objects.all()
-                                .order_by('-compensation')[:10])
+                .select_related('position__person', 'position__organization',
+                                'title__name')
+                .order_by('-compensation')[:10])
 
     def get_recent_orgs(self, **kwargs):
         return (models.Organization.objects.all()
-                                .order_by('-updated_at')[:10])
+                .select_related('stats__median_paid__compensation')
+                .order_by('-updated_at')[:10])
 
     def get_context_data(self, **kwargs):
         context = super(LandingView, self).get_context_data(**kwargs)
