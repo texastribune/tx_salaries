@@ -1,3 +1,5 @@
+import re
+
 from . import base
 from . import mixins
 
@@ -73,9 +75,23 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         '''
         return self.status_map[self.compensation_type[-1]]
 
+    def process_job_title(self):
+        # don't titlecase roman numerals
+        roman_regex = re.compile("^(IX|IV|V?I{0,3})")
+
+        def is_roman(snippet):
+            if len(roman_regex.match(snippet).group()) > 0:
+                return snippet
+            else:
+                return snippet.title()
+
+        return (u" ").join([is_roman(s) for s in self.data["CLASS TITLE"]
+                                                                .split(" ")])
+
     @property
     def compensations(self):
         compensation_type = self.process_compensation_type()
+        job_title = self.process_job_title()
         return [
             {
                 'tx_salaries.CompensationType': {
@@ -86,7 +102,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
                     'compensation': self.compensation,
                 },
                 'tx_salaries.EmployeeTitle': {
-                    'name': self.job_title.strip(),
+                    'name': job_title,
                 },
             }
         ]
