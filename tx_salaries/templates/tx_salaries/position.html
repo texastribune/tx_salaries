@@ -6,9 +6,9 @@
 {% load static from staticfiles %}
 
 {% block breadcrumb_items %}
-  <li>{{ position.organization.parent.name }}</li>
+  <li><a href="{% url 'tx_salaries:organization' position.organization.parent.pk %}">{{ position.organization.parent.name }}</a></li>
   <span class="divider">/</span>
-  <li>{{ position.organization.name }}</li>
+  <li><a href="{% url 'tx_salaries:organization' position.organization.pk %}">{{ position.organization.name }}</a></li>
 {% endblock %}
 
 {% block main_content %}

@@ -6,7 +6,7 @@
 {% load static from staticfiles %}
 
 {% block breadcrumb_items %}
-<li>{{ org.parent.name }}</li>
+<li><a href="{% url 'tx_salaries:organization' org.parent.pk %}">{{ org.parent.name }}</a></li>
 {% endblock %}
 
 {% block main_content %}
@@ -19,7 +19,7 @@
     <div class="grid">
       <h3>{{ org.name }}</h3>
       <ul>
-        <li>Department of <strong>{{ org.parent.name }}</strong></li>
+        <li>Department of <strong><a href="{% url 'tx_salaries:organization' org.parent.pk %}">{{ org.parent.name }}</a></strong></li>
         <li><strong>{{ org.stats.total_number }}</strong> employees</li>
         <li><strong>${{ org.stats.median_paid.compensation|intcomma }}</strong> median salary</li>
         <li>Data provided by {{ org.parent.name }} TPIA office on {{ org.updated_at }}</li>
@@ -71,8 +71,8 @@
             {% for employee in top_salaries %}
               <tr>
                 <td><a href="{% url 'tx_salaries:employee' employee.id %}">{{ employee.position.person.name }}</a></td>
-                <td>{{ employee.title.name }}</td>
-                <td>{{ employee.position.organization.name }}</td>
+                <td><a href="{% url 'tx_salaries:position' employee.position.post.pk %}">{{ employee.title.name }}</a></td>
+                <td><a href="{% url 'tx_salaries:organization' employee.position.organization.pk %}">{{ employee.position.organization.name }}</a></td>
                 <td>${{ employee.compensation|intcomma }}</td>
               </tr>
             {% endfor %}
@@ -90,7 +90,7 @@
           <tbody>
             {% for job in top_jobs %}
               <tr>
-                <td>{{ job.position.label }} </td>
+                <td><a href="{% url 'tx_salaries:position' job.position.pk %}">{{ job.position.label }}</a></td>
                 <td>${{ job.median_paid.compensation|intcomma }}</td>
               </tr>
             {% endfor %}

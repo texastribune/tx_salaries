@@ -69,8 +69,8 @@
           {% for employee in top_salaries %}
             <tr>
               <td><a href="{% url 'tx_salaries:employee' employee.id %}">{{ employee.position.person.name }}</a></td>
-              <td>{{ employee.title.name }}</td>
-              <td>{{ employee.position.organization.name }}</td>
+              <td><a href="{% url 'tx_salaries:position' employee.position.post.pk %}">{{ employee.title.name }}</a></td>
+              <td><a href="{% url 'tx_salaries:organization' employee.position.organization.pk %}">{{ employee.position.organization.name }}</a></td>
               <td>${{ employee.compensation|intcomma }}</td>
             </tr>
           {% endfor %}
