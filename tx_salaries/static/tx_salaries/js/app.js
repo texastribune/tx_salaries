@@ -1,5 +1,5 @@
-var $navPos = $('.nav').position().top;
-var $nav = $('.nav');
+var $navPos = $('.over-bar').position().top;
+var $nav = $('.over-bar');
 
 $(window).scroll(function() {
   var $scrollTop = $(window).scrollTop();
