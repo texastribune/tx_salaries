@@ -89,6 +89,10 @@ class TransformedRecord(mixins.GenericCompensationMixin,
                                                                 .split(" ")])
 
     @property
+    def post(self):
+        return {'label': self.process_job_title()}
+
+    @property
     def compensations(self):
         compensation_type = self.process_compensation_type()
         job_title = self.process_job_title()
