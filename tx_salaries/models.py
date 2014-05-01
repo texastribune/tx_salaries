@@ -229,12 +229,12 @@ class PositionStats(create_stats_mixin('position'), models.Model):
     @property
     def time_employed(self):
         # TODO
-        one_year = self.position.organization.members.filter(employee__hire_date__gte='2014-01-01')
-        five_years = (self.position.organization.members.filter(employee__hire_date__lte='2014-01-01')
-                            .filter(employee__hire_date__gte='2009-01-01'))
-        ten_years = (self.position.organization.members.filter(employee__hire_date__lte='2009-01-01')
-                            .filter(employee__hire_date__gte='2004-01-01'))
-        twenty_years = self.position.organization.members.filter(employee__hire_date__lte='2004-01-01')
+        one_year = self.position.members.filter(employee__hire_date__gte='2014-01-01')
+        five_years = (self.position.members.filter(employee__hire_date__lt='2014-01-01',
+                                        employee__hire_date__gte='2009-01-01'))
+        ten_years = (self.position.members.filter(employee__hire_date__lt='2009-01-01',
+                                        employee__hire_date__gte='2004-01-01'))
+        twenty_years = self.position.members.filter(employee__hire_date__lt='2004-01-01')
         return [
             {'time': '1 year', 'stats': self.generate_stats(one_year)},
             {'time': '5-10 years', 'stats': self.generate_stats(five_years)},
@@ -357,10 +357,10 @@ class OrganizationStats(create_stats_mixin('organization'),
     def time_employed(self):
         # TODO use dates on the models, don't calculate off jan. 1
         one_year = self.organization.members.filter(employee__hire_date__gte='2014-01-01')
-        five_years = (self.organization.members.filter(employee__hire_date__lt='2014-01-01')
-                            .filter(employee__hire_date__gte='2009-01-01'))
-        ten_years = (self.organization.members.filter(employee__hire_date__lt='2009-01-01')
-                            .filter(employee__hire_date__gte='2004-01-01'))
+        five_years = (self.organization.members.filter(employee__hire_date__lt='2014-01-01',
+                                        employee__hire_date__gte='2009-01-01'))
+        ten_years = (self.organization.members.filter(employee__hire_date__lt='2009-01-01',
+                                        employee__hire_date__gte='2004-01-01'))
         twenty_years = self.organization.members.filter(employee__hire_date__lt='2004-01-01')
         return [
             {'time': '1 year', 'stats': self.generate_stats(one_year)},
