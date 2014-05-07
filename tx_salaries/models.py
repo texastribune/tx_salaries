@@ -152,7 +152,7 @@ class PositionStats(create_stats_mixin('position'), models.Model):
             return num + (target - num % target)
 
     def get_distribution(self, cohort):
-        if cohort.count() <= 1:
+        if cohort.count() == 0:
             return None
         # Set bounds of buckets using all employees so breakdowns are comparable
         salaries = self.position.organization.members.aggregate(
@@ -279,7 +279,7 @@ class OrganizationStats(create_stats_mixin('organization'),
             return num + (target - num % target)
 
     def get_distribution(self, cohort):
-        if cohort.count() <= 1:
+        if cohort.count() == 0:
             return None
         # Set bounds of buckets using all employees so breakdowns are comparable
         salaries = self.organization.members.aggregate(
