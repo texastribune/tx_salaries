@@ -1,0 +1,97 @@
+{% extends "tx_salaries/layouts/base.html" %}
+
+{% block title %}{{ employee.position.person.name }}{{ block.super }}{% endblock %}
+
+{% load humanize %}
+{% load static from staticfiles %}
+
+{% block breadcrumb_items %}
+  <li><a href="{% url 'tx_salaries:organization' employee.position.organization.parent.pk %}">{{ employee.position.organization.parent.name }}</a></li>
+  <span class="divider">/</span>
+  <li><a href="{% url 'tx_salaries:organization' employee.position.organization.pk %}">{{ employee.position.organization.name }}</a></li>
+  <span class="divider">/</span>
+  <li><a href="{% url 'tx_salaries:position' employee.position.post.pk %}">{{ employee.title }}</a></li>
+{% endblock %}
+
+{% block main_content %}
+
+<link rel="stylesheet" href="{% static "tx_salaries/css/app.css" %}">
+
+<div class="grid overview">
+
+  <div id="main-content" class="cell w-9">
+    <div class="grid">
+      <div class="cell w-12 header-stats">
+        <h3>{{ employee.position.person.name }}</h3>
+        <p><strong><a href="{% url 'tx_salaries:position' employee.position.post.pk %}">{{ employee.title }}</a></strong> in <strong><a href="{% url 'tx_salaries:organization' employee.position.organization.pk %}">{{ employee.position.organization.name }}</a></strong> department of <strong><a href="{% url 'tx_salaries:organization' employee.position.organization.parent.pk %}">{{ employee.position.organization.parent.name }}</a></strong></p>
+        <p>Data received on 4/11/2014</p>
+      </div>
+    </div>
+
+    <hr>
+    <div class="grid">
+      <div class="cell w-4 header-stats" style="float:left;">
+        <p><strong>
+          {% for race in employee.position.person.races.all %}
+            {{ race.name }}
+          {% endfor %}
+          {{ employee.position.person.gender }}
+        </strong></p>
+      </div>
+
+      <div class="cell w-4 header-stats" style="float:right; text-align:right;">
+        <p><strong>{{ employee.hire_date }}</strong></p>
+        <p>Hire date</p>
+      </div>
+
+      <div class="cell w-4 header-stats" style="text-align:center;">
+        <p><strong>${{ employee.compensation|intcomma }}</strong></p>
+        <p>Annual Salary</p>
+        <p>{{ employee.ft }}</p>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="cell w-6">
+        <strong>Top salaries in {{ employee.department }}</strong>
+        <table class="tt-table striped">
+          <thead>
+            <th>Name</th>
+            <th>Hire Date</th>
+            <th>Salary</th>
+          </thead>
+          <tbody>
+            {% for employee in highest_salaries_in_department %}
+              <tr>
+                <td><a href="{% url 'tx_salaries:employee' employee.id %}">{{ employee.position.person.name }}</a></td>
+                <td>{{ employee.hire_date }}</td>
+                <td>${{ employee.compensation|intcomma }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="cell w-6">
+        <strong>Top {{ employee.title }} salaries at {{ employee.department }}</strong>
+        <table class="tt-table striped">
+          <thead>
+            <th>Name</th>
+            <th>Hire Date</th>
+            <th>Salary</th>
+          </thead>
+          <tbody>
+            {% for peer in highest_salaries_peers %}
+              <tr>
+                <td><a href="{% url 'tx_salaries:employee' peer.id %}">{{ peer.position.person.name }}</a></td>
+                <td>{{ peer.hire_date }}</td>
+                <td>${{ peer.compensation|intcomma }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

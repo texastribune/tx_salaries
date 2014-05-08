@@ -5,6 +5,7 @@ from . import eanes_isd
 from . import el_paso_county
 from . import texas_tech_system
 from . import texas_tech_university
+from . import state_of_texas
 
 
 TRANSFORMERS = {
@@ -15,4 +16,5 @@ TRANSFORMERS = {
     'd18ad5c9635a40de15b0ead0e8f8fe97b8ccca31': [el_paso_county.transform, ],
     'bc023bcf9e573ecdf8335ebafb24feec596e473f': [texas_tech_system.transform, ],
     'c60489252da989ab04f6a47a86265dc047dd367b': [texas_tech_university.transform, ],
+    '690fc3890e8f893a7b1634de2df958846ad12a1b': [state_of_texas.transform, ],
 }

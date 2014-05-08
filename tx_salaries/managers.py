@@ -23,9 +23,9 @@ class OrganizationStatsManager(DenormalizeManagerMixin, models.Manager):
         # TODO: Allow organization to break and say it is top-level
         #       Example: El Paso County Sheriff's Department instead
         #       of going all the way to El Paso County.
-        if organization.parent:
-            use_children = True
-            organization = organization.parent
+        # if organization.parent:
+        #     use_children = True
+        #     organization = organization.parent
 
         if use_children:
             kwargs = {'position__organization__parent': organization, }
