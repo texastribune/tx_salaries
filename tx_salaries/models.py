@@ -160,11 +160,15 @@ class PositionStats(create_stats_mixin('position'), models.Model):
                         min=models.Min('employee__compensation'))
         diff = salaries['max'] - salaries['min']
         if diff == 0:
-            return [{
-                'start': salaries['min'],
-                'end': salaries['max'],
-                'count': cohort.count()
-            }]
+            # TODO test
+            return {
+                'step': 0,
+                'slices': [{
+                    'start': salaries['min'],
+                    'end': salaries['max'],
+                    'count': cohort.count()
+                }]
+            }
         step = diff / 10
         start = salaries['min']
 
@@ -293,11 +297,15 @@ class OrganizationStats(create_stats_mixin('organization'),
                         min=models.Min('employee__compensation'))
         diff = salaries['max'] - salaries['min']
         if diff == 0:
-            return [{
-                'start': salaries['min'],
-                'end': salaries['max'],
-                'count': cohort.count()
-            }]
+            #TODO test
+            return {
+                'step': 0,
+                'slices': [{
+                    'start': salaries['min'],
+                    'end': salaries['max'],
+                    'count': cohort.count()
+                }]
+            }
         step = diff / 10
         start = salaries['min']
 
