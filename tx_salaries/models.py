@@ -126,13 +126,26 @@ class PositionStats(create_stats_mixin('position'), models.Model):
         # TODO this dict is not ideal
         total_number = cohort.count()
         if total_number > 0:
+            cohort_asc = (cohort.order_by('-employee__compensation')
+                                .values('employee__id'))
+
+            if total_number % 2 == 0:
+                # average the two middle compensations
+                median_compensation = (
+                    (self.get_employee(
+                        cohort_asc[(total_number / 2)]).compensation +
+                        self.get_employee(
+                            cohort_asc[((total_number / 2) - 1)]).compensation)
+                    / 2)
+            else:
+                # use the middle compensation
+                median_compensation = (
+                    self.get_employee(
+                        cohort_asc[(total_number - 1) / 2]).compensation)
+
             data = {
-                'highest_paid': self.get_employee(cohort
-                                    .order_by('-employee__compensation')
-                                    .values('employee__id')[0]),
-                'median_paid': self.get_employee(cohort
-                                    .order_by('-employee__compensation')
-                                    .values('employee__id')[(total_number - 1) / 2]),
+                'highest_paid': self.get_employee(cohort_asc[0]),
+                'median_paid': {'compensation': median_compensation},
                 'lowest_paid': self.get_employee(cohort
                                     .order_by('employee__compensation')
                                     .values('employee__id')[0]),
@@ -263,13 +276,26 @@ class OrganizationStats(create_stats_mixin('organization'),
         # TODO this dict is not ideal
         total_number = cohort.count()
         if total_number > 0:
+            cohort_asc = (cohort.order_by('-employee__compensation')
+                                .values('employee__id'))
+
+            if total_number % 2 == 0:
+                # average the two middle compensations
+                median_compensation = (
+                    (self.get_employee(
+                        cohort_asc[(total_number / 2)]).compensation +
+                        self.get_employee(
+                            cohort_asc[((total_number / 2) - 1)]).compensation)
+                    / 2)
+            else:
+                # use the middle compensation
+                median_compensation = (
+                    self.get_employee(
+                        cohort_asc[(total_number - 1) / 2]).compensation)
+
             data = {
-                'highest_paid': self.get_employee(cohort
-                                    .order_by('-employee__compensation')
-                                    .values('employee__id')[0]),
-                'median_paid': self.get_employee(cohort
-                                    .order_by('-employee__compensation')
-                                    .values('employee__id')[(total_number - 1) / 2]),
+                'highest_paid': self.get_employee(cohort_asc[0]),
+                'median_paid': {'compensation': median_compensation},
                 'lowest_paid': self.get_employee(cohort
                                     .order_by('employee__compensation')
                                     .values('employee__id')[0]),
