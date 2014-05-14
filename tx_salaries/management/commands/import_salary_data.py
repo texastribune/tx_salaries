@@ -28,7 +28,8 @@ class Command(BaseCommand):
         for filename in args:
             records = transformer.transform(filename, kwargs['sheet'],
                                             kwargs['label_row'])
-            if kwargs['verbosity'] >= 2:
+            verbosity = int(kwargs['verbosity'])
+            if verbosity >= 2:
                 print "Processing %d records from %s" % (len(records),
                         basename(filename))
 
@@ -37,12 +38,12 @@ class Command(BaseCommand):
             for record in records:
                 to_db.save(record)
                 records_remaining -= 1
-                if kwargs['verbosity'] == 1:
+                if verbosity == 1:
                     out('.')
-                elif kwargs['verbosity'] == 2 and records_remaining % 100 == 0:
+                elif verbosity == 2 and records_remaining % 100 == 0:
                     print "%s records remaining" % records_remaining
-                elif kwargs['verbosity'] >= 3 and records_remaining % 500 == 0:
+                elif verbosity >= 3 and records_remaining % 500 == 0:
                     print "%s records remaining" % records_remaining
 
-            if kwargs['verbosity'] == 1:
+            if verbosity == 1:
                 out('\n')
