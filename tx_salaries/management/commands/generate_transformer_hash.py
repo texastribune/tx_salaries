@@ -17,4 +17,9 @@ class Command(BaseCommand):
         for i in range(1, int(label_row)):
             reader.next()
         labels = reader.next()
-        print transformer.generate_key(labels)
+        transformer_key = transformer.generate_key(labels)
+
+        if transformer_key in transformer.TRANSFORMERS.keys():
+            print transformer_key + ' (exists)'
+        else:
+            print transformer_key
