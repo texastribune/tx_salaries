@@ -30,9 +30,18 @@ def transform(filename, sheet=None, label_row=1):
     transformers = get_transformers(labels)
 
     if len(transformers) > 1:
-        raise Exception("TODO")
+        question = 'Which transformer would you like to use?\n'
+        for i in range(0, len(transformers)):
+            try:
+                question += '%i: %s\n' % (i, transformers[i][0])
+            except TypeError:
+                raise Exception("Please list transformers with identical hashes as tuples")
+        transformer_choice = int(input(question))
+        transformer = transformers[transformer_choice][1]
 
-    transformer = transformers[0]
+    else:
+        transformer = transformers[0]
+
     # TODO: Figure out a better way to pass a dict reader in
     data = transformer(labels, reader)
     return data

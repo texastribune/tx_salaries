@@ -67,7 +67,13 @@ alphabetical dictionary in ``TRANSFORMERS`` and add this line::
 
     '{ generated hash }': [rio_grande_county.transform, ],
 
-Note that the value isn't a string -- instead it's a module.  Now you need to
+If the generated hash already exists, provide a tuple with a text
+label for the transformer and the transformer module like this::
+
+    '{ generated hash }': [('Rio Grande County', rio_grande_county.transform),
+                            ('Other Existing County', other_county.transform), ],
+
+Note that the second value isn't a string -- instead it's a module.  Now you need to
 import that module.  Go up to the top of the ``__init__.py`` file and add an
 import::
 
