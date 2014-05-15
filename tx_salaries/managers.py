@@ -17,24 +17,22 @@ class OrganizationStatsManager(DenormalizeManagerMixin, models.Manager):
 
     def denormalize(self, obj):
         Employee = obj._meta.concrete_model
-        use_children = False
         organization = obj.position.organization
 
         # TODO: Allow organization to break and say it is top-level
         #       Example: El Paso County Sheriff's Department instead
         #       of going all the way to El Paso County.
-        if organization.parent:
-            use_children = True
-            organization = organization.parent
-
-        if use_children:
-            kwargs = {'position__organization__parent': organization, }
-        else:
-            kwargs = {'position__organization': organization, }
-
+        kwargs = {'position__organization': organization, }
         cohort = Employee.objects.filter(**kwargs)
-
         self.update_cohort(cohort, organization=organization)
+
+        if organization.parent:
+            # employee works for a department,
+            # also calculate parent organization stats
+            organization = organization.parent
+            kwargs = {'position__organization__parent': organization, }
+            cohort = Employee.objects.filter(**kwargs)
+            self.update_cohort(cohort, organization=organization)
 
 
 class PositionStatsManager(DenormalizeManagerMixin, models.Manager):
