@@ -9,7 +9,7 @@ Create your virtualenv, then run:
 
 ::
 
-    pip install -r requirements.txt
+    pip install -r requirements.txt --allow-unverified=PIL --allow-external=argparse
 
 Next, install the various gems.
 
