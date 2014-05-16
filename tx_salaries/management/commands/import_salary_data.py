@@ -5,6 +5,7 @@ from optparse import make_option
 from os.path import basename
 
 from ...utils import to_db, transformer
+from ... import models
 
 
 def out(s):
@@ -35,6 +36,25 @@ class Command(BaseCommand):
 
             records_remaining = len(records)
 
+            try:
+                parent_org = self.get_parent_org(records[0])
+            except:
+                parent_org = None
+
+            if parent_org:
+                parent_org_employees = (models.Employee.objects
+                               .filter(position__organization__parent=parent_org))
+                while parent_org_employees.count():
+                    # delete employees in batches of 100
+                    employee_ids = parent_org_employees.values_list('pk', flat=True)[:100]
+                    parent_org_employees.filter(pk__in=employee_ids).delete()
+                parent_org_children = (models.Organization.objects
+                                .filter(parent=parent_org))
+                while parent_org_children.count():
+                    # delete organizations in batches of 100
+                    children_ids = parent_org_children.values_list('pk', flat=True)[:10]
+                    parent_org_children.filter(pk__in=children_ids).delete()
+
             for record in records:
                 to_db.save(record)
                 records_remaining -= 1
@@ -47,3 +67,7 @@ class Command(BaseCommand):
 
             if verbosity == 1:
                 out('\n')
+
+    def get_parent_org(self, first_record):
+        parent_org_name = first_record['tx_people.Organization']['name']
+        return models.Organization.objects.get(name=parent_org_name)
