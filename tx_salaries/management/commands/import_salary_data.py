@@ -33,10 +33,11 @@ class Command(BaseCommand):
                 print "Processing %d records from %s" % (len(records),
                         basename(filename))
 
+            todos = {'organizations': [], 'positions': []}
             records_remaining = len(records)
 
             for record in records:
-                to_db.save(record)
+                todos = to_db.save(record, todos)
                 records_remaining -= 1
                 if verbosity == 1:
                     out('.')
@@ -47,3 +48,5 @@ class Command(BaseCommand):
 
             if verbosity == 1:
                 out('\n')
+
+            to_db.denormalize(todos)

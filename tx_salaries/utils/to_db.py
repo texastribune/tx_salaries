@@ -3,7 +3,7 @@ from tx_people import models as tx_people
 from .. import models
 
 
-def save(data):
+def save(data, todos):
     # TODO: Save source data
     identifier, id_created = tx_people.Identifier.objects.get_or_create(
             **data['tx_people.Identifier'])
@@ -24,13 +24,19 @@ def save(data):
     children = data['tx_people.Organization'].pop('children', [])
     source_department, _ = tx_people.Organization.objects.get_or_create(
             **data['tx_people.Organization'])
+    if source_department not in todos['organizations']:
+        todos['organizations'].append(source_department)
     for child in children:
         department, _ = tx_people.Organization.objects.get_or_create(
                 parent=source_department, **child)
+        if department not in todos['organizations']:
+            todos['organizations'].append(department)
 
     # TODO: Remove post entirely
     post, _ = tx_people.Post.objects.get_or_create(organization=department,
             **data['tx_people.Post'])
+    if post not in todos['positions']:
+        todos['positions'].append(post)
 
     membership, _ = tx_people.Membership.objects.get_or_create(
             person=person, organization=department, post=post,
@@ -44,3 +50,14 @@ def save(data):
         models.Employee.objects.get_or_create(
             position=membership, compensation_type=compensation_type,
             title=title, **compensation['tx_salaries.Employee'])
+    return todos
+
+
+def denormalize(data):
+    print "Denormalizing %s organizations" % (len(data['organizations']))
+    for org in data['organizations']:
+        models.OrganizationStats.objects.denormalize(org)
+
+    print "Denormalizing %s positions" % (len(data['positions']))
+    for position in data['positions']:
+        models.PositionStats.objects.denormalize(position)
