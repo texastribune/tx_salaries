@@ -29,9 +29,8 @@ class Command(BaseCommand):
             records = transformer.transform(filename, kwargs['sheet'],
                                             kwargs['label_row'])
             verbosity = int(kwargs['verbosity'])
-            if verbosity >= 2:
-                print "Processing %d records from %s" % (len(records),
-                        basename(filename))
+            print "Processing %d records from %s" % (len(records),
+                  basename(filename))
 
             todos = {'organizations': [], 'positions': []}
             records_remaining = len(records)
