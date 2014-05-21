@@ -32,11 +32,14 @@ class Command(BaseCommand):
             print "Processing %d records from %s" % (len(records),
                   basename(filename))
 
-            todos = {'organizations': [], 'positions': []}
+            to_denormalize = {'organizations': [], 'positions': []}
             records_remaining = len(records)
 
             for record in records:
-                todos = to_db.save(record, todos)
+                save_for_stats = to_db.save(record)
+                to_denormalize = self.add_to_denormalize(save_for_stats,
+                                                         to_denormalize)
+
                 records_remaining -= 1
                 if verbosity == 1:
                     out('.')
@@ -48,4 +51,15 @@ class Command(BaseCommand):
             if verbosity == 1:
                 out('\n')
 
-            to_db.denormalize(todos)
+            to_db.denormalize(to_denormalize)
+
+    def add_to_denormalize(self, save_for_stats, to_denormalize):
+        for organization in save_for_stats['organizations']:
+            if organization not in to_denormalize['organizations']:
+                to_denormalize['organizations'].append(organization)
+
+        for position in save_for_stats['positions']:
+            if position not in to_denormalize['positions']:
+                to_denormalize['positions'].append(position)
+
+        return to_denormalize
