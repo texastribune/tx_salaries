@@ -21,7 +21,7 @@ class Command(BaseCommand):
         make_option('--row', action='store', dest='label_row', default=1,
                     help='Location of the row of labels, defaults to 1'),
         make_option('--v', action='store', dest='verbosity', default=0,
-            help='1=Every record; 2=100 records; 3=500 records'),
+                    help='1=Every record; 2=100 records; 3=500 records'),
     )
 
     def handle(self, *args, **kwargs):
@@ -30,7 +30,7 @@ class Command(BaseCommand):
                                             kwargs['label_row'])
             verbosity = int(kwargs['verbosity'])
             print "Processing %d records from %s" % (len(records),
-                  basename(filename))
+                                                     basename(filename))
 
             to_denormalize = {'organizations': [], 'positions': []}
             records_remaining = len(records)
