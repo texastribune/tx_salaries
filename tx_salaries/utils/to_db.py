@@ -4,7 +4,8 @@ from .. import models
 
 
 def save(data):
-    save_for_stats = {'organizations': [], 'positions': []}
+    save_for_stats = {'organizations': set(), 'positions': set()}
+
     # TODO: Save source data
     identifier, id_created = tx_people.Identifier.objects.get_or_create(
         **data['tx_people.Identifier'])
@@ -25,16 +26,16 @@ def save(data):
     children = data['tx_people.Organization'].pop('children', [])
     source_department, _ = tx_people.Organization.objects.get_or_create(
         **data['tx_people.Organization'])
-    save_for_stats['organizations'].append(source_department)
+    save_for_stats['organizations'].add(source_department)
     for child in children:
         department, _ = tx_people.Organization.objects.get_or_create(
             parent=source_department, **child)
-        save_for_stats['organizations'].append(department)
+        save_for_stats['organizations'].add(department)
 
     # TODO: Remove post entirely
     post, _ = tx_people.Post.objects.get_or_create(organization=department,
                                                    **data['tx_people.Post'])
-    save_for_stats['positions'].append(post)
+    save_for_stats['positions'].add(post)
 
     membership, _ = tx_people.Membership.objects.get_or_create(
         person=person, organization=department, post=post,
