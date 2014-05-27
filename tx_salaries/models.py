@@ -1,4 +1,5 @@
 from django.db import models
+from jsonfield import JSONField
 from tx_people import fields
 from tx_people.models import Membership, Organization, Post
 
@@ -104,6 +105,10 @@ def create_stats_mixin(prefix):
         median_paid = models.ForeignKey('Employee', **generate_kwargs('median'))
         lowest_paid = models.ForeignKey('Employee', **generate_kwargs('lowest'))
         total_number = models.PositiveIntegerField(default=0)
+        races = JSONField()
+        female = JSONField()
+        male = JSONField()
+        time_employed = JSONField()
 
         class Meta:
             abstract = True
