@@ -2,9 +2,9 @@ from django.db import models
 from jsonfield import JSONField
 from tx_people import fields
 from tx_people.models import Membership, Organization, Post
+from tx_people import mixins
 
 from . import managers
-from . import mixins
 
 
 def get_top_level_departments():
@@ -51,8 +51,8 @@ class EmployeeTitle(models.Model):
         return self.name
 
 
-class Employee(mixins.DenormalizeOnSaveMixin, mixins.TimeTrackingMixin,
-        mixins.ReducedDateStartAndEndMixin, models.Model):
+class Employee(mixins.TimeTrackingMixin, mixins.ReducedDateStartAndEndMixin,
+               models.Model):
     """
     # TODO
 

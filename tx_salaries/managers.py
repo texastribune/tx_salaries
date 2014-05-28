@@ -130,36 +130,32 @@ class OrganizationStatsManager(DenormalizeManagerMixin, models.Manager):
     use_for_related_manager = True
 
     def denormalize(self, obj):
-        Employee = obj._meta.concrete_model
-        use_children = False
-        organization = obj.position.organization
+        from tx_salaries.models import Employee
 
         # TODO: Allow organization to break and say it is top-level
         #       Example: El Paso County Sheriff's Department instead
         #       of going all the way to El Paso County.
-        if organization.parent:
-            use_children = True
-            organization = organization.parent
+        if obj.parent:
+            # employee works for a department,
+            # also calculate parent organization stats
+            kwargs = {'position__organization': obj, }
 
-        if use_children:
-            kwargs = {'position__organization__parent': organization, }
         else:
-            kwargs = {'position__organization': organization, }
+            kwargs = {'position__organization__parent': obj, }
 
         cohort = Employee.objects.filter(**kwargs)
-
-        self.update_cohort(cohort, organization=organization)
+        self.update_cohort(cohort, organization=obj)
 
 
 class PositionStatsManager(DenormalizeManagerMixin, models.Manager):
     use_for_related_manager = True
 
     def denormalize(self, obj):
-        Employee = obj._meta.concrete_model
+        from tx_salaries.models import Employee
         position_cohort = Employee.objects.filter(
-                position__organization=obj.position.organization,
-                position__post=obj.position.post)
-        self.update_cohort(position_cohort, position=obj.position.post)
+                position__organization=obj.organization,
+                position__post=obj)
+        self.update_cohort(position_cohort, position=obj)
 
 
 class EmployeeTitleStatsManager(DenormalizeManagerMixin, models.Manager):
