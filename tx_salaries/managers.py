@@ -5,9 +5,11 @@ class DenormalizeManagerMixin(object):
     def update_cohort(self, cohort, **kwargs):
         stats, created = self.get_or_create(**kwargs)
         total_in_cohort = cohort.count()
-        stats.highest_paid = cohort.order_by('-compensation')[0]
-        stats.median_paid = cohort.order_by('-compensation')[(total_in_cohort - 1) / 2]
-        stats.lowest_paid = cohort.order_by('compensation')[0]
+        stats.highest_paid = (cohort.order_by('-compensation')
+                                    .values_list('compensation', flat=True)[0])
+        stats.median_paid = self.get_median(cohort, total_in_cohort)
+        stats.lowest_paid = (cohort.order_by('compensation')
+                                   .values_list('compensation', flat=True)[0])
         stats.races = self.get_races(cohort)
         stats.female = self.generate_stats(cohort.filter(
                                            position__person__gender='F'), True)
@@ -17,26 +19,28 @@ class DenormalizeManagerMixin(object):
         stats.total_number = total_in_cohort
         stats.save()
 
+    def get_median(self, cohort, total_number):
+        if total_number % 2 == 0:
+            median_paid = (
+                (cohort.order_by('-compensation')
+                       .values_list('compensation',
+                                    flat=True)[(total_number / 2)] +
+                 cohort.order_by('-compensation')
+                       .values_list('compensation',
+                                    flat=True)[(total_number / 2) - 1]) / 2)
+        else:
+            median_paid = (cohort.order_by('-compensation')
+                                 .values_list('compensation',
+                                              flat=True)[(total_number - 1) / 2])
+        return median_paid
+
     def generate_stats(self, cohort, get_slices=False):
         total_number = cohort.count()
         if total_number > 0:
-
-            if total_number % 2 == 0:
-                median_paid = (
-                    (cohort.order_by('-compensation')
-                           .values_list('compensation',
-                                        flat=True)[(total_number / 2)] +
-                     cohort.order_by('-compensation')
-                           .values_list('compensation',
-                                        flat=True)[(total_number / 2) - 1]) / 2)
-            else:
-                median_paid = (cohort.order_by('-compensation')
-                                     .values_list('compensation',
-                                                  flat=True)[(total_number - 1) / 2])
             data = {
                 'highest_paid': (cohort.order_by('-compensation')
                                        .values_list('compensation', flat=True)[0]),
-                'median_paid': median_paid,
+                'median_paid': self.get_median(cohort, total_number),
                 'lowest_paid': (cohort.order_by('compensation')
                                       .values_list('compensation', flat=True)[0]),
                 'total_number': total_number
