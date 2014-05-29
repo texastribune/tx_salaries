@@ -95,15 +95,16 @@ class Employee(mixins.TimeTrackingMixin, mixins.ReducedDateStartAndEndMixin,
 def create_stats_mixin(prefix):
     def generate_kwargs(field):
         return {
-            'related_name': '{0}_stats_{1}'.format(prefix, field),
             'null': True,
             'blank': True,
+            'decimal_places': 4,
+            'max_digits': 12
         }
 
     class StatisticsMixin(models.Model):
-        highest_paid = models.ForeignKey('Employee', **generate_kwargs('highest'))
-        median_paid = models.ForeignKey('Employee', **generate_kwargs('median'))
-        lowest_paid = models.ForeignKey('Employee', **generate_kwargs('lowest'))
+        highest_paid = models.DecimalField(**generate_kwargs('highest'))
+        median_paid = models.DecimalField(**generate_kwargs('median'))
+        lowest_paid = models.DecimalField(**generate_kwargs('lowest'))
         total_number = models.PositiveIntegerField(default=0)
         races = JSONField()
         female = JSONField()
