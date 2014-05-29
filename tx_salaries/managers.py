@@ -20,11 +20,23 @@ class DenormalizeManagerMixin(object):
     def generate_stats(self, cohort, get_slices=False):
         total_number = cohort.count()
         if total_number > 0:
+
+            if total_number % 2 == 0:
+                median_paid = (
+                    (cohort.order_by('-compensation')
+                           .values_list('compensation',
+                                        flat=True)[(total_number / 2)] +
+                     cohort.order_by('-compensation')
+                           .values_list('compensation',
+                                        flat=True)[(total_number / 2) - 1]) / 2)
+            else:
+                median_paid = (cohort.order_by('-compensation')
+                                     .values_list('compensation',
+                                                  flat=True)[(total_number - 1) / 2])
             data = {
                 'highest_paid': (cohort.order_by('-compensation')
                                        .values_list('compensation', flat=True)[0]),
-                'median_paid': (cohort.order_by('-compensation')
-                                      .values_list('compensation', flat=True)[(total_number - 1) / 2]),
+                'median_paid': median_paid,
                 'lowest_paid': (cohort.order_by('compensation')
                                       .values_list('compensation', flat=True)[0]),
                 'total_number': total_number
