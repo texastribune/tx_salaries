@@ -48,3 +48,35 @@ class EvenEmployeeMedianTest(TestCase):
                                        position=membership_two)
         management.call_command('denormalize_salary_data')
         self.assertEqual(department.stats.median_paid, 98608.5)
+
+
+class RatiosAddUpTest(TestCase):
+    def test_gender_ratios(self):
+        parent_org = OrganizationFactory(name="Test Parent Organization")
+        department = OrganizationFactory(name="Test Organization",
+                                           parent=parent_org)
+        post = PostFactory(organization=department)
+        # POST MUST HAVE UNICODE VALUE
+        membership_one = MembershipFactory(post=post, organization=department,
+                                           person__gender='F')
+        membership_two = MembershipFactory(post=post, organization=department,
+                                           person__gender='F')
+
+        membership_three = MembershipFactory(post=post, organization=department,
+                                             person__gender='M')
+
+        membership_four = MembershipFactory(post=post, organization=department,
+                                            person__gender='M')
+
+        # create two employees
+        female_one = EmployeeFactory(compensation=135000,
+                                       position=membership_one)
+        female_two = EmployeeFactory(compensation=62217,
+                                       position=membership_two)
+        male_one = EmployeeFactory(compensation=140000,
+                                   position=membership_three)
+        male_two = EmployeeFactory(compensation=61050, position=membership_four)
+
+        management.call_command('denormalize_salary_data')
+
+        self.assertEqual(department.stats.male['ratio'] + department.stats.female['ratio'], 100)
