@@ -10,12 +10,14 @@ class DenormalizeManagerMixin(object):
         stats.median_paid = self.get_median(cohort, total_in_cohort)
         stats.lowest_paid = (cohort.order_by('compensation')
                                    .values_list('compensation', flat=True)[0])
-        stats.races = self.get_races(cohort)
+        stats.races = self.get_races(cohort, total_in_cohort)
         stats.female = self.generate_stats(cohort.filter(
-                                           position__person__gender='F'), True)
+                                           position__person__gender='F'),
+                                           total_in_cohort, True)
         stats.male = self.generate_stats(cohort.filter(
-                                         position__person__gender='M'), True)
-        stats.time_employed = self.get_tenures(cohort)
+                                         position__person__gender='M'),
+                                         total_in_cohort, True)
+        stats.time_employed = self.get_tenures(cohort, total_in_cohort)
         stats.total_number = total_in_cohort
         stats.save()
 
@@ -34,7 +36,7 @@ class DenormalizeManagerMixin(object):
                                               flat=True)[(total_number - 1) / 2])
         return median_paid
 
-    def generate_stats(self, cohort, get_slices=False):
+    def generate_stats(self, cohort, total_in_cohort, get_slices=False):
         total_number = cohort.count()
         if total_number > 0:
             data = {
@@ -43,7 +45,8 @@ class DenormalizeManagerMixin(object):
                 'median_paid': self.get_median(cohort, total_number),
                 'lowest_paid': (cohort.order_by('compensation')
                                       .values_list('compensation', flat=True)[0]),
-                'total_number': total_number
+                'total_number': total_number,
+                'ratio': round((float(total_number) / float(total_in_cohort)) * 100, 1)
             }
             if get_slices:
                 data.update({'distribution': self.get_distribution(cohort)})
@@ -51,7 +54,7 @@ class DenormalizeManagerMixin(object):
         else:
             return {'total_number': 0}
 
-    def get_races(self, cohort):
+    def get_races(self, cohort, total_in_cohort):
         unique_races = (cohort.values_list('position__person__races__name',
                                            flat=True).distinct())
         data = []
@@ -59,11 +62,11 @@ class DenormalizeManagerMixin(object):
             race_cohort = cohort.filter(position__person__races__name=race)
             data.append({
                 'race': race,
-                'stats': self.generate_stats(race_cohort)
+                'stats': self.generate_stats(race_cohort, total_in_cohort)
             })
         return data
 
-    def get_tenures(self, cohort):
+    def get_tenures(self, cohort, total_in_cohort):
         one_year = cohort.filter(hire_date__gte='2014-01-01')
         five_years = (cohort.filter(hire_date__lt='2014-01-01',
                                     hire_date__gte='2009-01-01'))
@@ -71,10 +74,10 @@ class DenormalizeManagerMixin(object):
                                    hire_date__gte='2004-01-01'))
         twenty_years = cohort.filter(hire_date__lt='2004-01-01')
         return [
-            {'time': '1 year', 'stats': self.generate_stats(one_year)},
-            {'time': '5-10 years', 'stats': self.generate_stats(five_years)},
-            {'time': '10-20 years', 'stats': self.generate_stats(ten_years)},
-            {'time': '20+ years', 'stats': self.generate_stats(twenty_years)}
+            {'time': '1 year', 'stats': self.generate_stats(one_year, total_in_cohort)},
+            {'time': '5-10 years', 'stats': self.generate_stats(five_years, total_in_cohort)},
+            {'time': '10-20 years', 'stats': self.generate_stats(ten_years, total_in_cohort)},
+            {'time': '20+ years', 'stats': self.generate_stats(twenty_years, total_in_cohort)}
         ]
 
     def round_nearest(self, num, target, ceil=False, floor=False):
@@ -99,7 +102,8 @@ class DenormalizeManagerMixin(object):
                 'slices': [{
                     'start': salaries['min'],
                     'end': salaries['max'],
-                    'count': cohort.count()
+                    'count': cohort.count(),
+                    'ratio': 100
                 }]
             }
         step = diff / 10
@@ -128,11 +132,13 @@ class DenormalizeManagerMixin(object):
 
         slices = []
         while start < salaries['max']:
+            cohort_total = cohort.filter(compensation__gt=start,
+                                         compensation__lte=start+step).count()
             slices.append({
                 'start': start,
                 'end': start + step,
-                'count': cohort.filter(compensation__gt=start,
-                                       compensation__lte=start+step).count(),
+                'count': cohort_total,
+                'ratio': round((float(cohort_total) / float(cohort.count())) * 100, 1)
             })
             start += step
         if not slices:
