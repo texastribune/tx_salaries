@@ -91,9 +91,8 @@ class DenormalizeManagerMixin(object):
         if cohort.count() == 0:
             return None
         # Set bounds of buckets using all employees so breakdowns are comparable
-        salaries = cohort.aggregate(
-                        max=models.Max('compensation'),
-                        min=models.Min('compensation'))
+        salaries = cohort.aggregate(max=models.Max('compensation'),
+                                    min=models.Min('compensation'))
         diff = salaries['max'] - salaries['min']
         if diff == 0:
             # TODO test
