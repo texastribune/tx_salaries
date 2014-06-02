@@ -2,7 +2,7 @@ from django.db import models
 
 
 class DenormalizeManagerMixin(object):
-    def update_cohort(self, cohort, date_provided, **kwargs):
+    def update_cohort(self, cohort, date_provided=False, **kwargs):
         stats, created = self.get_or_create(**kwargs)
         total_in_cohort = cohort.count()
         stats.highest_paid = (cohort.order_by('-compensation')
@@ -19,7 +19,8 @@ class DenormalizeManagerMixin(object):
                                          total_in_cohort, True)
         stats.time_employed = self.get_tenures(cohort, total_in_cohort)
         stats.total_number = total_in_cohort
-        stats.date_provided = date_provided
+        if date_provided:
+            stats.date_provided = date_provided
         stats.save()
 
     def get_median(self, cohort, total_number):
@@ -151,7 +152,7 @@ class DenormalizeManagerMixin(object):
 class OrganizationStatsManager(DenormalizeManagerMixin, models.Manager):
     use_for_related_manager = True
 
-    def denormalize(self, obj, date_provided):
+    def denormalize(self, obj, date_provided=False):
         from tx_salaries.models import Employee
 
         # TODO: Allow organization to break and say it is top-level
@@ -172,7 +173,7 @@ class OrganizationStatsManager(DenormalizeManagerMixin, models.Manager):
 class PositionStatsManager(DenormalizeManagerMixin, models.Manager):
     use_for_related_manager = True
 
-    def denormalize(self, obj, date_provided):
+    def denormalize(self, obj, date_provided=False):
         from tx_salaries.models import Employee
         position_cohort = Employee.objects.filter(
                 position__organization=obj.organization,
@@ -183,5 +184,5 @@ class PositionStatsManager(DenormalizeManagerMixin, models.Manager):
 class EmployeeTitleStatsManager(DenormalizeManagerMixin, models.Manager):
     use_for_related_manager = True
 
-    def denormalize(self, obj, date_provided):
+    def denormalize(self, obj, date_provided=False):
         self.update_cohort(obj.title.employees.all(), date_provided, title=obj.title)
