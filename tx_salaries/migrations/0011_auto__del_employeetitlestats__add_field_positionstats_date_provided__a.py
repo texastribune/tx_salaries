@@ -8,15 +8,49 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Deleting model 'EmployeeTitleStats'
+        db.delete_table(u'tx_salaries_employeetitlestats')
+
+        # Adding field 'PositionStats.date_provided'
+        db.add_column(u'tx_salaries_positionstats', 'date_provided',
+                      self.gf('django.db.models.fields.DateField')(null=True, blank=True),
+                      keep_default=False)
+
         # Adding field 'Employee.tenure'
         db.add_column(u'tx_salaries_employee', 'tenure',
                       self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=12, decimal_places=4, blank=True),
                       keep_default=False)
 
+        # Adding field 'OrganizationStats.date_provided'
+        db.add_column(u'tx_salaries_organizationstats', 'date_provided',
+                      self.gf('django.db.models.fields.DateField')(null=True, blank=True),
+                      keep_default=False)
+
 
     def backwards(self, orm):
+        # Adding model 'EmployeeTitleStats'
+        db.create_table(u'tx_salaries_employeetitlestats', (
+            ('time_employed', self.gf('jsonfield.fields.JSONField')(default={})),
+            ('median_paid', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=12, decimal_places=4, blank=True)),
+            ('races', self.gf('jsonfield.fields.JSONField')(default={})),
+            ('female', self.gf('jsonfield.fields.JSONField')(default={})),
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('lowest_paid', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=12, decimal_places=4, blank=True)),
+            ('total_number', self.gf('django.db.models.fields.PositiveIntegerField')(default=0)),
+            ('title', self.gf('django.db.models.fields.related.OneToOneField')(related_name='stats', unique=True, to=orm['tx_salaries.EmployeeTitle'])),
+            ('highest_paid', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=12, decimal_places=4, blank=True)),
+            ('male', self.gf('jsonfield.fields.JSONField')(default={})),
+        ))
+        db.send_create_signal(u'tx_salaries', ['EmployeeTitleStats'])
+
+        # Deleting field 'PositionStats.date_provided'
+        db.delete_column(u'tx_salaries_positionstats', 'date_provided')
+
         # Deleting field 'Employee.tenure'
         db.delete_column(u'tx_salaries_employee', 'tenure')
+
+        # Deleting field 'OrganizationStats.date_provided'
+        db.delete_column(u'tx_salaries_organizationstats', 'date_provided')
 
 
     models = {
@@ -166,21 +200,9 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '250'})
         },
-        u'tx_salaries.employeetitlestats': {
-            'Meta': {'object_name': 'EmployeeTitleStats'},
-            'female': ('jsonfield.fields.JSONField', [], {'default': '{}'}),
-            'highest_paid': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '12', 'decimal_places': '4', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'lowest_paid': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '12', 'decimal_places': '4', 'blank': 'True'}),
-            'male': ('jsonfield.fields.JSONField', [], {'default': '{}'}),
-            'median_paid': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '12', 'decimal_places': '4', 'blank': 'True'}),
-            'races': ('jsonfield.fields.JSONField', [], {'default': '{}'}),
-            'time_employed': ('jsonfield.fields.JSONField', [], {'default': '{}'}),
-            'title': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'stats'", 'unique': 'True', 'to': u"orm['tx_salaries.EmployeeTitle']"}),
-            'total_number': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'})
-        },
         u'tx_salaries.organizationstats': {
             'Meta': {'object_name': 'OrganizationStats'},
+            'date_provided': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'female': ('jsonfield.fields.JSONField', [], {'default': '{}'}),
             'highest_paid': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '12', 'decimal_places': '4', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -194,6 +216,7 @@ class Migration(SchemaMigration):
         },
         u'tx_salaries.positionstats': {
             'Meta': {'object_name': 'PositionStats'},
+            'date_provided': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'female': ('jsonfield.fields.JSONField', [], {'default': '{}'}),
             'highest_paid': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '12', 'decimal_places': '4', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),

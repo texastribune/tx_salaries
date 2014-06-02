@@ -179,10 +179,3 @@ class PositionStatsManager(DenormalizeManagerMixin, models.Manager):
                 position__organization=obj.organization,
                 position__post=obj)
         self.update_cohort(position_cohort, date_provided, position=obj)
-
-
-class EmployeeTitleStatsManager(DenormalizeManagerMixin, models.Manager):
-    use_for_related_manager = True
-
-    def denormalize(self, obj, date_provided=False):
-        self.update_cohort(obj.title.employees.all(), date_provided, title=obj.title)

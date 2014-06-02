@@ -120,12 +120,6 @@ def create_stats_mixin(prefix):
     return StatisticsMixin
 
 
-class EmployeeTitleStats(create_stats_mixin('title'), models.Model):
-    title = models.OneToOneField(EmployeeTitle, related_name='stats')
-
-    objects = managers.EmployeeTitleStatsManager()
-
-
 class PositionStats(create_stats_mixin('position'), models.Model):
     position = models.OneToOneField(Post, related_name='stats')
 
