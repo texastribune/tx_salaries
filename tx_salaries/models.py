@@ -112,6 +112,7 @@ def create_stats_mixin(prefix):
         female = JSONField()
         male = JSONField()
         time_employed = JSONField()
+        date_provided = models.DateField(null=True, blank=True)
 
         class Meta:
             abstract = True
