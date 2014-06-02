@@ -1,5 +1,7 @@
 from . import base
 
+from datetime import date
+
 
 def title_case_property(key):
     """Simple property for title casing a mapped value"""
@@ -16,7 +18,14 @@ class GenericCompensationMixin(object):
     * ``compensation_type``
     * ``hire_date``
     * ``compensation``
+    * ``DATE_PROVIDED``
     """
+    def calculate_tenure(self):
+        hire_date_data = map(int, self.hire_date.split('-'))
+        hire_date = date(hire_date_data[0], hire_date_data[1],
+                         hire_date_data[2])
+        return float((self.DATE_PROVIDED - hire_date).days) / float(360)
+
     @property
     def compensations(self):
         return [
@@ -30,6 +39,7 @@ class GenericCompensationMixin(object):
                 'tx_salaries.Employee': {
                     'hire_date': self.hire_date,
                     'compensation': self.compensation,
+                    'tenure': self.calculate_tenure()
                 },
             }
         ]

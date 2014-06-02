@@ -67,15 +67,15 @@ class DenormalizeManagerMixin(object):
         return data
 
     def get_tenures(self, cohort, total_in_cohort):
-        one_year = cohort.filter(hire_date__gte='2014-01-01')
-        five_years = (cohort.filter(hire_date__lt='2014-01-01',
-                                    hire_date__gte='2009-01-01'))
-        ten_years = (cohort.filter(hire_date__lt='2009-01-01',
-                                   hire_date__gte='2004-01-01'))
-        twenty_years = cohort.filter(hire_date__lt='2004-01-01')
+        one_year = cohort.filter(tenure__lte=1)
+        more_than_one_year = (cohort.filter(tenure__lt=10,
+                                            tenure__gt=1))
+        ten_years = (cohort.filter(tenure__lt=20,
+                                   tenure__gte=10))
+        twenty_years = cohort.filter(tenure__gt=20)
         return [
             {'time': '1 year', 'stats': self.generate_stats(one_year, total_in_cohort)},
-            {'time': '5-10 years', 'stats': self.generate_stats(five_years, total_in_cohort)},
+            {'time': '1-10 years', 'stats': self.generate_stats(more_than_one_year, total_in_cohort)},
             {'time': '10-20 years', 'stats': self.generate_stats(ten_years, total_in_cohort)},
             {'time': '20+ years', 'stats': self.generate_stats(twenty_years, total_in_cohort)}
         ]
