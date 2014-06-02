@@ -32,7 +32,8 @@ class Command(BaseCommand):
             print "Processing %d records from %s" % (len(records),
                                                      basename(filename))
 
-            to_denormalize = {'organizations': set(), 'positions': set()}
+            to_denormalize = {'organizations': set(), 'positions': set(),
+                              'date_provided': records[0]['date_provided']}
             records_remaining = len(records)
 
             for record in records:

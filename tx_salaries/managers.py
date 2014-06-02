@@ -2,7 +2,7 @@ from django.db import models
 
 
 class DenormalizeManagerMixin(object):
-    def update_cohort(self, cohort, **kwargs):
+    def update_cohort(self, cohort, date_provided, **kwargs):
         stats, created = self.get_or_create(**kwargs)
         total_in_cohort = cohort.count()
         stats.highest_paid = (cohort.order_by('-compensation')
@@ -19,6 +19,7 @@ class DenormalizeManagerMixin(object):
                                          total_in_cohort, True)
         stats.time_employed = self.get_tenures(cohort, total_in_cohort)
         stats.total_number = total_in_cohort
+        stats.date_provided = date_provided
         stats.save()
 
     def get_median(self, cohort, total_number):
@@ -150,7 +151,7 @@ class DenormalizeManagerMixin(object):
 class OrganizationStatsManager(DenormalizeManagerMixin, models.Manager):
     use_for_related_manager = True
 
-    def denormalize(self, obj):
+    def denormalize(self, obj, date_provided):
         from tx_salaries.models import Employee
 
         # TODO: Allow organization to break and say it is top-level
@@ -165,22 +166,22 @@ class OrganizationStatsManager(DenormalizeManagerMixin, models.Manager):
             kwargs = {'position__organization__parent': obj, }
 
         cohort = Employee.objects.filter(**kwargs)
-        self.update_cohort(cohort, organization=obj)
+        self.update_cohort(cohort, date_provided, organization=obj)
 
 
 class PositionStatsManager(DenormalizeManagerMixin, models.Manager):
     use_for_related_manager = True
 
-    def denormalize(self, obj):
+    def denormalize(self, obj, date_provided):
         from tx_salaries.models import Employee
         position_cohort = Employee.objects.filter(
                 position__organization=obj.organization,
                 position__post=obj)
-        self.update_cohort(position_cohort, position=obj)
+        self.update_cohort(position_cohort, date_provided, position=obj)
 
 
 class EmployeeTitleStatsManager(DenormalizeManagerMixin, models.Manager):
     use_for_related_manager = True
 
-    def denormalize(self, obj):
-        self.update_cohort(obj.title.employees.all(), title=obj.title)
+    def denormalize(self, obj, date_provided):
+        self.update_cohort(obj.title.employees.all(), date_provided, title=obj.title)
