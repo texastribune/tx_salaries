@@ -144,8 +144,6 @@ class DenormalizeManagerMixin(object):
             start += step
         if not slices:
             return None
-        slices[0]['count'] += cohort.filter(compensation=salaries['min']).count()
-
         return {'step': step, 'slices': slices}
 
 
