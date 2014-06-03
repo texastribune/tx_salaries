@@ -84,7 +84,12 @@ class RatiosAddUpTest(TestCase):
         hire_date_data = map(int, hire_date.split('-'))
         hire_date = date(hire_date_data[0], hire_date_data[1],
                          hire_date_data[2])
-        return float((date_provided - hire_date).days) / float(360)
+        tenure = float((date_provided - hire_date).days) / float(360)
+        if tenure < 0:
+            error_msg = ("An employee was hired after the data was provided.\n"
+                         "Is DATE_PROVIDED correct?")
+            raise ValueError(error_msg)
+        return tenure
 
     def test_time_employed(self):
         parent_org = OrganizationFactory(name="Test Parent Organization")
@@ -111,8 +116,6 @@ class RatiosAddUpTest(TestCase):
         male_one = EmployeeFactory(compensation=140000,
                                    position=membership_three,
                                    tenure=self.calculate_tenure('2012-04-10', date.today()))
-        male_two = EmployeeFactory(compensation=61050, position=membership_four,
-                                   tenure=self.calculate_tenure('1995-04-10', date.today()))
 
         management.call_command('denormalize_salary_data')
 
@@ -123,3 +126,7 @@ class RatiosAddUpTest(TestCase):
             except KeyError:
                 continue
         self.assertEqual(tenure_ratio_sum, 100)
+
+        with self.assertRaises(ValueError):
+            EmployeeFactory(compensation=61050, position=membership_four,
+                            tenure=self.calculate_tenure('1995-04-10', date(1900, 1, 1)))
