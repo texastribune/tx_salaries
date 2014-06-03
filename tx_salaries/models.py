@@ -84,6 +84,8 @@ class Employee(mixins.TimeTrackingMixin, mixins.ReducedDateStartAndEndMixin,
     position = models.ForeignKey(Membership)
     title = models.ForeignKey(EmployeeTitle, related_name='employees', null=True)
     hire_date = fields.ReducedDateField()
+    tenure = models.DecimalField(null=True, blank=True, decimal_places=4,
+                                 max_digits=12)
     compensation = models.DecimalField(decimal_places=4, max_digits=12)
     compensation_type = models.ForeignKey(CompensationType)
 
@@ -110,17 +112,12 @@ def create_stats_mixin(prefix):
         female = JSONField()
         male = JSONField()
         time_employed = JSONField()
+        date_provided = models.DateField(null=True, blank=True)
 
         class Meta:
             abstract = True
 
     return StatisticsMixin
-
-
-class EmployeeTitleStats(create_stats_mixin('title'), models.Model):
-    title = models.OneToOneField(EmployeeTitle, related_name='stats')
-
-    objects = managers.EmployeeTitleStatsManager()
 
 
 class PositionStats(create_stats_mixin('position'), models.Model):

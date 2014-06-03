@@ -53,10 +53,11 @@ def save(data):
 
 
 def denormalize(data):
+    date_provided = data['date_provided']
     print "Denormalizing %s organizations" % (len(data['organizations']))
     for org in data['organizations']:
-        models.OrganizationStats.objects.denormalize(org)
+        models.OrganizationStats.objects.denormalize(org, date_provided)
 
     print "Denormalizing %s positions" % (len(data['positions']))
     for position in data['positions']:
-        models.PositionStats.objects.denormalize(position)
+        models.PositionStats.objects.denormalize(position, date_provided)

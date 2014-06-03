@@ -2,7 +2,7 @@ from django.db import models
 
 
 class DenormalizeManagerMixin(object):
-    def update_cohort(self, cohort, **kwargs):
+    def update_cohort(self, cohort, date_provided=False, **kwargs):
         stats, created = self.get_or_create(**kwargs)
         total_in_cohort = cohort.count()
         stats.highest_paid = (cohort.order_by('-compensation')
@@ -19,6 +19,8 @@ class DenormalizeManagerMixin(object):
                                          total_in_cohort, True)
         stats.time_employed = self.get_tenures(cohort, total_in_cohort)
         stats.total_number = total_in_cohort
+        if date_provided:
+            stats.date_provided = date_provided
         stats.save()
 
     def get_median(self, cohort, total_number):
@@ -67,15 +69,15 @@ class DenormalizeManagerMixin(object):
         return data
 
     def get_tenures(self, cohort, total_in_cohort):
-        one_year = cohort.filter(hire_date__gte='2014-01-01')
-        five_years = (cohort.filter(hire_date__lt='2014-01-01',
-                                    hire_date__gte='2009-01-01'))
-        ten_years = (cohort.filter(hire_date__lt='2009-01-01',
-                                   hire_date__gte='2004-01-01'))
-        twenty_years = cohort.filter(hire_date__lt='2004-01-01')
+        one_year = cohort.filter(tenure__lte=1)
+        more_than_one_year = (cohort.filter(tenure__lt=10,
+                                            tenure__gt=1))
+        ten_years = (cohort.filter(tenure__lt=20,
+                                   tenure__gte=10))
+        twenty_years = cohort.filter(tenure__gt=20)
         return [
             {'time': '1 year', 'stats': self.generate_stats(one_year, total_in_cohort)},
-            {'time': '5-10 years', 'stats': self.generate_stats(five_years, total_in_cohort)},
+            {'time': '1-10 years', 'stats': self.generate_stats(more_than_one_year, total_in_cohort)},
             {'time': '10-20 years', 'stats': self.generate_stats(ten_years, total_in_cohort)},
             {'time': '20+ years', 'stats': self.generate_stats(twenty_years, total_in_cohort)}
         ]
@@ -150,7 +152,7 @@ class DenormalizeManagerMixin(object):
 class OrganizationStatsManager(DenormalizeManagerMixin, models.Manager):
     use_for_related_manager = True
 
-    def denormalize(self, obj):
+    def denormalize(self, obj, date_provided=False):
         from tx_salaries.models import Employee
 
         # TODO: Allow organization to break and say it is top-level
@@ -165,22 +167,15 @@ class OrganizationStatsManager(DenormalizeManagerMixin, models.Manager):
             kwargs = {'position__organization__parent': obj, }
 
         cohort = Employee.objects.filter(**kwargs)
-        self.update_cohort(cohort, organization=obj)
+        self.update_cohort(cohort, date_provided, organization=obj)
 
 
 class PositionStatsManager(DenormalizeManagerMixin, models.Manager):
     use_for_related_manager = True
 
-    def denormalize(self, obj):
+    def denormalize(self, obj, date_provided=False):
         from tx_salaries.models import Employee
         position_cohort = Employee.objects.filter(
                 position__organization=obj.organization,
                 position__post=obj)
-        self.update_cohort(position_cohort, position=obj)
-
-
-class EmployeeTitleStatsManager(DenormalizeManagerMixin, models.Manager):
-    use_for_related_manager = True
-
-    def denormalize(self, obj):
-        self.update_cohort(obj.title.employees.all(), title=obj.title)
+        self.update_cohort(position_cohort, date_provided, position=obj)
