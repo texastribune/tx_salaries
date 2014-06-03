@@ -72,6 +72,7 @@ class BaseTransformedRecord(object):
         d['tx_people.Membership'] = self.membership
         d['tx_people.Race'] = self.given_race
         d['compensations'] = self.compensations
+        d['date_provided'] = self.DATE_PROVIDED
         return d
 
 

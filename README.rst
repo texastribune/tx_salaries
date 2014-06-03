@@ -87,6 +87,8 @@ this::
     from . import base
     from . import mixins
 
+    from datetime import date
+
 
     class TransformedRecord(mixins.GenericCompensationMixin,
             mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
@@ -106,6 +108,9 @@ this::
         NAME_FIELDS = ('first_name', 'last_name', )
 
         ORGANIZATION_NAME = 'Rio Grande County'
+
+        DATE_PROVIDED = date(2013, 10, 31)
+        # Y/M/D agency provided the data
 
         @property
         def is_valid(self):
