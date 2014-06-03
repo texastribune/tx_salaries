@@ -130,3 +130,35 @@ class RatiosAddUpTest(TestCase):
         with self.assertRaises(ValueError):
             EmployeeFactory(compensation=61050, position=membership_four,
                             tenure=self.calculate_tenure('1995-04-10', date(1900, 1, 1)))
+
+    def test_gender_histogram(self):
+        parent_org = OrganizationFactory(name="Test Parent Organization")
+        department = OrganizationFactory(name="Test Organization",
+                                           parent=parent_org)
+        post = PostFactory(organization=department)
+        # POST MUST HAVE UNICODE VALUE
+        membership_one = MembershipFactory(post=post, organization=department,
+                                           person__gender='F')
+        membership_two = MembershipFactory(post=post, organization=department,
+                                           person__gender='F')
+
+        membership_three = MembershipFactory(post=post, organization=department,
+                                             person__gender='M')
+
+        membership_four = MembershipFactory(post=post, organization=department,
+                                            person__gender='M')
+        female_one = EmployeeFactory(compensation=135000,
+                                       position=membership_one)
+        female_two = EmployeeFactory(compensation=62217,
+                                       position=membership_two)
+        male_one = EmployeeFactory(compensation=140000,
+                                   position=membership_three)
+        male_two = EmployeeFactory(compensation=61050, position=membership_four)
+
+        management.call_command('denormalize_salary_data')
+
+        male_sum = sum([b['count'] for b in department.stats.male['distribution']['slices']])
+        self.assertEqual(male_sum, department.stats.male['total_number'])
+
+        female_sum = sum([b['count'] for b in department.stats.female['distribution']['slices']])
+        self.assertEqual(female_sum, department.stats.female['total_number'])
