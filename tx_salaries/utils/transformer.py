@@ -62,3 +62,49 @@ def get_transformers(labels):
         return TRANSFORMERS[generate_key(labels)]
     except KeyError:
         raise exceptions.ImproperlyConfigured()
+
+
+def summarize_import(organizations, filename):
+    from csv import DictWriter
+    columns = (
+        'Name',
+        'Title',
+        'Department',
+        'Gender',
+        'Hire_date',
+        'Tenure',
+        'Annual_salary',
+        'Entity',
+    )
+
+    member_kwargs = (
+        'person__name',
+        'post__label',
+        'organization__name',
+        'person__gender',
+        'employee__hire_date',
+        'employee__tenure',
+        'employee__compensation',
+        'organization__parent__name'
+    )
+
+    outfile = open(filename, 'w')
+    writer = DictWriter(outfile, columns)
+    writer.writerow(dict(zip(columns, columns)))
+
+    for org in organizations:
+        employee_values = org.members.values(*member_kwargs).distinct()
+        for val in employee_values:
+            writer.writerow({
+                'Name': val[member_kwargs[0]],
+                'Title': val[member_kwargs[1]],
+                'Department': val[member_kwargs[2]],
+                'Gender': val[member_kwargs[3]],
+                'Hire_date': val[member_kwargs[4]],
+                'Tenure': val[member_kwargs[5]],
+                'Annual_salary': val[member_kwargs[6]],
+                'Entity': val[member_kwargs[7]]
+            })
+
+    outfile.close()
+    print "Created %s" % filename
