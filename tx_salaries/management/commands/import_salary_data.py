@@ -61,5 +61,7 @@ class Command(BaseCommand):
             question = 'Would you like a summary of what was imported? y/n\n'
             summary_choice = raw_input(question)
             if summary_choice == 'y':
+                outfile = basename(filename)
+                outfile = outfile.split('.')[0] + '.csv'
                 transformer.summarize_import(to_denormalize['organizations'],
-                                             'summary-' + basename(filename))
+                                             'summary-' + outfile)
