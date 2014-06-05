@@ -1,6 +1,11 @@
+import re
+
 from . import base
 from . import mixins
 
+from datetime import date
+
+# http://raw.texastribune.org.s3.amazonaws.com/ut_dallas/salaries/2014-02/FOIA%20Request%20-%20Tribune.xlsx
 
 class TransformedRecord(mixins.GenericCompensationMixin,
         mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
@@ -25,6 +30,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     ORGANIZATION_NAME = 'University of Texas at Dallas'
 
     ORGANIZATION_CLASSIFICATION = 'University'
+
+    DATE_PROVIDED = date(2014, 2, 19)
 
     @property
     def is_valid(self):

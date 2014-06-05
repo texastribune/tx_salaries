@@ -1,5 +1,9 @@
+from datetime import date
+
 from . import base
 from . import mixins
+
+# http://raw.texastribune.org.s3.amazonaws.com/ut_permian_basin/salaries/2014-02/UTPB%20Request%20%2314050102~TexasTribuneUTPermianBasinSalaryData02-11-14.xlsx
 
 
 class TransformedRecord(mixins.GenericCompensationMixin,
@@ -31,6 +35,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     # TODO 14 people earn < 4000
     compensation_type = 'Full Time'
+
+    DATE_PROVIDED = date(2014, 2, 14)
 
     @property
     def get_raw_name(self):

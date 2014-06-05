@@ -1,5 +1,10 @@
+from datetime import date
+
 from . import base
 from . import mixins
+
+# http://raw.texastribune.org.s3.amazonaws.com/ut_health_san_antonio/salaries/2014-01/Texas%20Tribune%20Request%2001-28-2014.xlsx
+# --sheet="Submission Data" --row=6
 
 
 class TransformedRecord(mixins.GenericCompensationMixin,
@@ -27,6 +32,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     # TODO current app uses University Hospital
     ORGANIZATION_CLASSIFICATION = 'University Hospital'
+
+    DATE_PROVIDED = date(2014, 1, 28)
 
     @property
     def is_valid(self):

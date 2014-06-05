@@ -1,5 +1,9 @@
+from datetime import date
+
 from . import base
 from . import mixins
+
+# http://raw.texastribune.org.s3.amazonaws.com/ut_el_paso/salaries/2014-02/Hill%2C%20Dan_TexasTribune_01-13-14.xlsx
 
 
 class TransformedRecord(mixins.GenericCompensationMixin,
@@ -30,6 +34,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     # TODO not given on spreadsheet, 40 earn < 4000
     compensation_type = 'Full Time'
+
+    DATE_PROVIDED = date(2014, 2, 25)
 
     @property
     def is_valid(self):
