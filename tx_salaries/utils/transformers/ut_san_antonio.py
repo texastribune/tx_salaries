@@ -38,7 +38,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.last_name.strip() != ''
+        return self.last_name.strip() != '' or self.hire_date.strip() != ''
 
     @property
     def person(self):

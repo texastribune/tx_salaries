@@ -3,6 +3,8 @@ from datetime import date
 from . import base
 from . import mixins
 
+from .. import cleaver
+
 # http://raw.texastribune.org.s3.amazonaws.com/ut_arlington/salaries/2014-02/UT%20Arlington%20Salaries.xlsx
 
 
@@ -37,6 +39,14 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     DATE_PROVIDED = date(2014, 2, 13)
 
+    cleaver.DepartmentName.MAP = (cleaver.DepartmentName.MAP +
+                                 ((cleaver.regex_i(r'vp '), 'Vice President '), ) +
+                                 ((cleaver.regex_i(r'^It '), 'IT '), ) +
+                                 ((cleaver.regex_i(r'^Uta'), 'UTA'), ) +
+                                 ((cleaver.regex_i(r'Tmac'), 'TMAC'), ) +
+                                 ((cleaver.regex_i(r'^Ada '), 'ADA'), ) +
+                                 ((cleaver.regex_i(r'Orce - Ceshci'), 'ORCE - CESHCHI'), ))
+
     @property
     def get_raw_name(self):
         # TODO include suffix
@@ -48,7 +58,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.last_name.strip() != ''
+        return self.last_name.strip() != '' and self.hire_date.strip() != ''
 
     @property
     def person(self):
@@ -72,6 +82,22 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         day = hire_date[6:8]
         return "-".join([year, month, day])
 
+    def calculate_tenure(self, hire_date):
+        # if hire_date == ' --':
+        #     return None
+        try:
+            hire_date_data = map(int, hire_date.split('-'))
+        except:
+            return None
+        hire_date = date(hire_date_data[0], hire_date_data[1],
+                         hire_date_data[2])
+        tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
+        if tenure < 0:
+            error_msg = ("An employee was hired after the data was provided.\n"
+                         "Is DATE_PROVIDED correct?")
+            raise ValueError(error_msg)
+        return tenure
+
     @property
     def compensations(self):
         hire_date = self.process_hire_date(self.hire_date)
@@ -83,15 +109,28 @@ class TransformedRecord(mixins.GenericCompensationMixin,
                 'tx_salaries.Employee': {
                     'hire_date': hire_date,
                     'compensation': self.compensation,
+                    'tenure': self.calculate_tenure(hire_date),
                 },
                 'tx_salaries.EmployeeTitle': {
-                    'name': self.job_title,
+                    'name': unicode(cleaver.DepartmentNameCleaver(self.job_title)
+                                           .parse())
                 },
             }
         ]
 
     @property
+    def post(self):
+        return {'label': (unicode(cleaver.DepartmentNameCleaver(self.job_title)
+                                         .parse()))}
+
+
+    @property
     def given_race(self):
         return {'name': self.race.strip()}
+
+    @property
+    def department_as_child(self):
+        return [{'name': unicode(cleaver.DepartmentNameCleaver(self.department)
+                                        .parse()), }, ]
 
 transform = base.transform_factory(TransformedRecord)

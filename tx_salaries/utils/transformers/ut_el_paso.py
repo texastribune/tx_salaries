@@ -3,12 +3,13 @@ from datetime import date
 from . import base
 from . import mixins
 
+from .. import cleaver
+
 # http://raw.texastribune.org.s3.amazonaws.com/ut_el_paso/salaries/2014-02/Hill%2C%20Dan_TexasTribune_01-13-14.xlsx
 
 
 class TransformedRecord(mixins.GenericCompensationMixin,
-        mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
-        mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
+        mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, base.BaseTransformedRecord):
     MAP = {
@@ -36,6 +37,14 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     compensation_type = 'Full Time'
 
     DATE_PROVIDED = date(2014, 2, 25)
+
+    cleaver.DepartmentName.MAP = (cleaver.DepartmentName.MAP +
+                                 ((cleaver.regex_i(r'Utep'), 'UTEP'), ) +
+                                 ((cleaver.regex_i(r'^Ktep'), 'KTEP'), ) +
+                                 ((cleaver.regex_i(r'^Mpa'), 'MPA'), ) +
+                                 ((cleaver.regex_i(r' Pc '), 'PC'), ) +
+                                 ((cleaver.regex_i(r' Hpc '), 'HPC'), ) +
+                                 ((cleaver.regex_i(r'Mc/Pc'), 'MC/PC'), ))
 
     @property
     def is_valid(self):
@@ -91,9 +100,20 @@ class TransformedRecord(mixins.GenericCompensationMixin,
                     'compensation': self.compensation,
                 },
                 'tx_salaries.EmployeeTitle': {
-                    'name': self.job_title,
+                    'name': unicode(cleaver.DepartmentNameCleaver(self.job_title)
+                                           .parse()),
                 },
             }
         ]
+
+    @property
+    def post(self):
+        return {'label': (unicode(cleaver.DepartmentNameCleaver(self.job_title)
+                                         .parse()))}
+
+    @property
+    def department_as_child(self):
+        return [{'name': unicode(cleaver.DepartmentNameCleaver(self.department)
+                                        .parse()), }, ]
 
 transform = base.transform_factory(TransformedRecord)

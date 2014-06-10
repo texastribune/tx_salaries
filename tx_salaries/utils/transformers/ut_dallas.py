@@ -1,15 +1,14 @@
-import re
+from datetime import date
 
 from . import base
 from . import mixins
 
-from datetime import date
+from .. import cleaver
 
 # http://raw.texastribune.org.s3.amazonaws.com/ut_dallas/salaries/2014-02/FOIA%20Request%20-%20Tribune.xlsx
 
 class TransformedRecord(mixins.GenericCompensationMixin,
-        mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
-        mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
+        mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, base.BaseTransformedRecord):
     MAP = {
@@ -33,6 +32,15 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     DATE_PROVIDED = date(2014, 2, 19)
 
+    cleaver.DepartmentName.MAP = (cleaver.DepartmentName.MAP +
+                                 ((cleaver.regex_i(r'Cbh '), 'CBH '), ) +
+                                 ((cleaver.regex_i(r'Ir  - Ais'), 'IR - AIS '), ) +
+                                 ((cleaver.regex_i(r'Ir - Eas'), 'IR - EAS'), ) +
+                                 ((cleaver.regex_i(r'Ipe-Pppe'), 'IPE-PPE'), ) +
+                                 ((cleaver.regex_i(r'Atec'), 'ATEC'), ) +
+                                 ((cleaver.regex_i(r'^Ecs'), 'ECS'), ) +
+                                 ((cleaver.regex_i(r'\s{2,}'), ' '), ))
+
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
@@ -48,6 +56,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     @property
     def compensations(self):
+        tenure = self.calculate_tenure()
         comp = self.compensation if self.compensation.strip() != '' else self.hourly
         return [
             {
@@ -57,11 +66,18 @@ class TransformedRecord(mixins.GenericCompensationMixin,
                 'tx_salaries.Employee': {
                     'hire_date': self.hire_date,
                     'compensation': comp,
+                    'tenure': tenure,
                 },
                 'tx_salaries.EmployeeTitle': {
                     'name': self.job_title,
                 },
             }
         ]
+
+    @property
+    def department_as_child(self):
+        return [{'name': unicode(cleaver.DepartmentNameCleaver(self.department)
+                                        .parse()), }, ]
+
 
 transform = base.transform_factory(TransformedRecord)
