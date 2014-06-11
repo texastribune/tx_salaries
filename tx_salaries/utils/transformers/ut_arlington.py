@@ -121,7 +121,6 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         return {'label': (unicode(cleaver.DepartmentNameCleaver(self.job_title)
                                          .parse()))}
 
-
     @property
     def given_race(self):
         return {'name': self.race.strip()}
