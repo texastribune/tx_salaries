@@ -39,6 +39,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
                                  ((cleaver.regex_i(r'Ipe-Pppe'), 'IPE-PPE'), ) +
                                  ((cleaver.regex_i(r'Atec'), 'ATEC'), ) +
                                  ((cleaver.regex_i(r'^Ecs'), 'ECS'), ) +
+                                 ((cleaver.regex_i(r'^Nsm'), 'NSM'), ) +
                                  ((cleaver.regex_i(r'\s{2,}'), ' '), ))
 
     @property
@@ -69,7 +70,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
                     'tenure': tenure,
                 },
                 'tx_salaries.EmployeeTitle': {
-                    'name': self.job_title,
+                    'name': unicode(cleaver.DepartmentNameCleaver(self.job_title)
+                                    .parse()),
                 },
             }
         ]

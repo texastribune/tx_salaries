@@ -7,8 +7,7 @@ from . import mixins
 
 
 class TransformedRecord(mixins.GenericCompensationMixin,
-        mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
-        mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
+        mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, base.BaseTransformedRecord):
     MAP = {
@@ -77,6 +76,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
                 'tx_salaries.Employee': {
                     'hire_date': self.hire_date,
                     'compensation': compensation,
+                    'tenure': self.calculate_tenure()
                 },
                 'tx_salaries.EmployeeTitle': {
                     'name': self.job_title,

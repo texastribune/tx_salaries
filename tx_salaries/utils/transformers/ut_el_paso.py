@@ -44,6 +44,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
                                  ((cleaver.regex_i(r'^Mpa'), 'MPA'), ) +
                                  ((cleaver.regex_i(r' Pc '), 'PC'), ) +
                                  ((cleaver.regex_i(r' Hpc '), 'HPC'), ) +
+                                 ((cleaver.regex_i(r'Mssc'), 'MSSC'), ) +
+                                 ((cleaver.regex_i(r'Avp'), 'AVP'), ) +
                                  ((cleaver.regex_i(r'Mc/Pc'), 'MC/PC'), ))
 
     @property

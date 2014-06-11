@@ -83,8 +83,6 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         return "-".join([year, month, day])
 
     def calculate_tenure(self, hire_date):
-        # if hire_date == ' --':
-        #     return None
         try:
             hire_date_data = map(int, hire_date.split('-'))
         except:

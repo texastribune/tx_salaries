@@ -7,8 +7,7 @@ from . import mixins
 
 
 class TransformedRecord(mixins.GenericCompensationMixin,
-        mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
-        mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
+        mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, base.BaseTransformedRecord):
     MAP = {
@@ -56,12 +55,16 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         }
         return data
 
-    def process_job_title(self, job_title):
-        return job_title.split('.')[1]
+    def process_job_title(self):
+        return self.job_title.split('.')[1]
+
+    @property
+    def post(self):
+        return {'label': self.process_job_title()}
 
     @property
     def compensations(self):
-        job_title = self.process_job_title(self.job_title)
+        job_title = self.process_job_title()
         return [
             {
                 'tx_salaries.CompensationType': {
@@ -70,6 +73,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
                 'tx_salaries.Employee': {
                     'hire_date': self.hire_date,
                     'compensation': self.compensation,
+                    'tenure': self.calculate_tenure()
                 },
                 'tx_salaries.EmployeeTitle': {
                     'name': job_title,

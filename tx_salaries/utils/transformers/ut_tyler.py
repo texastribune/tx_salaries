@@ -7,8 +7,7 @@ from . import mixins
 
 
 class TransformedRecord(mixins.GenericCompensationMixin,
-        mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
-        mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
+        mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, base.BaseTransformedRecord):
     MAP = {
@@ -30,12 +29,13 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_CLASSIFICATION = 'University'
 
-    DATE_PROVIDED = date(2014, 1, 15)
+    DATE_PROVIDED = date(2014, 3, 1)
+    # salaries of new hires
 
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.full_name.strip() != ''
+        return self.full_name.strip() != '' and self.hire_date.strip() != ''
 
     def process_name(self, name):
         split_name = name.split(',')
@@ -79,6 +79,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
                 'tx_salaries.Employee': {
                     'hire_date': self.hire_date,
                     'compensation': self.compensation,
+                    'tenure': self.calculate_tenure()
                 },
                 'tx_salaries.EmployeeTitle': {
                     'name': self.job_title,
