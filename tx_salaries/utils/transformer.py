@@ -71,6 +71,7 @@ def summarize_import(organizations, filename):
         'Title',
         'Department',
         'Gender',
+        'Ethnicity',
         'Hire_date',
         'Tenure',
         'Annual_salary',
@@ -82,6 +83,7 @@ def summarize_import(organizations, filename):
         'post__label',
         'organization__name',
         'person__gender',
+        'person__races__name',
         'employee__hire_date',
         'employee__tenure',
         'employee__compensation',
@@ -100,10 +102,11 @@ def summarize_import(organizations, filename):
                 'Title': val[member_kwargs[1]],
                 'Department': val[member_kwargs[2]],
                 'Gender': val[member_kwargs[3]],
-                'Hire_date': val[member_kwargs[4]],
-                'Tenure': val[member_kwargs[5]],
-                'Annual_salary': val[member_kwargs[6]],
-                'Entity': val[member_kwargs[7]]
+                'Ethnicity': val[member_kwargs[4]],
+                'Hire_date': val[member_kwargs[5]],
+                'Tenure': val[member_kwargs[6]],
+                'Annual_salary': val[member_kwargs[7]],
+                'Entity': val[member_kwargs[8]]
             })
 
     outfile.close()
