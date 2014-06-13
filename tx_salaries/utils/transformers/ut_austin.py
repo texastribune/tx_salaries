@@ -82,8 +82,13 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             'name': self.get_raw_name,
         }
         try:
+            gender = self.gender.strip()
+            if gender == '':
+                gender = 'Not given'
+            else:
+                gender = self.gender_map[gender]
             data.update({
-                'gender': self.gender_map[self.gender.strip()]
+                'gender': gender
             })
             return data
         except KeyError:
@@ -129,7 +134,10 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     @property
     def given_race(self):
-        return {'name': self.race.strip()}
+        race = self.race.strip()
+        if race == '':
+            race = 'Not given'
+        return {'name': race}
 
     @property
     def department_as_child(self):

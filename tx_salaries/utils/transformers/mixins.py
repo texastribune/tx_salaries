@@ -107,7 +107,10 @@ class GenericPersonMixin(object):
         }
 
         if self.is_mapped_value('gender'):
-            r['gender'] = self.get_mapped_value('gender')
+            gender = self.get_mapped_value('gender')
+            if gender.split() == '':
+                gender = 'Not given'
+            r['gender'] = gender
 
         return r
 
@@ -120,8 +123,11 @@ class RaceMixin(object):
     """
     @property
     def given_race(self):
+        race = self.get_mapped_value('race')
+        if race.strip() == '':
+            race = 'Not given'
         return {
-            'name': self.get_mapped_value('race')
+            'name': race
         }
 
 

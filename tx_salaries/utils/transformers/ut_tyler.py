@@ -47,11 +47,14 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     @property
     def person(self):
         names = self.process_name(self.full_name)
+        gender = self.gender
+        if gender.strip() == '':
+            gender = 'Not given'
         data = {
             'family_name': names['family_name'],
             'given_name': names['given_name'],
             'name': " ".join([names['family_name'], names['given_name']]),
-            'gender': self.gender,
+            'gender': gender,
         }
         return data
 
