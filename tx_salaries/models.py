@@ -1,9 +1,10 @@
 from django.db import models
+from jsonfield import JSONField
 from tx_people import fields
 from tx_people.models import Membership, Organization, Post
+from tx_people import mixins
 
 from . import managers
-from . import mixins
 
 
 def get_top_level_departments():
@@ -50,8 +51,8 @@ class EmployeeTitle(models.Model):
         return self.name
 
 
-class Employee(mixins.DenormalizeOnSaveMixin, mixins.TimeTrackingMixin,
-        mixins.ReducedDateStartAndEndMixin, models.Model):
+class Employee(mixins.TimeTrackingMixin, mixins.ReducedDateStartAndEndMixin,
+               models.Model):
     """
     # TODO
 
@@ -83,6 +84,8 @@ class Employee(mixins.DenormalizeOnSaveMixin, mixins.TimeTrackingMixin,
     position = models.ForeignKey(Membership)
     title = models.ForeignKey(EmployeeTitle, related_name='employees', null=True)
     hire_date = fields.ReducedDateField()
+    tenure = models.DecimalField(null=True, blank=True, decimal_places=4,
+                                 max_digits=12)
     compensation = models.DecimalField(decimal_places=4, max_digits=12)
     compensation_type = models.ForeignKey(CompensationType)
 
@@ -94,27 +97,27 @@ class Employee(mixins.DenormalizeOnSaveMixin, mixins.TimeTrackingMixin,
 def create_stats_mixin(prefix):
     def generate_kwargs(field):
         return {
-            'related_name': '{0}_stats_{1}'.format(prefix, field),
             'null': True,
             'blank': True,
+            'decimal_places': 4,
+            'max_digits': 12
         }
 
     class StatisticsMixin(models.Model):
-        highest_paid = models.ForeignKey('Employee', **generate_kwargs('highest'))
-        median_paid = models.ForeignKey('Employee', **generate_kwargs('median'))
-        lowest_paid = models.ForeignKey('Employee', **generate_kwargs('lowest'))
+        highest_paid = models.DecimalField(**generate_kwargs('highest'))
+        median_paid = models.DecimalField(**generate_kwargs('median'))
+        lowest_paid = models.DecimalField(**generate_kwargs('lowest'))
         total_number = models.PositiveIntegerField(default=0)
+        races = JSONField()
+        female = JSONField()
+        male = JSONField()
+        time_employed = JSONField()
+        date_provided = models.DateField(null=True, blank=True)
 
         class Meta:
             abstract = True
 
     return StatisticsMixin
-
-
-class EmployeeTitleStats(create_stats_mixin('title'), models.Model):
-    title = models.OneToOneField(EmployeeTitle, related_name='stats')
-
-    objects = managers.EmployeeTitleStatsManager()
 
 
 class PositionStats(create_stats_mixin('position'), models.Model):

@@ -22,7 +22,7 @@ class Command(BaseCommand):
         make_option('--row', action='store', dest='label_row', default=1,
                     help='Location of the row of labels, defaults to 1'),
         make_option('--v', action='store', dest='verbosity', default=0,
-            help='1=Every record; 2=100 records; 3=500 records'),
+                    help='1=Every record; 2=100 records; 3=500 records'),
     )
 
     def handle(self, *args, **kwargs):
@@ -30,10 +30,11 @@ class Command(BaseCommand):
             records = transformer.transform(filename, kwargs['sheet'],
                                             kwargs['label_row'])
             verbosity = int(kwargs['verbosity'])
-            if verbosity >= 2:
-                print "Processing %d records from %s" % (len(records),
-                        basename(filename))
+            print "Processing %d records from %s" % (len(records),
+                                                     basename(filename))
 
+            to_denormalize = {'organizations': set(), 'positions': set(),
+                              'date_provided': records[0]['date_provided']}
             records_remaining = len(records)
 
             try:
@@ -56,7 +57,13 @@ class Command(BaseCommand):
                     parent_org_children.filter(pk__in=children_ids).delete()
 
             for record in records:
-                to_db.save(record)
+                save_for_stats = to_db.save(record)
+
+                to_denormalize['organizations'].update(
+                    save_for_stats['organizations'])
+                to_denormalize['positions'].update(
+                    save_for_stats['positions'])
+
                 records_remaining -= 1
                 if verbosity == 1:
                     out('.')
@@ -68,6 +75,10 @@ class Command(BaseCommand):
             if verbosity == 1:
                 out('\n')
 
+            to_db.denormalize(to_denormalize)
+
+
     def get_parent_org(self, first_record):
         parent_org_name = first_record['tx_people.Organization']['name']
         return models.Organization.objects.get(name=parent_org_name)
+
