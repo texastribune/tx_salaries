@@ -6,6 +6,7 @@ from . import mixins
 
 from datetime import date
 
+
 class TransformedRecord(mixins.GenericCompensationMixin,
     mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
     mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
@@ -33,7 +34,6 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         # Adjust to return False on invalid fields.  For example:
         return self.full_name.strip() != ''
 
-
     @property
     def department(self):
         return ''
@@ -48,7 +48,6 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         raw = self.get_mapped_value('compensation')
         # import ipdb; ipdb.set_trace();
         return raw.strip('$').replace(',', '')
-
 
     @property
     def person(self):
@@ -65,18 +64,15 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         last_name = split_name[0]
         split_firstname = split_name[1].split(' ')
         first_name = split_firstname[0]
-        try:
-            if len(split_firstname) == 2 and len(split_firstname[1]) == 1:
-                middle_init = split_firstname[1]
-            else:
-                first_name = split_name[1]
-                middle_init = ''
-            return {
-                'first_name': first_name,
-                'middle_init': middle_init,
-                'last_name': last_name
-            }
-        except:
-            import ipdb; ipdb.set_trace()
+        if len(split_firstname) == 2 and len(split_firstname[1]) == 1:
+            middle_init = split_firstname[1]
+        else:
+            first_name = split_name[1]
+            middle_init = ''
+        return {
+            'first_name': first_name,
+            'middle_init': middle_init,
+            'last_name': last_name
+        }
 
 transform = base.transform_factory(TransformedRecord)
