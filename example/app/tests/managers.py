@@ -78,6 +78,14 @@ class RatiosAddUpTest(TestCase):
 
         management.call_command('denormalize_salary_data')
 
+        male_ratio_sum = sum([b['ratio'] for b in department.stats.male['distribution']['slices']])
+        self.assertEqual(male_ratio_sum, department.stats.male['ratio'])
+        self.assertEqual(department.stats.male['ratio'], 50)
+
+        female_ratio_sum = sum([b['ratio'] for b in department.stats.female['distribution']['slices']])
+        self.assertEqual(female_ratio_sum, department.stats.female['ratio'])
+        self.assertEqual(department.stats.female['ratio'], 50)
+
         self.assertEqual(department.stats.male['ratio'] + department.stats.female['ratio'], 100)
 
     def calculate_tenure(self, hire_date, date_provided):

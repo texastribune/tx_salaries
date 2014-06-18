@@ -51,7 +51,8 @@ class DenormalizeManagerMixin(object):
                 'ratio': round((float(total_number) / float(total_in_cohort)) * 100, 1)
             }
             if get_slices:
-                data.update({'distribution': self.get_distribution(cohort)})
+                data.update({'distribution': self.get_distribution(cohort,
+                                                                   total_in_cohort)})
             return data
         else:
             return {'total_number': 0}
@@ -89,7 +90,7 @@ class DenormalizeManagerMixin(object):
         else:
             return num + (target - num % target)
 
-    def get_distribution(self, cohort):
+    def get_distribution(self, cohort, total_in_cohort):
         if cohort.count() == 0:
             return None
         # Set bounds of buckets using all employees so breakdowns are comparable
@@ -104,7 +105,7 @@ class DenormalizeManagerMixin(object):
                     'start': salaries['min'],
                     'end': salaries['max'],
                     'count': cohort.count(),
-                    'ratio': 100
+                    'ratio': round((float(cohort.count()) / float(total_in_cohort)) * 100, 1)
                 }]
             }
         step = diff / 10
@@ -133,13 +134,17 @@ class DenormalizeManagerMixin(object):
 
         slices = []
         while start < salaries['max']:
-            cohort_total = cohort.filter(compensation__gt=start,
-                                         compensation__lte=start+step).count()
+            if start == salaries['min']:
+                cohort_total = (cohort.filter(compensation__gte=start,
+                                              compensation__lte=start+step).count())
+            else:
+                cohort_total = (cohort.filter(compensation__gt=start,
+                                              compensation__lte=start+step).count())
             slices.append({
                 'start': start,
                 'end': start + step,
                 'count': cohort_total,
-                'ratio': round((float(cohort_total) / float(cohort.count())) * 100, 1)
+                'ratio': round((float(cohort_total) / float(total_in_cohort)) * 100, 1)
             })
             start += step
         if not slices:
