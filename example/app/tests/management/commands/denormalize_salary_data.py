@@ -14,8 +14,10 @@ class DenormalizeCreatesStats(TestCase):
 
         post = PostFactory(organization=child_org)
 
-        # POST MUST HAVE UNICODE VALUE
-        membership = MembershipFactory(post=post, organization=child_org)
+        try:
+            membership = MembershipFactory(post=post, organization=child_org)
+        except TypeError:
+            raise Exception('Could not create a Post. Did you give a unicode value in the tx_people sitepackages?')
 
         employee = EmployeeFactory(position=membership)
 
@@ -32,8 +34,10 @@ class DenormalizeCreatesStats(TestCase):
 
         post = PostFactory(organization=child_org)
 
-        # POST MUST HAVE UNICODE VALUE
-        membership = MembershipFactory(post=post, organization=child_org)
+        try:
+            membership = MembershipFactory(post=post, organization=child_org)
+        except TypeError:
+            raise Exception('Could not create a Post. Did you give a unicode value in the tx_people sitepackages?')
 
         employee = EmployeeFactory(position=membership)
 

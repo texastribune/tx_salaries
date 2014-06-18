@@ -12,11 +12,13 @@ class EvenEmployeeMedianTest(TestCase):
         department = OrganizationFactory(name="Test Organization",
                                            parent=parent_org)
         post = PostFactory(organization=department)
-        # POST MUST HAVE UNICODE VALUE
-        membership_one = MembershipFactory(post=post, organization=department,
-                                           person__gender='F')
-        membership_two = MembershipFactory(post=post, organization=department,
-                                           person__gender='F')
+        try:
+            membership_one = MembershipFactory(post=post, organization=department,
+                                             person__gender='F')
+            membership_two = MembershipFactory(post=post, organization=department,
+                                             person__gender='F')
+        except TypeError:
+            raise Exception('Could not create a Post. Did you give a unicode value in the tx_people sitepackages?')
 
         # create two employees
         employee_one = EmployeeFactory(compensation=135000,
@@ -36,11 +38,14 @@ class EvenEmployeeMedianTest(TestCase):
         department = OrganizationFactory(name="Test Organization",
                                            parent=parent_org)
         post = PostFactory(organization=department)
-        # POST MUST HAVE UNICODE VALUE
-        membership_one = MembershipFactory(post=post, organization=department,
-                                           person__gender='F')
-        membership_two = MembershipFactory(post=post, organization=department,
-                                           person__gender='F')
+
+        try:
+            membership_one = MembershipFactory(post=post, organization=department,
+                                             person__gender='F')
+            membership_two = MembershipFactory(post=post, organization=department,
+                                             person__gender='F')
+        except TypeError:
+            raise Exception('Could not create a Post. Did you give a unicode value in the tx_people sitepackages?')
 
         # create two employees
         employee_one = EmployeeFactory(compensation=135000,
@@ -57,11 +62,14 @@ class RatiosAddUpTest(TestCase):
         department = OrganizationFactory(name="Test Organization",
                                            parent=parent_org)
         post = PostFactory(organization=department)
-        # POST MUST HAVE UNICODE VALUE
-        membership_one = MembershipFactory(post=post, organization=department,
-                                           person__gender='F')
-        membership_two = MembershipFactory(post=post, organization=department,
-                                           person__gender='F')
+
+        try:
+            membership_one = MembershipFactory(post=post, organization=department,
+                                             person__gender='F')
+            membership_two = MembershipFactory(post=post, organization=department,
+                                             person__gender='F')
+        except TypeError:
+            raise Exception('Could not create a Post. Did you give a unicode value in the tx_people sitepackages?')
 
         membership_three = MembershipFactory(post=post, organization=department,
                                              person__gender='M')
@@ -104,17 +112,21 @@ class RatiosAddUpTest(TestCase):
         department = OrganizationFactory(name="Test Organization",
                                            parent=parent_org)
         post = PostFactory(organization=department)
-        # POST MUST HAVE UNICODE VALUE
-        membership_one = MembershipFactory(post=post, organization=department,
-                                           person__gender='F')
-        membership_two = MembershipFactory(post=post, organization=department,
-                                           person__gender='F')
 
-        membership_three = MembershipFactory(post=post, organization=department,
-                                             person__gender='M')
+        try:
+          membership_one = MembershipFactory(post=post, organization=department,
+                                             person__gender='F')
+          membership_two = MembershipFactory(post=post, organization=department,
+                                             person__gender='F')
 
-        membership_four = MembershipFactory(post=post, organization=department,
-                                            person__gender='M')
+          membership_three = MembershipFactory(post=post, organization=department,
+                                               person__gender='M')
+
+          membership_four = MembershipFactory(post=post, organization=department,
+                                              person__gender='M')
+        except TypeError:
+            raise Exception('Could not create a Post. Did you give a unicode value in the tx_people sitepackages?')
+
         female_one = EmployeeFactory(compensation=135000,
                                        position=membership_one,
                                        tenure=self.calculate_tenure('1975-04-10', date.today()))
@@ -144,17 +156,21 @@ class RatiosAddUpTest(TestCase):
         department = OrganizationFactory(name="Test Organization",
                                            parent=parent_org)
         post = PostFactory(organization=department)
-        # POST MUST HAVE UNICODE VALUE
-        membership_one = MembershipFactory(post=post, organization=department,
-                                           person__gender='F')
-        membership_two = MembershipFactory(post=post, organization=department,
-                                           person__gender='F')
 
-        membership_three = MembershipFactory(post=post, organization=department,
-                                             person__gender='M')
+        try:
+            membership_one = MembershipFactory(post=post, organization=department,
+                                               person__gender='F')
+            membership_two = MembershipFactory(post=post, organization=department,
+                                               person__gender='F')
 
-        membership_four = MembershipFactory(post=post, organization=department,
-                                            person__gender='M')
+            membership_three = MembershipFactory(post=post, organization=department,
+                                                 person__gender='M')
+
+            membership_four = MembershipFactory(post=post, organization=department,
+                                                person__gender='M')
+        except TypeError:
+            raise Exception('Could not create a Post. Did you give a unicode value in the tx_people sitepackages?')
+
         female_one = EmployeeFactory(compensation=135000,
                                        position=membership_one)
         female_two = EmployeeFactory(compensation=62217,
