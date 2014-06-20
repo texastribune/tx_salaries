@@ -157,7 +157,7 @@ class RatiosAddUpTest(TestCase):
                                             person__gender='M')
         female_one = EmployeeFactory(compensation=135000,
                                        position=membership_one)
-        female_two = EmployeeFactory(compensation=62217,
+        female_two = EmployeeFactory(compensation=162217,
                                        position=membership_two)
         male_one = EmployeeFactory(compensation=140000,
                                    position=membership_three)
@@ -170,3 +170,6 @@ class RatiosAddUpTest(TestCase):
 
         female_sum = sum([b['count'] for b in department.stats.female['distribution']['slices']])
         self.assertEqual(female_sum, department.stats.female['total_number'])
+
+        self.assertEqual(department.stats.female['distribution']['slices'][0]['start'],
+                         department.stats.male['distribution']['slices'][0]['start'])

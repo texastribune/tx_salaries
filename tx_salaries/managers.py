@@ -13,10 +13,10 @@ class DenormalizeManagerMixin(object):
         stats.races = self.get_races(cohort, total_in_cohort)
         stats.female = self.generate_stats(cohort.filter(
                                            position__person__gender='F'),
-                                           total_in_cohort, True)
+                                           total_in_cohort, True, cohort)
         stats.male = self.generate_stats(cohort.filter(
                                          position__person__gender='M'),
-                                         total_in_cohort, True)
+                                         total_in_cohort, True, cohort)
         stats.time_employed = self.get_tenures(cohort, total_in_cohort)
         stats.total_number = total_in_cohort
         if date_provided:
@@ -38,7 +38,8 @@ class DenormalizeManagerMixin(object):
                                               flat=True)[(total_number - 1) / 2])
         return median_paid
 
-    def generate_stats(self, cohort, total_in_cohort, get_slices=False):
+    def generate_stats(self, cohort, total_in_cohort, get_slices=False,
+                       parent_cohort=False):
         total_number = cohort.count()
         if total_number > 0:
             data = {
@@ -52,7 +53,8 @@ class DenormalizeManagerMixin(object):
             }
             if get_slices:
                 data.update({'distribution': self.get_distribution(cohort,
-                                                                   total_in_cohort)})
+                                                                   total_in_cohort,
+                                                                   parent_cohort)})
             return data
         else:
             return {'total_number': 0}
@@ -90,11 +92,11 @@ class DenormalizeManagerMixin(object):
         else:
             return num + (target - num % target)
 
-    def get_distribution(self, cohort, total_in_cohort):
+    def get_distribution(self, cohort, total_in_cohort, parent_cohort):
         if cohort.count() == 0:
             return None
-        # Set bounds of buckets using all employees so breakdowns are comparable
-        salaries = cohort.aggregate(max=models.Max('compensation'),
+        # Set bounds of buckets using all employees so gender breakdowns are comparable
+        salaries = parent_cohort.aggregate(max=models.Max('compensation'),
                                     min=models.Min('compensation'))
         diff = salaries['max'] - salaries['min']
         if diff == 0:
