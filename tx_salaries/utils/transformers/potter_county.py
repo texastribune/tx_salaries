@@ -55,7 +55,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         data = {
             'family_name': formatted_name['last_name'].title(),
             'given_name': formatted_name['first_name'].title(),
-            'name': " ".join([n.title() for n in formatted_name.values()])
+            'name': " ".join([n.title() for n in formatted_name.values()]),
+            'gender': self.gender
         }
         return data
 
