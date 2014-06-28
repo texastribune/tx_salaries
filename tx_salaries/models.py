@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.text import slugify
 from jsonfield import JSONField
 from tx_people import fields
 from tx_people.models import Membership, Organization, Post
@@ -86,12 +87,17 @@ class Employee(mixins.TimeTrackingMixin, mixins.ReducedDateStartAndEndMixin,
     hire_date = fields.ReducedDateField()
     tenure = models.DecimalField(null=True, blank=True, decimal_places=4,
                                  max_digits=12)
+    slug = models.SlugField(null=True, blank=True, default=None)
     compensation = models.DecimalField(decimal_places=4, max_digits=12)
     compensation_type = models.ForeignKey(CompensationType)
 
     def __unicode__(self):
         return u'{title}, {person}'.format(title=self.position.post,
                 person=self.position.person)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(unicode(self.position.person.name))
+        super(Employee, self).save(*args, **kwargs)
 
 
 def create_stats_mixin(prefix):
@@ -113,6 +119,7 @@ def create_stats_mixin(prefix):
         male = JSONField()
         time_employed = JSONField()
         date_provided = models.DateField(null=True, blank=True)
+        slug = models.SlugField(null=True, blank=True, default=None)
 
         class Meta:
             abstract = True
@@ -125,9 +132,17 @@ class PositionStats(create_stats_mixin('position'), models.Model):
 
     objects = managers.PositionStatsManager()
 
+    def save(self, *args, **kwargs):
+        self.slug = slugify(unicode(self.position.label))
+        super(PositionStats, self).save(*args, **kwargs)
+
 
 class OrganizationStats(create_stats_mixin('organization'),
         models.Model):
     organization = models.OneToOneField(Organization, related_name='stats')
 
     objects = managers.OrganizationStatsManager()
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(unicode(self.organization.name))
+        super(OrganizationStats, self).save(*args, **kwargs)
