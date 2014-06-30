@@ -1,9 +1,11 @@
 from django.db import models
+from django.utils.text import slugify
+from jsonfield import JSONField
 from tx_people import fields
 from tx_people.models import Membership, Organization, Post
+from tx_people import mixins
 
 from . import managers
-from . import mixins
 
 
 def get_top_level_departments():
@@ -50,8 +52,8 @@ class EmployeeTitle(models.Model):
         return self.name
 
 
-class Employee(mixins.DenormalizeOnSaveMixin, mixins.TimeTrackingMixin,
-        mixins.ReducedDateStartAndEndMixin, models.Model):
+class Employee(mixins.TimeTrackingMixin, mixins.ReducedDateStartAndEndMixin,
+               models.Model):
     """
     # TODO
 
@@ -83,6 +85,9 @@ class Employee(mixins.DenormalizeOnSaveMixin, mixins.TimeTrackingMixin,
     position = models.ForeignKey(Membership)
     title = models.ForeignKey(EmployeeTitle, related_name='employees', null=True)
     hire_date = fields.ReducedDateField()
+    tenure = models.DecimalField(null=True, blank=True, decimal_places=4,
+                                 max_digits=12)
+    slug = models.SlugField(null=True, blank=True, default=None)
     compensation = models.DecimalField(decimal_places=4, max_digits=12)
     compensation_type = models.ForeignKey(CompensationType)
 
@@ -90,20 +95,31 @@ class Employee(mixins.DenormalizeOnSaveMixin, mixins.TimeTrackingMixin,
         return u'{title}, {person}'.format(title=self.position.post,
                 person=self.position.person)
 
+    def save(self, *args, **kwargs):
+        self.slug = slugify(unicode(self.position.person.name))
+        super(Employee, self).save(*args, **kwargs)
+
 
 def create_stats_mixin(prefix):
     def generate_kwargs(field):
         return {
-            'related_name': '{0}_stats_{1}'.format(prefix, field),
             'null': True,
             'blank': True,
+            'decimal_places': 4,
+            'max_digits': 12
         }
 
     class StatisticsMixin(models.Model):
-        highest_paid = models.ForeignKey('Employee', **generate_kwargs('highest'))
-        median_paid = models.ForeignKey('Employee', **generate_kwargs('median'))
-        lowest_paid = models.ForeignKey('Employee', **generate_kwargs('lowest'))
+        highest_paid = models.DecimalField(**generate_kwargs('highest'))
+        median_paid = models.DecimalField(**generate_kwargs('median'))
+        lowest_paid = models.DecimalField(**generate_kwargs('lowest'))
         total_number = models.PositiveIntegerField(default=0)
+        races = JSONField()
+        female = JSONField()
+        male = JSONField()
+        time_employed = JSONField()
+        date_provided = models.DateField(null=True, blank=True)
+        slug = models.SlugField(null=True, blank=True, default=None)
 
         class Meta:
             abstract = True
@@ -111,16 +127,14 @@ def create_stats_mixin(prefix):
     return StatisticsMixin
 
 
-class EmployeeTitleStats(create_stats_mixin('title'), models.Model):
-    title = models.OneToOneField(EmployeeTitle, related_name='stats')
-
-    objects = managers.EmployeeTitleStatsManager()
-
-
 class PositionStats(create_stats_mixin('position'), models.Model):
     position = models.OneToOneField(Post, related_name='stats')
 
     objects = managers.PositionStatsManager()
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(unicode(self.position.label))
+        super(PositionStats, self).save(*args, **kwargs)
 
 
 class OrganizationStats(create_stats_mixin('organization'),
@@ -128,3 +142,7 @@ class OrganizationStats(create_stats_mixin('organization'),
     organization = models.OneToOneField(Organization, related_name='stats')
 
     objects = managers.OrganizationStatsManager()
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(unicode(self.organization.name))
+        super(OrganizationStats, self).save(*args, **kwargs)

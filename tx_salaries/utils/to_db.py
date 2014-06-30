@@ -4,9 +4,11 @@ from .. import models
 
 
 def save(data):
+    save_for_stats = {'organizations': set(), 'positions': set()}
+
     # TODO: Save source data
     identifier, id_created = tx_people.Identifier.objects.get_or_create(
-            **data['tx_people.Identifier'])
+        **data['tx_people.Identifier'])
 
     race, _ = tx_people.Race.objects.get_or_create(**data['tx_people.Race'])
 
@@ -23,24 +25,39 @@ def save(data):
     # TODO: How should we/can we deal with recursive children?
     children = data['tx_people.Organization'].pop('children', [])
     source_department, _ = tx_people.Organization.objects.get_or_create(
-            **data['tx_people.Organization'])
+        **data['tx_people.Organization'])
+    save_for_stats['organizations'].add(source_department)
     for child in children:
         department, _ = tx_people.Organization.objects.get_or_create(
-                parent=source_department, **child)
+            parent=source_department, **child)
+        save_for_stats['organizations'].add(department)
 
     # TODO: Remove post entirely
     post, _ = tx_people.Post.objects.get_or_create(organization=department,
-            **data['tx_people.Post'])
+                                                   **data['tx_people.Post'])
+    save_for_stats['positions'].add(post)
 
     membership, _ = tx_people.Membership.objects.get_or_create(
-            person=person, organization=department, post=post,
-            **data['tx_people.Membership'])
+        person=person, organization=department, post=post,
+        **data['tx_people.Membership'])
 
     for compensation in data['compensations']:
         compensation_type, _ = models.CompensationType.objects.get_or_create(
-                **compensation['tx_salaries.CompensationType'])
+            **compensation['tx_salaries.CompensationType'])
         title, _ = models.EmployeeTitle.objects.get_or_create(
-                **compensation['tx_salaries.EmployeeTitle'])
+            **compensation['tx_salaries.EmployeeTitle'])
         models.Employee.objects.get_or_create(
             position=membership, compensation_type=compensation_type,
             title=title, **compensation['tx_salaries.Employee'])
+    return save_for_stats
+
+
+def denormalize(data):
+    date_provided = data['date_provided']
+    print "Denormalizing %s organizations" % (len(data['organizations']))
+    for org in data['organizations']:
+        models.OrganizationStats.objects.denormalize(org, date_provided)
+
+    print "Denormalizing %s positions" % (len(data['positions']))
+    for position in data['positions']:
+        models.PositionStats.objects.denormalize(position, date_provided)

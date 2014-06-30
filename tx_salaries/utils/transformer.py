@@ -8,23 +8,40 @@ from django.core import exceptions
 from .transformers import TRANSFORMERS
 
 
-def convert_to_csv_reader(filename):
+def convert_to_csv_reader(filename, sheet=None):
     format = convert.guess_format(filename)
     f = open(filename, "rb")
-    converted = StringIO(convert.convert(f, format))
+    convert_kwargs = {}
+    if sheet is not None:
+        # Only pass `sheet` to the `convert` function when its set to
+        # a non-None value.  This is done to satisfy csvkit which checks
+        # for the presence of `sheet`, not whether it's valid.
+        convert_kwargs['sheet'] = sheet
+    converted = StringIO(convert.convert(f, format, **convert_kwargs))
     reader = UnicodeCSVReader(converted)
     return reader
 
 
-def transform(filename):
-    reader = convert_to_csv_reader(filename)
+def transform(filename, sheet=None, label_row=1):
+    reader = convert_to_csv_reader(filename, sheet=sheet)
+    for i in range(1, int(label_row)):
+        reader.next()
     labels = reader.next()
     transformers = get_transformers(labels)
 
     if len(transformers) > 1:
-        raise Exception("TODO")
+        question = 'Which transformer would you like to use?\n'
+        for i in range(0, len(transformers)):
+            try:
+                question += '%i: %s\n' % (i, transformers[i][0])
+            except TypeError:
+                raise Exception("Please list transformers with identical hashes as tuples")
+        transformer_choice = int(input(question))
+        transformer = transformers[transformer_choice][1]
 
-    transformer = transformers[0]
+    else:
+        transformer = transformers[0]
+
     # TODO: Figure out a better way to pass a dict reader in
     data = transformer(labels, reader)
     return data
