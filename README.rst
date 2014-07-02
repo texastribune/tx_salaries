@@ -112,6 +112,8 @@ this::
         DATE_PROVIDED = date(2013, 10, 31)
         # Y/M/D agency provided the data
 
+        URL = "http://raw.texastribune.org.s3.amazonaws.com/path/to/rio_grande_county.xls"
+
         @property
         def is_valid(self):
             # Adjust to return False on invalid fields.  For example:
