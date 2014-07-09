@@ -94,7 +94,7 @@ this::
             mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
             mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
             mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-            base.BaseTransformedRecord):
+            mixins.LinkMixin, base.BaseTransformedRecord):
         MAP = {
             'last_name': 'LABEL FOR LAST NAME',
             'first_name': 'LABEL FOR FIRST NAME',
