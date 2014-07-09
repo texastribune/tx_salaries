@@ -5,6 +5,7 @@ class DenormalizeManagerMixin(object):
     def update_cohort(self, cohort, date_provided=False, **kwargs):
         stats, created = self.get_or_create(**kwargs)
         total_in_cohort = cohort.count()
+        stats.distribution = self.get_distribution(cohort, total_in_cohort, cohort)
         stats.highest_paid = (cohort.order_by('-compensation')
                                     .values_list('compensation', flat=True)[0])
         stats.median_paid = self.get_median(cohort, total_in_cohort)
