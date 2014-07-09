@@ -111,13 +111,16 @@ class DenormalizeManagerMixin(object):
                     'ratio': round((float(cohort.count()) / float(total_in_cohort)) * 100, 1)
                 }]
             }
-
-        if diff == 0:
-            step = diff / 1
-        elif diff < 20000:
-            step = diff / 3
+        if cohort != parent_cohort:
+            if diff == 0:
+                step = diff / 1
+            elif diff < 20000:
+                step = diff / 3
+            else:
+                step = diff / 6
         else:
-            step = diff / 6
+            step = diff/10
+
         start = salaries['min']
 
         slices = []
