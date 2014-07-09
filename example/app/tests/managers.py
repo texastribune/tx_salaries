@@ -173,3 +173,37 @@ class RatiosAddUpTest(TestCase):
 
         self.assertEqual(department.stats.female['distribution']['slices'][0]['start'],
                          department.stats.male['distribution']['slices'][0]['start'])
+
+    def test_overall_distribution(self):
+        parent_org = OrganizationFactory(name="Test Parent Organization")
+        department = OrganizationFactory(name="Test Organization",
+                                           parent=parent_org)
+        post = PostFactory(organization=department)
+        # POST MUST HAVE UNICODE VALUE
+        membership_one = MembershipFactory(post=post, organization=department,
+                                           person__gender='F')
+        membership_two = MembershipFactory(post=post, organization=department,
+                                           person__gender='F')
+
+        membership_three = MembershipFactory(post=post, organization=department,
+                                             person__gender='M')
+
+        membership_four = MembershipFactory(post=post, organization=department,
+                                            person__gender='M')
+        female_one = EmployeeFactory(compensation=135000,
+                                       position=membership_one)
+        female_two = EmployeeFactory(compensation=162217,
+                                       position=membership_two)
+        male_one = EmployeeFactory(compensation=140000,
+                                   position=membership_three)
+        male_two = EmployeeFactory(compensation=61050, position=membership_four)
+
+        management.call_command('denormalize_salary_data')
+        self.assertTrue(parent_org.stats.distribution)
+        self.assertTrue(department.stats.distribution)
+
+        slice_sum = sum([b['count'] for b in department.stats.distribution['slices']])
+        self.assertEqual(slice_sum, department.stats.total_number)
+
+        parent_slice_sum = sum([b['count'] for b in parent_org.stats.distribution['slices']])
+        self.assertEqual(slice_sum, parent_org.stats.total_number)
