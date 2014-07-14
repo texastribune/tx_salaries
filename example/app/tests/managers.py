@@ -225,3 +225,30 @@ class RatiosAddUpTest(TestCase):
 
         male_slice_sum = sum([b['count'] for b in department.stats.male['distribution']['slices']])
         self.assertEqual(male_slice_sum, 0)
+
+    def test_no_diff_distribution(self):
+        parent_org = OrganizationFactory(name="Test Parent Organization")
+        department = OrganizationFactory(name="Test Organization",
+                                           parent=parent_org)
+        post = PostFactory(organization=department)
+        # POST MUST HAVE UNICODE VALUE
+        membership_one = MembershipFactory(post=post, organization=department,
+                                           person__gender='F')
+        membership_three = MembershipFactory(post=post, organization=department,
+                                             person__gender='M')
+        female_one = EmployeeFactory(compensation=135000,
+                                     position=membership_one)
+        male_one = EmployeeFactory(compensation=135000, position=membership_three)
+        management.call_command('denormalize_salary_data')
+
+        self.assertEqual(parent_org.stats.distribution['step'], 0)
+        self.assertEqual(department.stats.distribution['step'], 0)
+
+        self.assertEqual(parent_org.stats.distribution['slices'][0]['start'],
+                         department.stats.distribution['slices'][0]['end'])
+        self.assertEqual(department.stats.distribution['slices'][0]['start'],
+                         department.stats.distribution['slices'][0]['end'])
+
+        self.assertEqual(department.stats.distribution['slices'][0]['ratio'], 100)
+        self.assertEqual(parent_org.stats.male['distribution']['slices'][0]['ratio'], 50)
+        self.assertEqual(parent_org.stats.female['distribution']['slices'][0]['ratio'], 50)

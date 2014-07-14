@@ -101,7 +101,6 @@ class DenormalizeManagerMixin(object):
                                     min=models.Min('compensation'))
         diff = salaries['max'] - salaries['min']
         if diff == 0:
-            # TODO test
             return {
                 'step': 0,
                 'slices': [{
