@@ -56,3 +56,12 @@ class Command(BaseCommand):
                 out('\n')
 
             to_db.denormalize(to_denormalize)
+
+            print "Finished processing %s" % basename(filename)
+            question = 'Would you like a summary of what was imported? y/n\n'
+            summary_choice = raw_input(question)
+            if summary_choice == 'y':
+                outfile = basename(filename)
+                outfile = outfile.split('.')[0] + '.csv'
+                transformer.summarize_import(to_denormalize['organizations'],
+                                             'summary-' + outfile)
