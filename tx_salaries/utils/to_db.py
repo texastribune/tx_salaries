@@ -10,6 +10,9 @@ def save(data):
     identifier, id_created = tx_people.Identifier.objects.get_or_create(
         **data['tx_people.Identifier'])
 
+    link, link_created = tx_people.Link.objects.get_or_create(
+        **data['tx_people.Links'])
+
     race, _ = tx_people.Race.objects.get_or_create(**data['tx_people.Race'])
 
     if id_created:
@@ -26,6 +29,7 @@ def save(data):
     children = data['tx_people.Organization'].pop('children', [])
     source_department, _ = tx_people.Organization.objects.get_or_create(
         **data['tx_people.Organization'])
+    source_department.links.add(link)
     save_for_stats['organizations'].add(source_department)
     for child in children:
         department, _ = tx_people.Organization.objects.get_or_create(
