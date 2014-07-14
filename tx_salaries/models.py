@@ -110,6 +110,7 @@ def create_stats_mixin(prefix):
         }
 
     class StatisticsMixin(models.Model):
+        distribution = JSONField()
         highest_paid = models.DecimalField(**generate_kwargs('highest'))
         median_paid = models.DecimalField(**generate_kwargs('median'))
         lowest_paid = models.DecimalField(**generate_kwargs('lowest'))
