@@ -98,7 +98,7 @@ class DenormalizeManagerMixin(object):
     def get_distribution(self, cohort, total_in_cohort, parent_cohort):
         # Set bounds of buckets using all employees so gender breakdowns are comparable
         salaries = parent_cohort.aggregate(max=models.Max('compensation'),
-                                    min=models.Min('compensation'))
+                                           min=models.Min('compensation'))
         diff = salaries['max'] - salaries['min']
         if diff == 0:
             return {
@@ -118,7 +118,7 @@ class DenormalizeManagerMixin(object):
             else:
                 step = diff / 6
         else:
-            step = diff/10
+            step = diff / 10
 
         start = salaries['min']
 
@@ -126,10 +126,12 @@ class DenormalizeManagerMixin(object):
         while start < salaries['max']:
             if start == salaries['min']:
                 cohort_total = (cohort.filter(compensation__gte=start,
-                                              compensation__lte=start+step).count())
+                                              compensation__lte=start + step)
+                                      .count())
             else:
                 cohort_total = (cohort.filter(compensation__gt=start,
-                                              compensation__lte=start+step).count())
+                                              compensation__lte=start + step)
+                                      .count())
             slices.append({
                 'start': start,
                 'end': start + step,
@@ -168,7 +170,6 @@ class PositionStatsManager(DenormalizeManagerMixin, models.Manager):
 
     def denormalize(self, obj, date_provided=False):
         from tx_salaries.models import Employee
-        position_cohort = Employee.objects.filter(
-                position__organization=obj.organization,
-                position__post=obj)
+        position_cohort = Employee.objects.filter(position__organization=obj.organization,
+                                                  position__post=obj)
         self.update_cohort(position_cohort, date_provided, position=obj)
