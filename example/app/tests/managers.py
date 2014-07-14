@@ -207,3 +207,21 @@ class RatiosAddUpTest(TestCase):
 
         parent_slice_sum = sum([b['count'] for b in parent_org.stats.distribution['slices']])
         self.assertEqual(slice_sum, parent_org.stats.total_number)
+
+    def test_empty_cohort(self):
+        parent_org = OrganizationFactory(name="Test Parent Organization")
+        department = OrganizationFactory(name="Test Organization",
+                                           parent=parent_org)
+        post = PostFactory(organization=department)
+        # POST MUST HAVE UNICODE VALUE
+        membership_one = MembershipFactory(post=post, organization=department,
+                                           person__gender='F')
+        female_one = EmployeeFactory(compensation=135000,
+                                     position=membership_one)
+        management.call_command('denormalize_salary_data')
+
+        self.assertTrue(parent_org.stats.male['distribution'])
+        self.assertTrue(department.stats.distribution)
+
+        male_slice_sum = sum([b['count'] for b in department.stats.male['distribution']['slices']])
+        self.assertEqual(male_slice_sum, 0)
