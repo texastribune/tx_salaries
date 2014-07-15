@@ -192,3 +192,50 @@ class RatiosAddUpTest(TestCase):
 
         self.assertEqual(department.stats.female['distribution']['slices'][0]['start'],
                          department.stats.male['distribution']['slices'][0]['start'])
+
+
+class CompensationTypeStatsTest(TestCase):
+    def test_full_time_denormalized(self):
+        parent_org = OrganizationFactory(name="Test Parent Organization")
+        department = OrganizationFactory(name="Test Organization",
+                                           parent=parent_org)
+        post = PostFactory(organization=department)
+        # POST MUST HAVE UNICODE VALUE
+        membership_one = MembershipFactory(post=post, organization=department,
+                                           person__gender='F')
+        membership_two = MembershipFactory(post=post, organization=department,
+                                           person__gender='F')
+        membership_three = MembershipFactory(post=post, organization=department,
+                                             person__gender='M')
+        membership_four = MembershipFactory(post=post, organization=department,
+                                            person__gender='M')
+        full_time = CompensationTypeFactory(name='FT')
+        part_time = CompensationTypeFactory(name='PT')
+        female_one = EmployeeFactory(compensation=135000,
+                                     position=membership_one,
+                                     compensation_type=full_time)
+        female_two = EmployeeFactory(compensation=162217,
+                                     position=membership_two,
+                                     compensation_type=part_time)
+        male_one = EmployeeFactory(compensation=140000,
+                                   position=membership_three,
+                                   compensation_type=part_time)
+        male_two = EmployeeFactory(compensation=61050, position=membership_four,
+                                   compensation_type=full_time)
+
+        management.call_command('denormalize_salary_data')
+
+        self.assertEqual(department.stats.male['total_number'], 1)
+        self.assertEqual(department.stats.female['total_number'], 1)
+        self.assertEqual(department.stats.total_number, 2)
+        self.assertEqual(parent_org.stats.total_number, 2)
+        self.assertEqual(post.stats.total_number, 2)
+
+        self.assertEqual(department.stats.female['median_paid'],
+                         female_one.compensation)
+        self.assertEqual(department.stats.male['median_paid'],
+                         male_two.compensation)
+        self.assertEqual(parent_org.stats.male['median_paid'],
+                         male_two.compensation)
+        self.assertEqual(post.stats.female['median_paid'],
+                         female_one.compensation)
