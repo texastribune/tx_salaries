@@ -3,7 +3,8 @@ from django.test import TestCase
 from datetime import date
 
 from tx_salaries.factories import (OrganizationFactory, PostFactory,
-                                   MembershipFactory, EmployeeFactory)
+                                   MembershipFactory, EmployeeFactory,
+                                   CompensationTypeFactory)
 
 
 class EvenEmployeeMedianTest(TestCase):
@@ -18,11 +19,15 @@ class EvenEmployeeMedianTest(TestCase):
         membership_two = MembershipFactory(post=post, organization=department,
                                            person__gender='F')
 
+        full_time = CompensationTypeFactory(name='FT')
+
         # create two employees
         employee_one = EmployeeFactory(compensation=135000,
-                                       position=membership_one)
+                                       position=membership_one,
+                                       compensation_type=full_time)
         employee_two = EmployeeFactory(compensation=62217,
-                                       position=membership_two)
+                                       position=membership_two,
+                                       compensation_type=full_time)
         management.call_command('denormalize_salary_data')
         # assert median salary of the organization is 98608.5
         self.assertEqual(
@@ -42,11 +47,15 @@ class EvenEmployeeMedianTest(TestCase):
         membership_two = MembershipFactory(post=post, organization=department,
                                            person__gender='F')
 
+        full_time = CompensationTypeFactory(name='FT')
+
         # create two employees
         employee_one = EmployeeFactory(compensation=135000,
-                                       position=membership_one)
+                                       position=membership_one,
+                                       compensation_type=full_time)
         employee_two = EmployeeFactory(compensation=62217,
-                                       position=membership_two)
+                                       position=membership_two,
+                                       compensation_type=full_time)
         management.call_command('denormalize_salary_data')
         self.assertEqual(department.stats.median_paid, 98608.5)
 
@@ -68,13 +77,18 @@ class RatiosAddUpTest(TestCase):
 
         membership_four = MembershipFactory(post=post, organization=department,
                                             person__gender='M')
+        full_time = CompensationTypeFactory(name='FT')
         female_one = EmployeeFactory(compensation=135000,
-                                       position=membership_one)
+                                     position=membership_one,
+                                     compensation_type=full_time)
         female_two = EmployeeFactory(compensation=62217,
-                                       position=membership_two)
+                                     position=membership_two,
+                                     compensation_type=full_time)
         male_one = EmployeeFactory(compensation=140000,
-                                   position=membership_three)
-        male_two = EmployeeFactory(compensation=61050, position=membership_four)
+                                   position=membership_three,
+                                   compensation_type=full_time)
+        male_two = EmployeeFactory(compensation=61050, position=membership_four,
+                                   compensation_type=full_time)
 
         management.call_command('denormalize_salary_data')
 
@@ -109,20 +123,22 @@ class RatiosAddUpTest(TestCase):
                                            person__gender='F')
         membership_two = MembershipFactory(post=post, organization=department,
                                            person__gender='F')
-
         membership_three = MembershipFactory(post=post, organization=department,
                                              person__gender='M')
-
         membership_four = MembershipFactory(post=post, organization=department,
                                             person__gender='M')
+        full_time = CompensationTypeFactory(name='FT')
         female_one = EmployeeFactory(compensation=135000,
-                                       position=membership_one,
-                                       tenure=self.calculate_tenure('1975-04-10', date.today()))
+                                     position=membership_one,
+                                     compensation_type=full_time,
+                                     tenure=self.calculate_tenure('1975-04-10', date.today()))
         female_two = EmployeeFactory(compensation=62217,
-                                       position=membership_two,
-                                       tenure=self.calculate_tenure('1985-04-10', date.today()))
+                                     position=membership_two,
+                                     compensation_type=full_time,
+                                     tenure=self.calculate_tenure('1985-04-10', date.today()))
         male_one = EmployeeFactory(compensation=140000,
                                    position=membership_three,
+                                   compensation_type=full_time,
                                    tenure=self.calculate_tenure('2012-04-10', date.today()))
 
         management.call_command('denormalize_salary_data')
@@ -149,19 +165,22 @@ class RatiosAddUpTest(TestCase):
                                            person__gender='F')
         membership_two = MembershipFactory(post=post, organization=department,
                                            person__gender='F')
-
         membership_three = MembershipFactory(post=post, organization=department,
                                              person__gender='M')
-
         membership_four = MembershipFactory(post=post, organization=department,
                                             person__gender='M')
+        full_time = CompensationTypeFactory(name='FT')
         female_one = EmployeeFactory(compensation=135000,
-                                       position=membership_one)
+                                     position=membership_one,
+                                     compensation_type=full_time)
         female_two = EmployeeFactory(compensation=162217,
-                                       position=membership_two)
+                                     position=membership_two,
+                                     compensation_type=full_time)
         male_one = EmployeeFactory(compensation=140000,
-                                   position=membership_three)
-        male_two = EmployeeFactory(compensation=61050, position=membership_four)
+                                   position=membership_three,
+                                   compensation_type=full_time)
+        male_two = EmployeeFactory(compensation=61050, position=membership_four,
+                                   compensation_type=full_time)
 
         management.call_command('denormalize_salary_data')
 

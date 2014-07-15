@@ -2,7 +2,8 @@ from django.core import management
 from django.test import TestCase
 
 from tx_salaries.factories import (OrganizationFactory, PostFactory,
-     MembershipFactory, EmployeeFactory)
+                                   MembershipFactory, EmployeeFactory,
+                                   CompensationTypeFactory)
 
 from tx_salaries.models import OrganizationStats, PositionStats
 
@@ -16,8 +17,10 @@ class DenormalizeCreatesStats(TestCase):
 
         # POST MUST HAVE UNICODE VALUE
         membership = MembershipFactory(post=post, organization=child_org)
+        full_time = CompensationTypeFactory(name='FT')
 
-        employee = EmployeeFactory(position=membership)
+        employee = EmployeeFactory(position=membership,
+                                   compensation_type=full_time)
 
         with self.assertRaises(OrganizationStats.DoesNotExist):
             parent_org.stats
@@ -34,8 +37,10 @@ class DenormalizeCreatesStats(TestCase):
 
         # POST MUST HAVE UNICODE VALUE
         membership = MembershipFactory(post=post, organization=child_org)
+        full_time = CompensationTypeFactory(name='FT')
 
-        employee = EmployeeFactory(position=membership)
+        employee = EmployeeFactory(position=membership,
+                                   compensation_type=full_time)
 
         management.call_command('denormalize_salary_data')
 
