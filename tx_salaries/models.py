@@ -27,7 +27,11 @@ def get_top_level_departments():
 
 
 class CompensationType(models.Model):
-    name = models.CharField(max_length=250)
+    name_choices = (
+        ('FT', 'Full Time'),
+        ('PT', 'Part Time')
+    )
+    name = models.CharField(max_length=250, choices=name_choices)
     description = models.TextField()
     # TODO
     # calculator = models.CharField(choices=constants.AVAILABLE_CALCULATORS)
