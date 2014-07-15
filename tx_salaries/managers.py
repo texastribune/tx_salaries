@@ -159,20 +159,26 @@ class OrganizationStatsManager(DenormalizeManagerMixin, models.Manager):
 
     def denormalize(self, obj, date_provided=False):
         from tx_salaries.models import Employee
-
         # TODO: Allow organization to break and say it is top-level
         #       Example: El Paso County Sheriff's Department instead
         #       of going all the way to El Paso County.
         if obj.parent:
             # employee works for a department,
             # also calculate parent organization stats
-            kwargs = {'position__organization': obj, }
+            kwargs = {
+                'position__organization': obj,
+                'compensation_type__name': 'FT'
+            }
 
         else:
-            kwargs = {'position__organization__parent': obj, }
+            kwargs = {
+                'position__organization__parent': obj,
+                'compensation_type__name': 'FT'
+            }
 
         cohort = Employee.objects.filter(**kwargs)
-        self.update_cohort(cohort, date_provided, organization=obj)
+        if cohort.count() > 0:
+            self.update_cohort(cohort, date_provided, organization=obj)
 
 
 class PositionStatsManager(DenormalizeManagerMixin, models.Manager):
@@ -180,7 +186,10 @@ class PositionStatsManager(DenormalizeManagerMixin, models.Manager):
 
     def denormalize(self, obj, date_provided=False):
         from tx_salaries.models import Employee
+
         position_cohort = Employee.objects.filter(
-                position__organization=obj.organization,
-                position__post=obj)
-        self.update_cohort(position_cohort, date_provided, position=obj)
+                        compensation_type__name='FT',
+                        position__organization=obj.organization,
+                        position__post=obj)
+        if position_cohort.count() > 0:
+            self.update_cohort(position_cohort, date_provided, position=obj)
