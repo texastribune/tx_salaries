@@ -171,3 +171,17 @@ class PostMixin(object):
         return {
             'label': self.job_title,
         }
+
+
+class LinkMixin(object):
+    """
+    Adds a ``link`` property to an organization's raw salary information
+
+    Requires a ``URL`` property to be available.
+    """
+    @property
+    def links(self):
+        return {
+            'url': self.URL,
+            'note': 'Salary information'
+        }

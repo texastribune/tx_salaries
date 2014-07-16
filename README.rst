@@ -94,7 +94,8 @@ this::
             mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
             mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
             mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-            mixins.RaceMixin, base.BaseTransformedRecord):
+            mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
+
         MAP = {
             'last_name': 'LABEL FOR LAST NAME',
             'first_name': 'LABEL FOR FIRST NAME',
@@ -113,6 +114,8 @@ this::
 
         DATE_PROVIDED = date(2013, 10, 31)
         # Y/M/D agency provided the data
+
+        URL = "http://raw.texastribune.org.s3.amazonaws.com/path/to/rio_grande_county.xls"
 
         @property
         def is_valid(self):
