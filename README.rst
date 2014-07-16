@@ -112,6 +112,8 @@ this::
 
         ORGANIZATION_NAME = 'Rio Grande County'
 
+        ORGANIZATION_CLASSIFICATION = 'County'
+
         DATE_PROVIDED = date(2013, 10, 31)
         # Y/M/D agency provided the data
 
