@@ -1,16 +1,26 @@
+from datetime import date
+
 from . import base
+from . import mixins
+
 from .. import cleaver
 
 
-class TransformedRecord(base.BaseTransformedRecord):
+class TransformedRecord(base.BaseTransformedRecord, mixins.RaceMixin,
+                        mixins.GenericCompensationMixin, mixins.LinkMixin):
     MAP = {
         'compensation': 'ANNUAL SALARY (HOURLY RATE FOR PT)',
         'hire_date': 'CURRENT HIRE DATE',
         'first_name': 'FIRST NAME',
-        'last_name': 'LAST NAME'
+        'last_name': 'LAST NAME',
+        'race': 'RACE/ETHNICITY'
     }
 
     NAME_FIELDS = ('first_name', 'last_name', )
+
+    DATE_PROVIDED = date(2013, 8, 31)
+
+    URL = 'http://raw.texastribune.org.s3.amazonaws.com/collin_college/salaries/2013-07/collin_college.xlsx'
 
     def __init__(self, data):
         super(TransformedRecord, self).__init__(data)
@@ -50,7 +60,7 @@ class TransformedRecord(base.BaseTransformedRecord):
         return {
             'scheme': 'tx_salaries_hash',
             'identifier': base.create_hash_for_record(self.data,
-                    exclude=[self.compensation_key, ])
+                    exclude=[self.compensation_key, ]),
         }
 
     @property
@@ -71,6 +81,7 @@ class TransformedRecord(base.BaseTransformedRecord):
             'children': [{
                 'name': unicode(self.department()),
             }],
+            'classification': 'Community College'
         }
 
     @property
@@ -98,6 +109,10 @@ class TransformedRecord(base.BaseTransformedRecord):
                         'tx_salaries.Employee': {
                             'hire_date': hire_date,
                             'compensation': '719',
+                            'tenure': self.calculate_tenure()
+                        },
+                        'tx_salaries.EmployeeTitle': {
+                            'name': self.job_title,
                         },
                     },
                     {
@@ -107,11 +122,15 @@ class TransformedRecord(base.BaseTransformedRecord):
                         'tx_salaries.Employee': {
                             'hire_date': hire_date,
                             'compensation': '575',
-                        }
+                            'tenure': self.calculate_tenure()
+                        },
+                        'tx_salaries.EmployeeTitle': {
+                            'name': self.job_title,
+                        },
                     }
                 ]
             elif self.is_valid:
-                # This is someone who's salary we can't even really
+                # This is someone whose salary we can't even really
                 # guess at as no rate is provided by Collin College.
                 #
                 # NOTE: This should no longer be accessed
@@ -128,6 +147,10 @@ class TransformedRecord(base.BaseTransformedRecord):
                     'tx_salaries.Employee': {
                         'hire_date': hire_date,
                         'compensation': self.compensation,
+                        'tenure': self.calculate_tenure()
+                    },
+                    'tx_salaries.EmployeeTitle': {
+                        'name': self.job_title,
                     },
                 },
             ]
