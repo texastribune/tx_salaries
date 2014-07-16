@@ -23,7 +23,7 @@ def get_top_level_departments():
     """
     return (Organization.objects.select_related('stats')
             .filter(parent=None)
-            .exclude(children__members__employee=None))
+            .exclude(children__members__employee=None).exclude(stats=None))
 
 
 class CompensationType(models.Model):
