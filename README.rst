@@ -131,6 +131,8 @@ this::
             else:
                 return 'Part Time'
 
+    transform = base.transform_factory(TransformedRecord)
+
 Each of the ``LABEL FOR XXX`` fields should be adjusted to match the
 appropriate column in the given spreadsheet.
 
@@ -139,12 +141,7 @@ customize the various properties added by the mixins or replace them with
 custom properties in other cases.  See the mixins for further documentation on
 what they add.
 
-Next you need to add the actual ``transform`` function.  At the end of the
-``rio_grande_county.py`` file, add this line::
-
-    transform = base.transform_factory(TransformedRecord)
-
-This generates a ``transform`` function that uses the ``TransformedRecord``
+The last line generates a ``transform`` function that uses the ``TransformedRecord``
 that you just created.  Now you're ready to run the importer.
 
 Back on the command line, run this::
