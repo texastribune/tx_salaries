@@ -94,7 +94,7 @@ this::
             mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
             mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
             mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-            base.BaseTransformedRecord):
+            mixins.RaceMixin, base.BaseTransformedRecord):
         MAP = {
             'last_name': 'LABEL FOR LAST NAME',
             'first_name': 'LABEL FOR FIRST NAME',
@@ -103,6 +103,8 @@ this::
             'hire_date': 'LABEL FOR HIRE DATE',
             'status': 'LABEL FOR FT/PT STATUS',
             'compensation': 'LABEL FOR COMPENSATION',
+            'gender': 'LABEL FOR GENDER',
+            'race': 'LABEL FOR RACE',
         }
 
         NAME_FIELDS = ('first_name', 'last_name', )
