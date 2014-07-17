@@ -7,7 +7,7 @@ class DenormalizeManagerMixin(object):
         total_in_cohort = cohort.count()
         stats.highest_paid = (cohort.order_by('-compensation')
                                     .values_list('compensation', flat=True)[0])
-        stats.median_paid = self.get_median(cohort, total_in_cohort)
+        stats.median_paid = self.get_median(cohort)
         stats.lowest_paid = (cohort.order_by('compensation')
                                    .values_list('compensation', flat=True)[0])
         stats.races = self.get_races(cohort, total_in_cohort)
@@ -23,8 +23,12 @@ class DenormalizeManagerMixin(object):
             stats.date_provided = date_provided
         stats.save()
 
-    def get_median(self, cohort, total_number):
-        if total_number % 2 == 0:
+    def get_median(self, cohort):
+        cohort = cohort.filter(compensation_type__name='FT')
+        total_number = cohort.count()
+        if total_number == 0:
+            return 0
+        elif total_number % 2 == 0:
             median_paid = (
                 (cohort.order_by('-compensation')
                        .values_list('compensation',
@@ -45,7 +49,7 @@ class DenormalizeManagerMixin(object):
             data = {
                 'highest_paid': (cohort.order_by('-compensation')
                                        .values_list('compensation', flat=True)[0]),
-                'median_paid': self.get_median(cohort, total_number),
+                'median_paid': self.get_median(cohort),
                 'lowest_paid': (cohort.order_by('compensation')
                                       .values_list('compensation', flat=True)[0]),
                 'total_number': total_number,
@@ -167,13 +171,11 @@ class OrganizationStatsManager(DenormalizeManagerMixin, models.Manager):
             # also calculate parent organization stats
             kwargs = {
                 'position__organization': obj,
-                'compensation_type__name': 'FT'
             }
 
         else:
             kwargs = {
                 'position__organization__parent': obj,
-                'compensation_type__name': 'FT'
             }
 
         cohort = Employee.objects.filter(**kwargs)
@@ -188,7 +190,6 @@ class PositionStatsManager(DenormalizeManagerMixin, models.Manager):
         from tx_salaries.models import Employee
 
         position_cohort = Employee.objects.filter(
-                        compensation_type__name='FT',
                         position__organization=obj.organization,
                         position__post=obj)
         if position_cohort.count() > 0:

@@ -225,11 +225,11 @@ class CompensationTypeStatsTest(TestCase):
 
         management.call_command('denormalize_salary_data')
 
-        self.assertEqual(department.stats.male['total_number'], 1)
-        self.assertEqual(department.stats.female['total_number'], 1)
-        self.assertEqual(department.stats.total_number, 2)
-        self.assertEqual(parent_org.stats.total_number, 2)
-        self.assertEqual(post.stats.total_number, 2)
+        self.assertEqual(department.stats.male['total_number'], 2)
+        self.assertEqual(department.stats.female['total_number'], 2)
+        self.assertEqual(department.stats.total_number, 4)
+        self.assertEqual(parent_org.stats.total_number, 4)
+        self.assertEqual(post.stats.total_number, 4)
 
         self.assertEqual(department.stats.female['median_paid'],
                          female_one.compensation)
