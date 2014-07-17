@@ -33,7 +33,7 @@ you want to use ``tx_salaries``.
 
 Importing Data
 """"""""""""""
-Data is imported using the ``import_salary_data``.  You can run it once
+Data is imported using the ``import_salary_data`` management command.  You can run it once
 ``tx_salaries`` is properly installed like this::
 
     python manage.py import_salary_data /path/to/some-salary-spreadsheet.xlsx
@@ -44,7 +44,7 @@ that csvkit's `in2csv`_ understands.
 
 Writing a New Transformer
 """""""""""""""""""""""""
-This sections walks you through creating a new importer.  We're going to use
+This section walks you through creating a new importer.  We're going to use
 the fictional "Rio Grande County" (fictional in Texas at least).
 
 Transformers require two things:
@@ -53,21 +53,21 @@ Transformers require two things:
 * An actual transformer capable of processing that file
 
 Entries in the ``TRANSFORMERS`` dictionary are made up of a unique hash that
-servers as the key to a given spreadsheet and a callable function that can
+serves as the key to a given spreadsheet and a callable function that can
 transform it.
 
 To generate a key, run the following command on your spreadsheet::
 
-    python manage generate_transformer_hash path/to/rio_grande_county.xls --sheet="sheet name"
+    python manage generate_transformer_hash path/to/rio_grande_county.xls
 
-The output should be a 40 character string.  Copy that value and open the
+The output should be a 40-character string.  Copy that value and open the
 ``tx_salaries/utils/transformers/__init__.py`` file which contains all of the
 known transformers.  Find the spot where ``rio_grande_county`` would fit in the
 alphabetical dictionary in ``TRANSFORMERS`` and add this line::
 
     '{ generated hash }': [rio_grande_county.transform, ],
 
-If the generated hash already exists, provide a tuple with a text
+If the generated hash already exists with another transformer, provide a tuple with a text
 label for the transformer and the transformer module like this::
 
     '{ generated hash }': [('Rio Grande County', rio_grande_county.transform),
@@ -94,7 +94,8 @@ this::
             mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
             mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
             mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-            mixins.LinkMixin, base.BaseTransformedRecord):
+            mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
+
         MAP = {
             'last_name': 'LABEL FOR LAST NAME',
             'first_name': 'LABEL FOR FIRST NAME',
@@ -103,11 +104,15 @@ this::
             'hire_date': 'LABEL FOR HIRE DATE',
             'status': 'LABEL FOR FT/PT STATUS',
             'compensation': 'LABEL FOR COMPENSATION',
+            'gender': 'LABEL FOR GENDER',
+            'race': 'LABEL FOR RACE',
         }
 
         NAME_FIELDS = ('first_name', 'last_name', )
 
         ORGANIZATION_NAME = 'Rio Grande County'
+
+        ORGANIZATION_CLASSIFICATION = 'County'
 
         DATE_PROVIDED = date(2013, 10, 31)
         # Y/M/D agency provided the data
@@ -126,6 +131,8 @@ this::
             else:
                 return 'Part Time'
 
+    transform = base.transform_factory(TransformedRecord)
+
 Each of the ``LABEL FOR XXX`` fields should be adjusted to match the
 appropriate column in the given spreadsheet.
 
@@ -134,21 +141,19 @@ customize the various properties added by the mixins or replace them with
 custom properties in other cases.  See the mixins for further documentation on
 what they add.
 
-Next you need to add the actual ``transform`` function.  At the end of the
-``rio_grande_county.py`` file, add this line::
-
-    transform = base.transform_factory(TransformedRecord)
-
-This generates a ``transform`` function that uses the ``TransformedRecord``
+The last line generates a ``transform`` function that uses the ``TransformedRecord``
 that you just created.  Now you're ready to run the importer.
 
 Back on the command line, run this::
 
-    python manage import_salary_data /path/to/rio_grande_county.xls --sheet="sheet name"
+    python manage import_salary_data /path/to/rio_grande_county.xls
 
 Pay attention to any error messages you receive and make the appropriate
-adjustments.  Congratulations!  You just completed your first salary
-transformer.
+adjustments. Note the ``generate_transformer_hash`` and ``import_salary`` data
+management commands can take ``--sheet`` and ``--row`` flags if the agency gave
+you a spreadsheet with multiple sheets or a header row that isn't the first row.
+
+Congratulations!  You just completed your first salary transformer.
 
 
 Understanding Transformers
