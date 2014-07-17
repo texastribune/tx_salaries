@@ -239,3 +239,26 @@ class CompensationTypeStatsTest(TestCase):
                          male_two.compensation)
         self.assertEqual(post.stats.female['median_paid'],
                          female_one.compensation)
+
+    def test_part_time_denormalized(self):
+        parent_org = OrganizationFactory(name="Test Parent Organization")
+        department = OrganizationFactory(name="Test Organization",
+                                           parent=parent_org)
+        post = PostFactory(organization=department)
+        # POST MUST HAVE UNICODE VALUE
+        membership_one = MembershipFactory(post=post, organization=department,
+                                           person__gender='F')
+        part_time = CompensationTypeFactory(name='PT')
+        female_one = EmployeeFactory(compensation=135000,
+                                     position=membership_one,
+                                     compensation_type=part_time)
+
+        management.call_command('denormalize_salary_data')
+
+        self.assertTrue(department.stats)
+        self.assertTrue(parent_org.stats)
+        self.assertTrue(post.stats)
+
+        self.assertEqual(department.stats.median_paid, 0)
+        self.assertEqual(department.stats.total_number, 1)
+        self.assertEqual(post.stats.total_number, 1)
