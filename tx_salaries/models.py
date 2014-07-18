@@ -87,7 +87,7 @@ class Employee(mixins.TimeTrackingMixin, mixins.ReducedDateStartAndEndMixin,
     hire_date = fields.ReducedDateField()
     tenure = models.DecimalField(null=True, blank=True, decimal_places=4,
                                  max_digits=12)
-    slug = models.SlugField(null=True, blank=True, default=None)
+    slug = models.SlugField(max_length=255, null=True, blank=True, default=None)
     compensation = models.DecimalField(decimal_places=4, max_digits=12)
     compensation_type = models.ForeignKey(CompensationType)
 
@@ -120,7 +120,8 @@ def create_stats_mixin(prefix):
         male = JSONField()
         time_employed = JSONField()
         date_provided = models.DateField(null=True, blank=True)
-        slug = models.SlugField(null=True, blank=True, default=None)
+        slug = models.SlugField(max_length=255, null=True, blank=True,
+                                default=None)
 
         class Meta:
             abstract = True
