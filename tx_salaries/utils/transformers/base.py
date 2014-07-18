@@ -10,6 +10,7 @@ DEFAULT_DATA_TEMPLATE = {
     'tx_people.Post': {},
     'tx_people.Membership': {},
     'tx_people.Race': {},
+    'tx_people.Links': {},
     'compensations': [{
         'tx_salaries.CompensationType': {},
         'tx_salaries.Employee': {},
@@ -70,7 +71,8 @@ class BaseTransformedRecord(object):
         d['tx_people.Organization'] = self.organization
         d['tx_people.Post'] = self.post
         d['tx_people.Membership'] = self.membership
-        d['tx_people.Race'] = self.given_race
+        d['tx_people.Race'] = self.race
+        d['tx_people.Links'] = self.links
         d['compensations'] = self.compensations
         d['date_provided'] = self.DATE_PROVIDED
         return d

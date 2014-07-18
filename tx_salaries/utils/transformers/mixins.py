@@ -122,9 +122,9 @@ class RaceMixin(object):
     Requires a ``race`` property to be available.
     """
     @property
-    def given_race(self):
-        race = self.get_mapped_value('race')
-        if race.strip() == '':
+    def race(self):
+        race = self.get_mapped_value('race').strip()
+        if race == '':
             race = 'Not given'
         return {
             'name': race
@@ -176,4 +176,18 @@ class PostMixin(object):
     def post(self):
         return {
             'label': self.job_title,
+        }
+
+
+class LinkMixin(object):
+    """
+    Adds a ``link`` property to an organization's raw salary information
+
+    Requires a ``URL`` property to be available.
+    """
+    @property
+    def links(self):
+        return {
+            'url': self.URL,
+            'note': 'Salary information'
         }
