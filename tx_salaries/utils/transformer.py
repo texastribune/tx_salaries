@@ -61,4 +61,4 @@ def get_transformers(labels):
     try:
         return TRANSFORMERS[generate_key(labels)]
     except KeyError:
-        raise exceptions.ImproperlyConfigured()
+        raise exceptions.ImproperlyConfigured("There are no transformers that match the header labels of this file")
