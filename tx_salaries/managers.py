@@ -5,6 +5,7 @@ class DenormalizeManagerMixin(object):
     def update_cohort(self, cohort, date_provided=False, **kwargs):
         stats, created = self.get_or_create(**kwargs)
         total_in_cohort = cohort.count()
+        stats.distribution = self.get_distribution(cohort, total_in_cohort, cohort)
         stats.highest_paid = (cohort.order_by('-compensation')
                                     .values_list('compensation', flat=True)[0])
         stats.median_paid = self.get_median(cohort)
@@ -55,13 +56,15 @@ class DenormalizeManagerMixin(object):
                 'total_number': total_number,
                 'ratio': round((float(total_number) / float(total_in_cohort)) * 100, 1)
             }
-            if get_slices:
-                data.update({'distribution': self.get_distribution(cohort,
-                                                                   total_in_cohort,
-                                                                   parent_cohort)})
-            return data
+
         else:
-            return {'total_number': 0}
+            data = {'total_number': 0}
+
+        if get_slices:
+            data.update({'distribution': self.get_distribution(cohort,
+                                                               total_in_cohort,
+                                                               parent_cohort)})
+        return data
 
     def get_races(self, cohort, total_in_cohort):
         unique_races = (cohort.values_list('position__person__races__name',
@@ -97,14 +100,11 @@ class DenormalizeManagerMixin(object):
             return num + (target - num % target)
 
     def get_distribution(self, cohort, total_in_cohort, parent_cohort):
-        if cohort.count() == 0:
-            return None
         # Set bounds of buckets using all employees so gender breakdowns are comparable
         salaries = parent_cohort.aggregate(max=models.Max('compensation'),
-                                    min=models.Min('compensation'))
+                                           min=models.Min('compensation'))
         diff = salaries['max'] - salaries['min']
         if diff == 0:
-            # TODO test
             return {
                 'step': 0,
                 'slices': [{
@@ -114,38 +114,28 @@ class DenormalizeManagerMixin(object):
                     'ratio': round((float(cohort.count()) / float(total_in_cohort)) * 100, 1)
                 }]
             }
-        step = diff / 10
-        start = salaries['min']
+        if cohort != parent_cohort:
+            if diff == 0:
+                step = diff / 1
+            elif diff < 20000:
+                step = diff / 3
+            else:
+                step = diff / 6
+        else:
+            step = diff / 10
 
-        # Round start and step to nice numbers, and make the step bigger if
-        # it would create more than 12 bars on the graph.
-        if step > 70000 or diff / 50000 > 12:
-            step = self.round_nearest(step, 100000, ceil=True)
-            start = self.round_nearest(start, 100000, floor=True)
-        elif step > 30000 or diff / 20000 > 12:
-            step = 50000
-            start = self.round_nearest(start, 10000, floor=True)
-        elif step > 15000 or diff / 10000 > 12:
-            step = 20000
-            start = self.round_nearest(start, 10000, floor=True)
-        elif step > 8000 or diff / 5000 > 12:
-            step = 10000
-            start = self.round_nearest(start, 10000, floor=True)
-        elif step > 3000:
-            step = 5000
-            start = self.round_nearest(start, 1000, floor=True)
-        elif step > 70:
-            step = self.round_nearest(step, 100)
-            start = self.round_nearest(start, 100, floor=True)
+        start = salaries['min']
 
         slices = []
         while start < salaries['max']:
             if start == salaries['min']:
                 cohort_total = (cohort.filter(compensation__gte=start,
-                                              compensation__lte=start+step).count())
+                                              compensation__lte=start + step)
+                                      .count())
             else:
                 cohort_total = (cohort.filter(compensation__gt=start,
-                                              compensation__lte=start+step).count())
+                                              compensation__lte=start + step)
+                                      .count())
             slices.append({
                 'start': start,
                 'end': start + step,
