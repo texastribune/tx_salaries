@@ -12,7 +12,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
         mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-        mixins.RaceMixin, base.BaseTransformedRecord):
+        mixins.LinkMixin, base.BaseTransformedRecord):
     MAP = {
         'last_name': 'NAME LAST',
         'first_name': 'NAME FIRST',
@@ -22,8 +22,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'job_title': 'JOB TITLE',
         'hire_date': 'CONTINUOUS EMPLOYMENT DATE',
         'gender': 'GENDER',
-        'race': 'ETHNICITY',
-        'status': 'LABEL FOR FT/PT STATUS',
+        'given_race': 'ETHNICITY',
         'compensation': 'FY ALLOCATIONS',
     }
 
@@ -36,9 +35,12 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     ORGANIZATION_CLASSIFICATION = 'University'
 
     # TODO not given, 29 < 4000
-    compensation_type = 'Full Time'
+    compensation_type = 'FT'
+    description = 'Annual compensation'
 
     DATE_PROVIDED = date(2014, 2, 14)
+
+    URL = 'http://s3.amazonaws.com/raw.texastribune.org/ut_austin/salaries/2014-02/TexasTribuneUTAustinSalaryData02-11-14.xlsx'
 
     cleaver.DepartmentName.MAP = (cleaver.DepartmentName.MAP +
                                  ((cleaver.regex_i(r'vp '), 'Vice President '), ) +
@@ -115,6 +117,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             {
                 'tx_salaries.CompensationType': {
                     'name': self.compensation_type,
+                    'description': self.description
                 },
                 'tx_salaries.Employee': {
                     'hire_date': hire_date,
@@ -133,8 +136,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
                                          .parse()))}
 
     @property
-    def given_race(self):
-        race = self.race.strip()
+    def race(self):
+        race = self.given_race.strip()
         if race == '':
             race = 'Not given'
         return {'name': race}

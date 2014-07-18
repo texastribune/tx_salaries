@@ -3,13 +3,11 @@ from datetime import date
 from . import base
 from . import mixins
 
-# http://raw.texastribune.org.s3.amazonaws.com/ut_health_houston/salaries/2014-01/Employee%20Salary%201-29-2014%20%282%29.xls
-
 
 class TransformedRecord(mixins.GenericCompensationMixin,
         mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-        mixins.RaceMixin, base.BaseTransformedRecord):
+        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
     MAP = {
         'last_name': 'Last',
         'first_name': 'First Name',
@@ -29,9 +27,12 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     ORGANIZATION_CLASSIFICATION = 'University Hospital'
 
     # TODO not given on spreadsheet, but they appear to give part time
-    compensation_type = 'Full Time'
+    compensation_type = 'FT'
+    description = 'Annual compensation'
 
     DATE_PROVIDED = date(2014, 1, 29)
+
+    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_health_houston/salaries/2014-01/Employee%20Salary%201-29-2014%20%282%29.xls'
 
     @property
     def is_valid(self):

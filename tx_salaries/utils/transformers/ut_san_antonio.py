@@ -5,13 +5,11 @@ from . import mixins
 
 from .. import cleaver
 
-# http://raw.texastribune.org.s3.amazonaws.com/ut_san_antonio/salaries/2014-01/Hill1931-responsive.xls
-
 
 class TransformedRecord(mixins.GenericCompensationMixin,
         mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-        mixins.RaceMixin, base.BaseTransformedRecord):
+        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
     MAP = {
         'last_name': 'Last Name',
         'first_name': 'First Name',
@@ -32,9 +30,12 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     ORGANIZATION_CLASSIFICATION = 'University'
 
     # TODO 45 earn < 10,000
-    compensation_type = 'Full Time'
+    compensation_type = 'FT'
+    description = 'Annual compensation'
 
     DATE_PROVIDED = date(2014, 1, 21)
+
+    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_san_antonio/salaries/2014-01/Hill1931-responsive.xls'
 
     cleaver.DepartmentName.MAP = (cleaver.DepartmentName.MAP +
                                  ((cleaver.regex_i(r' Vc '), ' VC '), ) +
@@ -82,6 +83,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             {
                 'tx_salaries.CompensationType': {
                     'name': self.compensation_type,
+                    'description': self.description
                 },
                 'tx_salaries.Employee': {
                     'hire_date': self.hire_date,

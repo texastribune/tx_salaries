@@ -12,7 +12,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
         mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-        mixins.RaceMixin, base.BaseTransformedRecord):
+        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
     MAP = {
         'last_name': 'NAME LAST',
         'first_name': 'NAME FIRST',
@@ -35,7 +35,10 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     ORGANIZATION_CLASSIFICATION = 'University'
 
     # TODO not given on spreadsheet, but they appear to give part time. 14 people earn < 4000
-    compensation_type = 'Full Time'
+    compensation_type = 'FT'
+    description = 'Annual compensation'
+
+    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_arlington/salaries/2014-02/UT%20Arlington%20Salaries.xlsx'
 
     DATE_PROVIDED = date(2014, 2, 13)
 
@@ -103,6 +106,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             {
                 'tx_salaries.CompensationType': {
                     'name': self.compensation_type,
+                    'description': self.description
                 },
                 'tx_salaries.Employee': {
                     'hire_date': hire_date,
@@ -120,10 +124,6 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     def post(self):
         return {'label': (unicode(cleaver.DepartmentNameCleaver(self.job_title)
                                          .parse()))}
-
-    @property
-    def given_race(self):
-        return {'name': self.race.strip()}
 
     @property
     def department_as_child(self):

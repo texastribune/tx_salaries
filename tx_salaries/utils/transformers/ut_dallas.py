@@ -10,7 +10,7 @@ from .. import cleaver
 class TransformedRecord(mixins.GenericCompensationMixin,
         mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-        mixins.RaceMixin, base.BaseTransformedRecord):
+        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
     MAP = {
         'last_name': 'Last',
         'first_name': 'First Name',
@@ -29,6 +29,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     ORGANIZATION_NAME = 'University of Texas at Dallas'
 
     ORGANIZATION_CLASSIFICATION = 'University'
+
+    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_dallas/salaries/2014-02/FOIA%20Request%20-%20Tribune.xlsx'
 
     DATE_PROVIDED = date(2014, 2, 19)
 
@@ -50,10 +52,17 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     @property
     def compensation_type(self):
         if self.compensation.strip() != '':
-            return 'Full Time'
+            return 'FT'
         else:
             # TODO need hours worked
-            return 'Part Time'
+            return 'PT'
+
+    @property
+    def description(self):
+        if self.compensation.strip() != '':
+            return 'Annual compensation'
+        else:
+            return 'Hourly compensation'
 
     @property
     def compensations(self):

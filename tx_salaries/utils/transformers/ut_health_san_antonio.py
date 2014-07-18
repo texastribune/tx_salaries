@@ -3,14 +3,13 @@ from datetime import date
 from . import base
 from . import mixins
 
-# http://raw.texastribune.org.s3.amazonaws.com/ut_health_san_antonio/salaries/2014-01/Texas%20Tribune%20Request%2001-28-2014.xlsx
 # --sheet="Submission Data" --row=6
 
 
 class TransformedRecord(mixins.GenericCompensationMixin,
         mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-        mixins.RaceMixin, base.BaseTransformedRecord):
+        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
     MAP = {
         'last_name': 'Last Name',
         'first_name': 'First Name',
@@ -33,6 +32,10 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     ORGANIZATION_CLASSIFICATION = 'University Hospital'
 
     DATE_PROVIDED = date(2014, 1, 28)
+
+    description = 'Annual compensation'
+
+    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_health_san_antonio/salaries/2014-01/Texas%20Tribune%20Request%2001-28-2014.xlsx'
 
     @property
     def is_valid(self):

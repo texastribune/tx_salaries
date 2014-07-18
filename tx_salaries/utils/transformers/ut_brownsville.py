@@ -9,7 +9,7 @@ from . import mixins
 class TransformedRecord(mixins.GenericCompensationMixin,
         mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-        mixins.RaceMixin, base.BaseTransformedRecord):
+        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
     MAP = {
         'last_name': 'Last Name',
         'first_name': 'First Name',
@@ -29,9 +29,12 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     ORGANIZATION_CLASSIFICATION = 'University'
 
     # TODO not given on spreadsheet, but they appear to give part time
-    compensation_type = 'Full Time'
+    compensation_type = 'FT'
+    description = 'Annual compensation'
 
     DATE_PROVIDED = date(2014, 1, 24)
+
+    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_brownsville/salaries/2014-01/PIR%20662.xlsx'
 
     @property
     def is_valid(self):

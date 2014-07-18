@@ -3,14 +3,13 @@ from datetime import date
 from . import base
 from . import mixins
 
-# http://raw.texastribune.org.s3.amazonaws.com/ut_health_tyler/salaries/2014-01/Texas%20Tribune%20-%20UTHSCT%2002054%201-16-2014.xls
 # --sheet=sheet1
 
 
 class TransformedRecord(mixins.GenericCompensationMixin,
         mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-        mixins.RaceMixin, base.BaseTransformedRecord):
+        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
     MAP = {
         'last_name': 'Last Name',
         'first_name': 'First Name',
@@ -33,6 +32,10 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     DATE_PROVIDED = date(2014, 1, 16)
 
+    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_health_tyler/salaries/2014-01/Texas%20Tribune%20-%20UTHSCT%2002054%201-16-2014.xls'
+
+    description = 'Annual compensation'
+
     @property
     def is_valid(self):
         # be sure to use --sheet="sheet1"
@@ -46,10 +49,9 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     @property
     def compensation_type(self):
         if self.FTE.strip() == "1.0":
-            return 'Full Time'
+            return 'FT'
         else:
-            return 'Part Time'
+            return 'PT'
         # TODO ask about FTE, FTSA and Annual Rt
-
 
 transform = base.transform_factory(TransformedRecord)
