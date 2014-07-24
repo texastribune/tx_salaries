@@ -226,6 +226,43 @@ class RatiosAddUpTest(TestCase):
         male_slice_sum = sum([b['count'] for b in department.stats.male['distribution']['slices']])
         self.assertEqual(male_slice_sum, 0)
 
+    def test_salary_in_correct_bin(self):
+        '''
+        Based on UT Brownsville's Office of the President,
+        which misplaced president's salary prior to managers.py change
+        '''
+        parent_org = OrganizationFactory(name="Test Parent Organization")
+        department = OrganizationFactory(name="Test Organization",
+                                           parent=parent_org)
+        post = PostFactory(organization=department)
+        # POST MUST HAVE UNICODE VALUE
+        membership_one = MembershipFactory(post=post, organization=department,
+                                           person__gender='F')
+        president = EmployeeFactory(compensation=311783,
+                                       position=membership_one)
+        female_two = EmployeeFactory(compensation=108000,
+                                       position=membership_one)
+        female_three = EmployeeFactory(compensation=96256,
+                                       position=membership_one)
+        female_four = EmployeeFactory(compensation=70000,
+                                       position=membership_one)
+        female_five = EmployeeFactory(compensation=65000,
+                                       position=membership_one)
+        female_six = EmployeeFactory(compensation=47815,
+                                       position=membership_one)
+        male_one = EmployeeFactory(compensation=34000,
+                                   position=membership_one)
+        male_two = EmployeeFactory(compensation=26663, position=membership_one)
+
+        management.call_command('denormalize_salary_data')
+
+        slice_length = len(department.stats.distribution['slices'])
+        last_slice = department.stats.distribution['slices'][slice_length - 1]
+        max_end = max([s['end'] for s in department.stats.distribution['slices']])
+        self.assertEqual(max_end, last_slice['end'])
+        self.assertTrue(president.compensation <= last_slice['end'])
+        self.assertTrue(president.compensation > last_slice['start'])
+
     def test_no_diff_distribution(self):
         parent_org = OrganizationFactory(name="Test Parent Organization")
         department = OrganizationFactory(name="Test Organization",
