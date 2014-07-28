@@ -1,6 +1,6 @@
 import sys
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
 from os.path import basename
 
@@ -19,6 +19,10 @@ class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--sheet', action='store', dest='sheet', default=None,
                     help='Sheet name'),
+        make_option('--noinput', action='store_false', dest='interactive',
+                    default=True, help="Do NOT prompt the user for input of "
+                    "any kind. This will automatically force existing agencies"
+                    " to be updated."),
         make_option('--row', action='store', dest='label_row', default=1,
                     help='Location of the row of labels, defaults to 1'),
         make_option('--v', action='store', dest='verbosity', default=0,
@@ -30,12 +34,6 @@ class Command(BaseCommand):
             records = transformer.transform(filename, kwargs['sheet'],
                                             kwargs['label_row'])
             verbosity = int(kwargs['verbosity'])
-            print "Processing %d records from %s" % (len(records),
-                                                     basename(filename))
-
-            to_denormalize = {'organizations': set(), 'positions': set(),
-                              'date_provided': records[0]['date_provided']}
-            records_remaining = len(records)
 
             try:
                 parent_org = self.get_parent_org(records[0])
@@ -43,18 +41,14 @@ class Command(BaseCommand):
                 parent_org = None
 
             if parent_org:
-                parent_org_employees = (models.Employee.objects
-                               .filter(position__organization__parent=parent_org))
-                while parent_org_employees.count():
-                    # delete employees in batches of 100
-                    employee_ids = parent_org_employees.values_list('pk', flat=True)[:100]
-                    parent_org_employees.filter(pk__in=employee_ids).delete()
-                parent_org_children = (models.Organization.objects
-                                .filter(parent=parent_org))
-                while parent_org_children.count():
-                    # delete organizations in batches of 100
-                    children_ids = parent_org_children.values_list('pk', flat=True)[:10]
-                    parent_org_children.filter(pk__in=children_ids).delete()
+                self.update_organization(parent_org, kwargs)
+
+            print "Processing %d records from %s" % (len(records),
+                                                     basename(filename))
+
+            to_denormalize = {'organizations': set(), 'positions': set(),
+                              'date_provided': records[0]['date_provided']}
+            records_remaining = len(records)
 
             for record in records:
                 save_for_stats = to_db.save(record)
@@ -77,8 +71,39 @@ class Command(BaseCommand):
 
             to_db.denormalize(to_denormalize)
 
-
     def get_parent_org(self, first_record):
         parent_org_name = first_record['tx_people.Organization']['name']
         return models.Organization.objects.get(name=parent_org_name)
 
+    def update_organization(self, parent_org, kwargs):
+        if kwargs['interactive']:
+            confirm = raw_input("""
+You are importing data for an agency that already exists.
+
+This will delete all employees and departments currently stored for %s and replace them with information from this file.
+
+Are you sure you want to do this?
+
+Type 'yes' to continue, or 'no' to cancel: """ % parent_org.name)
+            if confirm != 'yes':
+                raise CommandError("Import cancelled.")
+
+        self.delete_org_employees(parent_org)
+
+        self.delete_departments(parent_org)
+
+    def delete_org_employees(self, parent_org):
+        parent_org_employees = (models.Employee.objects
+                                       .filter(position__organization__parent=parent_org))
+        while parent_org_employees.count():
+            # delete employees in batches of 100
+            employee_ids = parent_org_employees.values_list('pk', flat=True)[:100]
+            parent_org_employees.filter(pk__in=employee_ids).delete()
+
+    def delete_departments(self, parent_org):
+        parent_org_children = models.Organization.objects.filter(parent=parent_org)
+
+        while parent_org_children.count():
+            # delete organizations in batches of 100
+            children_ids = parent_org_children.values_list('pk', flat=True)[:10]
+            parent_org_children.filter(pk__in=children_ids).delete()
