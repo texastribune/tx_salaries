@@ -78,6 +78,14 @@ class RatiosAddUpTest(TestCase):
 
         management.call_command('denormalize_salary_data')
 
+        male_ratio_sum = sum([b['ratio'] for b in department.stats.male['distribution']['slices']])
+        self.assertEqual(male_ratio_sum, department.stats.male['ratio'])
+        self.assertEqual(department.stats.male['ratio'], 50)
+
+        female_ratio_sum = sum([b['ratio'] for b in department.stats.female['distribution']['slices']])
+        self.assertEqual(female_ratio_sum, department.stats.female['ratio'])
+        self.assertEqual(department.stats.female['ratio'], 50)
+
         self.assertEqual(department.stats.male['ratio'] + department.stats.female['ratio'], 100)
 
     def calculate_tenure(self, hire_date, date_provided):
@@ -149,7 +157,7 @@ class RatiosAddUpTest(TestCase):
                                             person__gender='M')
         female_one = EmployeeFactory(compensation=135000,
                                        position=membership_one)
-        female_two = EmployeeFactory(compensation=62217,
+        female_two = EmployeeFactory(compensation=162217,
                                        position=membership_two)
         male_one = EmployeeFactory(compensation=140000,
                                    position=membership_three)
@@ -162,3 +170,85 @@ class RatiosAddUpTest(TestCase):
 
         female_sum = sum([b['count'] for b in department.stats.female['distribution']['slices']])
         self.assertEqual(female_sum, department.stats.female['total_number'])
+
+        self.assertEqual(department.stats.female['distribution']['slices'][0]['start'],
+                         department.stats.male['distribution']['slices'][0]['start'])
+
+    def test_overall_distribution(self):
+        parent_org = OrganizationFactory(name="Test Parent Organization")
+        department = OrganizationFactory(name="Test Organization",
+                                           parent=parent_org)
+        post = PostFactory(organization=department)
+        # POST MUST HAVE UNICODE VALUE
+        membership_one = MembershipFactory(post=post, organization=department,
+                                           person__gender='F')
+        membership_two = MembershipFactory(post=post, organization=department,
+                                           person__gender='F')
+
+        membership_three = MembershipFactory(post=post, organization=department,
+                                             person__gender='M')
+
+        membership_four = MembershipFactory(post=post, organization=department,
+                                            person__gender='M')
+        female_one = EmployeeFactory(compensation=135000,
+                                       position=membership_one)
+        female_two = EmployeeFactory(compensation=162217,
+                                       position=membership_two)
+        male_one = EmployeeFactory(compensation=140000,
+                                   position=membership_three)
+        male_two = EmployeeFactory(compensation=61050, position=membership_four)
+
+        management.call_command('denormalize_salary_data')
+        self.assertTrue(parent_org.stats.distribution)
+        self.assertTrue(department.stats.distribution)
+
+        slice_sum = sum([b['count'] for b in department.stats.distribution['slices']])
+        self.assertEqual(slice_sum, department.stats.total_number)
+
+        parent_slice_sum = sum([b['count'] for b in parent_org.stats.distribution['slices']])
+        self.assertEqual(slice_sum, parent_org.stats.total_number)
+
+    def test_empty_cohort(self):
+        parent_org = OrganizationFactory(name="Test Parent Organization")
+        department = OrganizationFactory(name="Test Organization",
+                                           parent=parent_org)
+        post = PostFactory(organization=department)
+        # POST MUST HAVE UNICODE VALUE
+        membership_one = MembershipFactory(post=post, organization=department,
+                                           person__gender='F')
+        female_one = EmployeeFactory(compensation=135000,
+                                     position=membership_one)
+        management.call_command('denormalize_salary_data')
+
+        self.assertTrue(parent_org.stats.male['distribution'])
+        self.assertTrue(department.stats.distribution)
+
+        male_slice_sum = sum([b['count'] for b in department.stats.male['distribution']['slices']])
+        self.assertEqual(male_slice_sum, 0)
+
+    def test_no_diff_distribution(self):
+        parent_org = OrganizationFactory(name="Test Parent Organization")
+        department = OrganizationFactory(name="Test Organization",
+                                           parent=parent_org)
+        post = PostFactory(organization=department)
+        # POST MUST HAVE UNICODE VALUE
+        membership_one = MembershipFactory(post=post, organization=department,
+                                           person__gender='F')
+        membership_three = MembershipFactory(post=post, organization=department,
+                                             person__gender='M')
+        female_one = EmployeeFactory(compensation=135000,
+                                     position=membership_one)
+        male_one = EmployeeFactory(compensation=135000, position=membership_three)
+        management.call_command('denormalize_salary_data')
+
+        self.assertEqual(parent_org.stats.distribution['step'], 0)
+        self.assertEqual(department.stats.distribution['step'], 0)
+
+        self.assertEqual(parent_org.stats.distribution['slices'][0]['start'],
+                         department.stats.distribution['slices'][0]['end'])
+        self.assertEqual(department.stats.distribution['slices'][0]['start'],
+                         department.stats.distribution['slices'][0]['end'])
+
+        self.assertEqual(department.stats.distribution['slices'][0]['ratio'], 100)
+        self.assertEqual(parent_org.stats.male['distribution']['slices'][0]['ratio'], 50)
+        self.assertEqual(parent_org.stats.female['distribution']['slices'][0]['ratio'], 50)
