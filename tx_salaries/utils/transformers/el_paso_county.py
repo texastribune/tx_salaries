@@ -21,7 +21,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'annual': 'ANNUAL RATE',
         'pay_rate': 'PAY RATE',
         'race': 'ETHNICITY',
-        'gender': 'SEX'
+        'gender': 'SEX',
     }
 
     NAME_FIELDS = ('first_name', 'last_name', )
@@ -32,7 +32,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     DATE_PROVIDED = date(2013, 10, 31)
     # Y/M/D agency provided the data
 
-    URL = "http://raw.texastribune.org.s3.amazonaws.com/path/to/rio_grande_county.xls"
+    URL = "http://raw.texastribune.org.s3.amazonaws.com/el_paso_county/salaries/2013-07/el_paso_county.xlsx"
 
     cleaver.DepartmentName.MAP = cleaver.DepartmentName.MAP + (
         (cleaver.regex_i(r'ADM\.$'), 'Administration'),

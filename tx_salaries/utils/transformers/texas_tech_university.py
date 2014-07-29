@@ -22,7 +22,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'pay_status': 'FT or PT Status',
         'compensation': 'Salary',
         'race': 'Race',
-        'gender': 'Gender'
+        'gender': 'Gender',
     }
 
     gender_map = {'Female': 'F', 'Femail': 'F', 'Male': 'M'}

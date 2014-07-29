@@ -13,7 +13,7 @@ class TransformedRecord(base.BaseTransformedRecord, mixins.RaceMixin,
         'hire_date': 'CURRENT HIRE DATE',
         'first_name': 'FIRST NAME',
         'last_name': 'LAST NAME',
-        'race': 'RACE/ETHNICITY'
+        'race': 'RACE/ETHNICITY',
     }
 
     NAME_FIELDS = ('first_name', 'last_name', )
