@@ -69,25 +69,19 @@ class RatiosAddUpTest(TestCase):
         # POST MUST HAVE UNICODE VALUE
         membership_one = MembershipFactory(post=post, organization=department,
                                            person__gender='F')
-        membership_two = MembershipFactory(post=post, organization=department,
-                                           person__gender='F')
-
         membership_three = MembershipFactory(post=post, organization=department,
                                              person__gender='M')
-
-        membership_four = MembershipFactory(post=post, organization=department,
-                                            person__gender='M')
         full_time = CompensationTypeFactory(name='FT')
         female_one = EmployeeFactory(compensation=135000,
                                      position=membership_one,
                                      compensation_type=full_time)
         female_two = EmployeeFactory(compensation=62217,
-                                     position=membership_two,
+                                     position=membership_one,
                                      compensation_type=full_time)
         male_one = EmployeeFactory(compensation=140000,
                                    position=membership_three,
                                    compensation_type=full_time)
-        male_two = EmployeeFactory(compensation=61050, position=membership_four,
+        male_two = EmployeeFactory(compensation=61050, position=membership_three,
                                    compensation_type=full_time)
 
         management.call_command('denormalize_salary_data')
@@ -121,19 +115,15 @@ class RatiosAddUpTest(TestCase):
         # POST MUST HAVE UNICODE VALUE
         membership_one = MembershipFactory(post=post, organization=department,
                                            person__gender='F')
-        membership_two = MembershipFactory(post=post, organization=department,
-                                           person__gender='F')
         membership_three = MembershipFactory(post=post, organization=department,
                                              person__gender='M')
-        membership_four = MembershipFactory(post=post, organization=department,
-                                            person__gender='M')
         full_time = CompensationTypeFactory(name='FT')
         female_one = EmployeeFactory(compensation=135000,
                                      position=membership_one,
                                      compensation_type=full_time,
                                      tenure=self.calculate_tenure('1975-04-10', date.today()))
         female_two = EmployeeFactory(compensation=62217,
-                                     position=membership_two,
+                                     position=membership_one,
                                      compensation_type=full_time,
                                      tenure=self.calculate_tenure('1985-04-10', date.today()))
         male_one = EmployeeFactory(compensation=140000,
@@ -152,7 +142,7 @@ class RatiosAddUpTest(TestCase):
         self.assertEqual(tenure_ratio_sum, 100)
 
         with self.assertRaises(ValueError):
-            EmployeeFactory(compensation=61050, position=membership_four,
+            EmployeeFactory(compensation=61050, position=membership_three,
                             tenure=self.calculate_tenure('1995-04-10', date(1900, 1, 1)))
 
     def test_gender_histogram(self):
@@ -163,23 +153,19 @@ class RatiosAddUpTest(TestCase):
         # POST MUST HAVE UNICODE VALUE
         membership_one = MembershipFactory(post=post, organization=department,
                                            person__gender='F')
-        membership_two = MembershipFactory(post=post, organization=department,
-                                           person__gender='F')
         membership_three = MembershipFactory(post=post, organization=department,
                                              person__gender='M')
-        membership_four = MembershipFactory(post=post, organization=department,
-                                            person__gender='M')
         full_time = CompensationTypeFactory(name='FT')
         female_one = EmployeeFactory(compensation=135000,
                                      position=membership_one,
                                      compensation_type=full_time)
         female_two = EmployeeFactory(compensation=162217,
-                                     position=membership_two,
+                                     position=membership_one,
                                      compensation_type=full_time)
         male_one = EmployeeFactory(compensation=140000,
                                    position=membership_three,
                                    compensation_type=full_time)
-        male_two = EmployeeFactory(compensation=61050, position=membership_four,
+        male_two = EmployeeFactory(compensation=61050, position=membership_three,
                                    compensation_type=full_time)
 
         management.call_command('denormalize_salary_data')
@@ -202,23 +188,19 @@ class RatiosAddUpTest(TestCase):
         full_time = CompensationTypeFactory(name='FT')
         membership_one = MembershipFactory(post=post, organization=department,
                                            person__gender='F')
-        membership_two = MembershipFactory(post=post, organization=department,
-                                           person__gender='F')
-
         membership_three = MembershipFactory(post=post, organization=department,
                                              person__gender='M')
-
-        membership_four = MembershipFactory(post=post, organization=department,
-                                            person__gender='M')
         female_one = EmployeeFactory(compensation=135000,
                                      position=membership_one,
                                      compensation_type=full_time)
         female_two = EmployeeFactory(compensation=162217,
-                                     position=membership_two,
+                                     position=membership_one,
                                      compensation_type=full_time)
         male_one = EmployeeFactory(compensation=140000,
-                                   position=membership_three)
-        male_two = EmployeeFactory(compensation=61050, position=membership_four)
+                                   position=membership_three,
+                                   compensation_type=full_time)
+        male_two = EmployeeFactory(compensation=61050, position=membership_three,
+                                   compensation_type=full_time)
 
         management.call_command('denormalize_salary_data')
 
@@ -239,25 +221,19 @@ class RatiosAddUpTest(TestCase):
         # POST MUST HAVE UNICODE VALUE
         membership_one = MembershipFactory(post=post, organization=department,
                                            person__gender='F')
-        membership_two = MembershipFactory(post=post, organization=department,
-                                           person__gender='F')
-
         membership_three = MembershipFactory(post=post, organization=department,
                                              person__gender='M')
-
-        membership_four = MembershipFactory(post=post, organization=department,
-                                            person__gender='M')
         full_time = CompensationTypeFactory(name='FT')
         female_one = EmployeeFactory(compensation=135000,
                                      position=membership_one,
                                      compensation_type=full_time)
         female_two = EmployeeFactory(compensation=162217,
-                                     position=membership_two,
+                                     position=membership_one,
                                      compensation_type=full_time)
         male_one = EmployeeFactory(compensation=140000,
                                    position=membership_three,
                                    compensation_type=full_time)
-        male_two = EmployeeFactory(compensation=61050, position=membership_four,
+        male_two = EmployeeFactory(compensation=61050, position=membership_three,
                                    compensation_type=full_time)
 
         management.call_command('denormalize_salary_data')
@@ -330,24 +306,20 @@ class CompensationTypeStatsTest(TestCase):
         # POST MUST HAVE UNICODE VALUE
         membership_one = MembershipFactory(post=post, organization=department,
                                            person__gender='F')
-        membership_two = MembershipFactory(post=post, organization=department,
-                                           person__gender='F')
         membership_three = MembershipFactory(post=post, organization=department,
                                              person__gender='M')
-        membership_four = MembershipFactory(post=post, organization=department,
-                                            person__gender='M')
         full_time = CompensationTypeFactory(name='FT')
         part_time = CompensationTypeFactory(name='PT')
         female_one = EmployeeFactory(compensation=135000,
                                      position=membership_one,
                                      compensation_type=full_time)
         female_two = EmployeeFactory(compensation=162217,
-                                     position=membership_two,
+                                     position=membership_one,
                                      compensation_type=part_time)
         male_one = EmployeeFactory(compensation=140000,
                                    position=membership_three,
                                    compensation_type=part_time)
-        male_two = EmployeeFactory(compensation=61050, position=membership_four,
+        male_two = EmployeeFactory(compensation=61050, position=membership_three,
                                    compensation_type=full_time)
 
         management.call_command('denormalize_salary_data')
