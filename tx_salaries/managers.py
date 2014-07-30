@@ -176,8 +176,7 @@ class OrganizationStatsManager(DenormalizeManagerMixin, models.Manager):
             }
 
         cohort = Employee.objects.filter(**kwargs)
-        if cohort.count() > 0:
-            self.update_cohort(cohort, date_provided, organization=obj)
+        self.update_cohort(cohort, date_provided, organization=obj)
 
 
 class PositionStatsManager(DenormalizeManagerMixin, models.Manager):
@@ -189,5 +188,4 @@ class PositionStatsManager(DenormalizeManagerMixin, models.Manager):
         position_cohort = Employee.objects.filter(
                         position__organization=obj.organization,
                         position__post=obj)
-        if position_cohort.count() > 0:
-            self.update_cohort(position_cohort, date_provided, position=obj)
+        self.update_cohort(position_cohort, date_provided, position=obj)
