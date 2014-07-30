@@ -101,11 +101,17 @@ class DenormalizeManagerMixin(object):
             return num + (target - num % target)
 
     def get_distribution(self, cohort, total_in_cohort, parent_cohort):
+        parent_cohort = parent_cohort.filter(compensation_type__name='FT')
+        cohort = cohort.filter(compensation_type__name='FT')
+        if parent_cohort.count() == 0:
+            # The entity has no full-time employees to generate a distribution
+            return None
         # Set bounds of buckets using all employees so gender breakdowns are comparable
         salaries = parent_cohort.aggregate(max=models.Max('compensation'),
                                            min=models.Min('compensation'))
         diff = salaries['max'] - salaries['min']
         if diff == 0:
+            # All employees in the parent organization earn the same
             return {
                 'step': 0,
                 'slices': [{
