@@ -386,6 +386,6 @@ class CompensationTypeStatsTest(TestCase):
         self.assertTrue(parent_org.stats)
         self.assertTrue(post.stats)
 
-        self.assertEqual(department.stats.median_paid, 0)
+        self.assertIsNone(department.stats.median_paid)
         self.assertEqual(department.stats.total_number, 1)
         self.assertEqual(post.stats.total_number, 1)

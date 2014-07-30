@@ -28,7 +28,8 @@ class DenormalizeManagerMixin(object):
         cohort = cohort.filter(compensation_type__name='FT')
         total_number = cohort.count()
         if total_number == 0:
-            return 0
+            # There are no full-time employees to calculate a median salary
+            return None
         elif total_number % 2 == 0:
             median_paid = (
                 (cohort.order_by('-compensation')
