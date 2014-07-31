@@ -8,6 +8,8 @@ from . import houston
 from . import houston_community_college
 from . import katy_isd
 from . import north_east_isd
+from . import pasadena_isd
+from . import potter_county
 from . import state_of_texas
 from . import texas_am_system
 from . import texas_tech_system
@@ -22,7 +24,6 @@ from . import ut_health_tyler
 from . import ut_health_san_antonio
 from . import ut_medical_branch
 from . import ut_pan_american
-from . import pasadena_isd
 from . import ut_permian_basin
 from . import ut_san_antonio
 from . import ut_system
@@ -40,6 +41,7 @@ TRANSFORMERS = {
     '0809eca5428e583732e7939f7252398f5c4e6947': [katy_isd.transform, ],
     'd982fa55bf19391e9f756cf03614cdd3969c4311': [north_east_isd.transform, ],
     '2252263014de05fa4efd240e0a3716c484495a93': [pasadena_isd.transform, ],
+    '0e027f3d0038d81f570cbda2aeedf3dd1f720881': [potter_county.transform, ],
     '690fc3890e8f893a7b1634de2df958846ad12a1b': [state_of_texas.transform, ],
     'eb4e22c07597829d7b62f48e6f69dd2d29bf69e2': [texas_am_system.transform, ],
     'bc023bcf9e573ecdf8335ebafb24feec596e473f': [texas_tech_system.transform, ],
