@@ -276,23 +276,32 @@ class RatiosAddUpTest(TestCase):
                                            parent=parent_org)
         post = PostFactory(organization=department)
         # POST MUST HAVE UNICODE VALUE
+        full_time = CompensationTypeFactory(name='FT')
         membership_one = MembershipFactory(post=post, organization=department,
                                            person__gender='F')
         president = EmployeeFactory(compensation=311783,
-                                       position=membership_one)
+                                    position=membership_one,
+                                    compensation_type=full_time)
         female_two = EmployeeFactory(compensation=108000,
-                                       position=membership_one)
+                                     position=membership_one,
+                                     compensation_type=full_time)
         female_three = EmployeeFactory(compensation=96256,
-                                       position=membership_one)
+                                       position=membership_one,
+                                       compensation_type=full_time)
         female_four = EmployeeFactory(compensation=70000,
-                                       position=membership_one)
+                                      position=membership_one,
+                                      compensation_type=full_time)
         female_five = EmployeeFactory(compensation=65000,
-                                       position=membership_one)
+                                      position=membership_one,
+                                      compensation_type=full_time)
         female_six = EmployeeFactory(compensation=47815,
-                                       position=membership_one)
+                                     position=membership_one,
+                                     compensation_type=full_time)
         male_one = EmployeeFactory(compensation=34000,
-                                   position=membership_one)
-        male_two = EmployeeFactory(compensation=26663, position=membership_one)
+                                   position=membership_one,
+                                   compensation_type=full_time)
+        male_two = EmployeeFactory(compensation=26663, position=membership_one,
+                                   compensation_type=full_time)
 
         management.call_command('denormalize_salary_data')
 
