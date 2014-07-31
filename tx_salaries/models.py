@@ -23,11 +23,15 @@ def get_top_level_departments():
     """
     return (Organization.objects.select_related('stats')
             .filter(parent=None)
-            .exclude(children__members__employee=None))
+            .exclude(children__members__employee=None).exclude(stats=None))
 
 
 class CompensationType(models.Model):
-    name = models.CharField(max_length=250)
+    name_choices = (
+        ('FT', 'Full Time'),
+        ('PT', 'Part Time')
+    )
+    name = models.CharField(max_length=250, choices=name_choices)
     description = models.TextField()
     # TODO
     # calculator = models.CharField(choices=constants.AVAILABLE_CALCULATORS)
@@ -110,7 +114,7 @@ def create_stats_mixin(prefix):
         }
 
     class StatisticsMixin(models.Model):
-        distribution = JSONField()
+        distribution = JSONField(null=True)
         highest_paid = models.DecimalField(**generate_kwargs('highest'))
         median_paid = models.DecimalField(**generate_kwargs('median'))
         lowest_paid = models.DecimalField(**generate_kwargs('lowest'))

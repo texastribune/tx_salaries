@@ -8,7 +8,7 @@ class DenormalizeManagerMixin(object):
         stats.distribution = self.get_distribution(cohort, total_in_cohort, cohort)
         stats.highest_paid = (cohort.order_by('-compensation')
                                     .values_list('compensation', flat=True)[0])
-        stats.median_paid = self.get_median(cohort, total_in_cohort)
+        stats.median_paid = self.get_median(cohort)
         stats.lowest_paid = (cohort.order_by('compensation')
                                    .values_list('compensation', flat=True)[0])
         stats.races = self.get_races(cohort, total_in_cohort)
@@ -24,8 +24,13 @@ class DenormalizeManagerMixin(object):
             stats.date_provided = date_provided
         stats.save()
 
-    def get_median(self, cohort, total_number):
-        if total_number % 2 == 0:
+    def get_median(self, cohort):
+        cohort = cohort.filter(compensation_type__name='FT')
+        total_number = cohort.count()
+        if total_number == 0:
+            # There are no full-time employees to calculate a median salary
+            return None
+        elif total_number % 2 == 0:
             median_paid = (
                 (cohort.order_by('-compensation')
                        .values_list('compensation',
@@ -46,7 +51,7 @@ class DenormalizeManagerMixin(object):
             data = {
                 'highest_paid': (cohort.order_by('-compensation')
                                        .values_list('compensation', flat=True)[0]),
-                'median_paid': self.get_median(cohort, total_number),
+                'median_paid': self.get_median(cohort),
                 'lowest_paid': (cohort.order_by('compensation')
                                       .values_list('compensation', flat=True)[0]),
                 'total_number': total_number,
@@ -96,11 +101,17 @@ class DenormalizeManagerMixin(object):
             return num + (target - num % target)
 
     def get_distribution(self, cohort, total_in_cohort, parent_cohort):
+        parent_cohort = parent_cohort.filter(compensation_type__name='FT')
+        cohort = cohort.filter(compensation_type__name='FT')
+        if parent_cohort.count() == 0:
+            # The entity has no full-time employees to generate a distribution
+            return None
         # Set bounds of buckets using all employees so gender breakdowns are comparable
         salaries = parent_cohort.aggregate(max=models.Max('compensation'),
                                            min=models.Min('compensation'))
         diff = salaries['max'] - salaries['min']
         if diff == 0:
+            # All employees in the parent organization earn the same
             return {
                 'step': 0,
                 'slices': [{
@@ -110,6 +121,8 @@ class DenormalizeManagerMixin(object):
                     'ratio': round((float(cohort.count()) / float(total_in_cohort)) * 100, 1)
                 }]
             }
+
+        start = salaries['min']
         if cohort != parent_cohort:
             if diff == 0:
                 step = diff / 1
@@ -120,7 +133,26 @@ class DenormalizeManagerMixin(object):
         else:
             step = diff / 10
 
-        start = salaries['min']
+        # Round start and step to nice numbers, and make the step bigger if
+        # it would create more than 12 bars on the graph.
+        if step > 70000 or diff / 50000 > 12:
+            step = self.round_nearest(step, 100000, ceil=True)
+            start = self.round_nearest(start, 100000, floor=True)
+        elif step > 30000 or diff / 20000 > 12:
+            step = 50000
+            start = self.round_nearest(start, 10000, floor=True)
+        elif step > 15000 or diff / 10000 > 12:
+            step = 20000
+            start = self.round_nearest(start, 10000, floor=True)
+        elif step > 8000 or diff / 5000 > 12:
+            step = 10000
+            start = self.round_nearest(start, 10000, floor=True)
+        elif step > 3000:
+            step = 5000
+            start = self.round_nearest(start, 1000, floor=True)
+        elif step > 70:
+            step = self.round_nearest(step, 100)
+            start = self.round_nearest(start, 100, floor=True)
 
         slices = []
         while start < salaries['max']:
@@ -149,17 +181,20 @@ class OrganizationStatsManager(DenormalizeManagerMixin, models.Manager):
 
     def denormalize(self, obj, date_provided=False):
         from tx_salaries.models import Employee
-
         # TODO: Allow organization to break and say it is top-level
         #       Example: El Paso County Sheriff's Department instead
         #       of going all the way to El Paso County.
         if obj.parent:
             # employee works for a department,
             # also calculate parent organization stats
-            kwargs = {'position__organization': obj, }
+            kwargs = {
+                'position__organization': obj,
+            }
 
         else:
-            kwargs = {'position__organization__parent': obj, }
+            kwargs = {
+                'position__organization__parent': obj,
+            }
 
         cohort = Employee.objects.filter(**kwargs)
         self.update_cohort(cohort, date_provided, organization=obj)
@@ -170,6 +205,8 @@ class PositionStatsManager(DenormalizeManagerMixin, models.Manager):
 
     def denormalize(self, obj, date_provided=False):
         from tx_salaries.models import Employee
-        position_cohort = Employee.objects.filter(position__organization=obj.organization,
-                                                  position__post=obj)
+
+        position_cohort = Employee.objects.filter(
+                        position__organization=obj.organization,
+                        position__post=obj)
         self.update_cohort(position_cohort, date_provided, position=obj)
