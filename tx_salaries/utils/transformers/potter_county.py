@@ -11,7 +11,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
     mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
     mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-    base.BaseTransformedRecord):
+    mixins.LinkMixin, base.BaseTransformedRecord):
     MAP = {
         'full_name': 'Employee Name',
         'job_title': 'Job Title',
@@ -27,7 +27,10 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     DATE_PROVIDED = date(2014, 06, 17)
     # Y/M/D agency provided the data
 
-    compensation_type = 'Full Time'
+    compensation_type = 'FT'
+    description = 'Base annual salary'
+
+    URL = 'http://raw.texastribune.org.s3.amazonaws.com/potter_county/salaries/2014-06/Response%20to%20Request_Spreadsheet.xlsx'
 
     @property
     def is_valid(self):
@@ -36,7 +39,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     @property
     def department(self):
-        return ''
+        return '' # FIXME county provided no department names
 
     @property
     def race(self):
