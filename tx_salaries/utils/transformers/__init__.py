@@ -6,6 +6,7 @@ from . import eanes_isd
 from . import el_paso_county
 from . import houston
 from . import houston_community_college
+from . import katy_isd
 from . import state_of_texas
 from . import texas_am_system
 from . import texas_tech_system
@@ -34,6 +35,7 @@ TRANSFORMERS = {
     'd18ad5c9635a40de15b0ead0e8f8fe97b8ccca31': [el_paso_county.transform, ],
     'fe075cbd88973ebfc8d177dfd27aed40da7088e6': [houston.transform, ],
     'a4f1152500a1c25df0705463266f75a9b15f6b5a': [houston_community_college.transform, ],
+    '0809eca5428e583732e7939f7252398f5c4e6947': [katy_isd.transform, ],
     '690fc3890e8f893a7b1634de2df958846ad12a1b': [state_of_texas.transform, ],
     'eb4e22c07597829d7b62f48e6f69dd2d29bf69e2': [texas_am_system.transform, ],
     'bc023bcf9e573ecdf8335ebafb24feec596e473f': [texas_tech_system.transform, ],
