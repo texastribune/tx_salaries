@@ -1,3 +1,5 @@
+from datetime import date
+
 from . import base
 from . import mixins
 
@@ -8,6 +10,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         mixins.MembershipMixin,
         mixins.OrganizationMixin,
         mixins.PostMixin,
+        mixins.RaceMixin,
+        mixins.LinkMixin,
         base.BaseTransformedRecord):
     MAP = {
         'department': 'Department',
@@ -17,17 +21,25 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'hire_date': 'Hire Date',
         'pay_status': 'FT or PT Status',
         'compensation': 'Salary',
-        'race': 'Race',  # Not used yet
+        'race': 'Race',
+        'gender': 'Gender',
     }
+
+    gender_map = {'Female': 'F', 'Femail': 'F', 'Male': 'M'}
 
     NAME_FIELDS = ('name', )
     ORGANIZATION_NAME = 'Texas Tech University'
+    ORGANIZATION_CLASSIFICATION = 'University'
 
     # The data we get for Texas Tech System is always valid
     is_valid = True
 
     # All employees are full-time right now
     compensation_type = 'Full Time'
+
+    DATE_PROVIDED = date(2013, 7, 31)
+
+    URL = 'http://raw.texastribune.org.s3.amazonaws.com/texas_tech_university/salaries/2013-07/Faculty%20Open%20Records%20-%20Tribune.xlsx'
 
     @property
     def identifier(self):
@@ -54,6 +66,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             'given_name': name.first,
             'additional_name': name.middle,
             'name': unicode(name),
+            'gender': self.gender_map[self.gender]
         }
 
 

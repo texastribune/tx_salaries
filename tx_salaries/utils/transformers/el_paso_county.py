@@ -1,11 +1,40 @@
-from copy import copy
+from datetime import date
 
-from .import base
+from . import base
+from . import mixins
+
 from .. import cleaver
 
 
-class ElPasoDepartmentName(cleaver.DepartmentName):
-    MAP = cleaver.DepartmentName.MAP + (
+class TransformedRecord(mixins.GenericCompensationMixin,
+        mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
+        mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
+        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
+    MAP = {
+        'last_name': 'LAST NAME',
+        'first_name': 'FIRST NAME',
+        'department': 'DEPARTMENT',
+        'job_title': 'JOB TITLE',
+        'hire_date': 'HIRE DATE',
+        'status': 'PART FULL',
+        'annual': 'ANNUAL RATE',
+        'pay_rate': 'PAY RATE',
+        'race': 'ETHNICITY',
+        'gender': 'SEX',
+    }
+
+    NAME_FIELDS = ('first_name', 'last_name', )
+
+    ORGANIZATION_NAME = 'El Paso County'
+    ORGANIZATION_CLASSIFICATION = 'County'
+
+    DATE_PROVIDED = date(2013, 10, 31)
+    # Y/M/D agency provided the data
+
+    URL = "http://raw.texastribune.org.s3.amazonaws.com/el_paso_county/salaries/2013-07/el_paso_county.xlsx"
+
+    cleaver.DepartmentName.MAP = cleaver.DepartmentName.MAP + (
         (cleaver.regex_i(r'ADM\.$'), 'Administration'),
         (cleaver.regex_i(r'DIST ATTY'), 'District Attorney'),
         (cleaver.regex_i(r'COATTYADM'), 'County Attorney Administration'),
@@ -15,71 +44,49 @@ class ElPasoDepartmentName(cleaver.DepartmentName):
         (cleaver.regex_i(r'ADULT PROB-GANG INTERVENTION'), 'Adult Probation - Gang Intervention'),
     )
 
+    @property
+    def is_valid(self):
+        # Georgina Torres invalid hire date
+        return self.last_name.strip() != '' and self.hire_date != '00/00/0000'
 
-def transform(labels, source):
-    data = []
-    for raw_row in source:
-        if len(raw_row[0].strip()) is 0:
-            continue
+    @property
+    def compensation_type(self):
+        if self.status.upper() == 'F':
+            return 'FT'
+        else:
+            return 'PT'
 
-        row = dict(zip(labels, raw_row))
-        d = copy(base.DEFAULT_DATA_TEMPLATE)
-        d['original'] = row
-        raw_name = '%s %s %s' % (row['FIRST NAME'], row['MIDDLE'],
-                row['LAST NAME'])
-
-        d['tx_people.Identifier'] = {
+    @property
+    def identifier(self):
+        return {
             'scheme': 'tx_salaries_hash',
-            'identifier': base.create_hash_for_record(row, exclude=['PAY RATE', ]),
-        }
-        name = cleaver.EmployeeNameCleaver(raw_name).parse()
-        d['tx_people.Person'] = {
-            'family_name': name.last,
-            'given_name': name.first,
-            'additional_name': name.middle,
-            'name': str(name),
-            'gender': row['SEX'],
+            'identifier': base.create_hash_for_record(self.data, exclude=['PAY RATE', ]),
         }
 
-        department = cleaver.DepartmentNameCleaver(row['DEPARTMENT'].title(),
-                object_class=ElPasoDepartmentName).parse()
-        d['tx_people.Organization'] = {
-            'name': 'El Paso County',
-            'children': [
-                {'name': str(department), },
-            ],
-        }
+    def calculate_tenure(self):
+        hire_date_data = map(int, self.hire_date.split('/'))
+        try:
+            hire_date = date(hire_date_data[2], hire_date_data[0],
+                         hire_date_data[1])
+        except:
+            return None
+        tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
+        if tenure < 0:
+            error_msg = ("An employee was hired after the data was provided.\n"
+                         "Is DATE_PROVIDED correct?")
+            raise ValueError(error_msg)
+        return tenure
 
-        d['tx_people.Post'] = {
-            'label': row['JOB TITLE'].title(),
-        }
-
-        d['tx_people.Membership'] = {
-            'start_date': row['HIRE DATE'],
-        }
-
-        if row['PART FULL'].strip() == 'P':
-            compensation_type = 'Part Time'
+    @property
+    def compensation(self):
+        if self.annual.strip() == '0':
+            return self.pay_rate
         else:
-            compensation_type = 'Full Time'
+            return self.annual
 
-        if row['ANNUAL RATE'].strip() == '0':
-            compensation_key = 'PAY RATE'
-        else:
-            compensation_key = 'ANNUAL RATE'
+    @property
+    def department_as_child(self):
+        return [{'name': unicode(cleaver.DepartmentNameCleaver(self.department)
+                                        .parse()), }, ]
 
-        d['compensations'] = [
-            {
-                'tx_salaries.CompensationType': {
-                    'name': compensation_type,
-                },
-                'tx_salaries.Employee': {
-                    'hire_date': row['HIRE DATE'],
-                    'compensation': row[compensation_key],
-                },
-            }
-        ]
-        data.append(d)
-    return data
-
-
+transform = base.transform_factory(TransformedRecord)
