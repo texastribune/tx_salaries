@@ -3,6 +3,7 @@ from . import brownsville_isd
 from . import collin_college
 from . import eanes_isd
 from . import el_paso_county
+from . import state_of_texas
 from . import texas_am_system
 from . import texas_tech_system
 from . import texas_tech_university
@@ -27,6 +28,7 @@ TRANSFORMERS = {
     '39bcb735ae0a6d3b9bddb839337680abf76be1fd': [collin_college.transform, ],
     'b3ac361fd078f04d8035cef647ac839ef3f0f353': [eanes_isd.transform, ],
     'd18ad5c9635a40de15b0ead0e8f8fe97b8ccca31': [el_paso_county.transform, ],
+    '690fc3890e8f893a7b1634de2df958846ad12a1b': [state_of_texas.transform, ],
     'eb4e22c07597829d7b62f48e6f69dd2d29bf69e2': [texas_am_system.transform, ],
     'bc023bcf9e573ecdf8335ebafb24feec596e473f': [texas_tech_system.transform, ],
     'c60489252da989ab04f6a47a86265dc047dd367b': [texas_tech_university.transform, ],
