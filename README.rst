@@ -99,7 +99,7 @@ this::
         MAP = {
             'last_name': 'LABEL FOR LAST NAME',
             'first_name': 'LABEL FOR FIRST NAME',
-            'department': 'LABEL FOR DEPTARTMENT',
+            'department': 'LABEL FOR DEPARTMENT',
             'job_title': 'LABEL FOR JOB TITLE',
             'hire_date': 'LABEL FOR HIRE DATE',
             'status': 'LABEL FOR FT/PT STATUS',
@@ -127,9 +127,16 @@ this::
         @property
         def compensation_type(self):
             if self.status.upper() == 'FT':
-                return 'Full Time'
+                return 'FT'
             else:
-                return 'Part Time'
+                return 'PT'
+
+        @property
+        def description(self):
+            if self.status.upper() == 'FT':
+                return 'Full-time salary'
+            else:
+                return 'Part-time salary'
 
     transform = base.transform_factory(TransformedRecord)
 

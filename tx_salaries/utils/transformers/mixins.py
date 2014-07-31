@@ -40,6 +40,7 @@ class GenericCompensationMixin(object):
             {
                 'tx_salaries.CompensationType': {
                     'name': self.compensation_type,
+                    'description': self.description
                 },
                 'tx_salaries.EmployeeTitle': {
                     'name': self.job_title,

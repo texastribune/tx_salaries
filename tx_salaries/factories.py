@@ -1,6 +1,7 @@
 import factory
 from tx_people.models import Organization, Membership, Person, Post
-from tx_salaries.models import Employee, EmployeeTitle, CompensationType, OrganizationStats
+from tx_salaries.models import (Employee, EmployeeTitle, CompensationType,
+                                OrganizationStats)
 
 
 # tx_people factories
