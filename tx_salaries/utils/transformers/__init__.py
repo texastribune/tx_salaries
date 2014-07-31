@@ -22,6 +22,7 @@ from . import ut_health_tyler
 from . import ut_health_san_antonio
 from . import ut_medical_branch
 from . import ut_pan_american
+from . import pasadena_isd
 from . import ut_permian_basin
 from . import ut_san_antonio
 from . import ut_system
@@ -38,6 +39,7 @@ TRANSFORMERS = {
     'a4f1152500a1c25df0705463266f75a9b15f6b5a': [houston_community_college.transform, ],
     '0809eca5428e583732e7939f7252398f5c4e6947': [katy_isd.transform, ],
     'd982fa55bf19391e9f756cf03614cdd3969c4311': [north_east_isd.transform, ],
+    '2252263014de05fa4efd240e0a3716c484495a93': [pasadena_isd.transform, ],
     '690fc3890e8f893a7b1634de2df958846ad12a1b': [state_of_texas.transform, ],
     'eb4e22c07597829d7b62f48e6f69dd2d29bf69e2': [texas_am_system.transform, ],
     'bc023bcf9e573ecdf8335ebafb24feec596e473f': [texas_tech_system.transform, ],
