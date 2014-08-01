@@ -159,8 +159,12 @@ Back on the command line, run this::
 
     python manage import_salary_data /path/to/rio_grande_county.xls
 
-Pay attention to any error messages you receive and make the appropriate
-adjustments. Note the ``generate_transformer_hash`` and ``import_salary`` data
+Pay attention to any error messages you receive. Most transformer errors are due
+to missing data -- either the user didn't map to all the necessary fields,
+didn't include a mixin to process a field or made an error in an overridden
+property that is supposed to return an attribute.
+
+Note the ``generate_transformer_hash`` and ``import_salary`` data
 management commands can take ``--sheet`` and ``--row`` flags if the agency gave
 you a spreadsheet with multiple sheets or a header row that isn't the first row.
 
@@ -200,7 +204,11 @@ dictionary that must look something like this::
 
 That record is structured such that its keys and values match the models and kwargs for storing tx_people and tx_salaries models. How do spreadsheets get structured like that?
 
-The `import_salary_data`_ management command runs through several modules to store spreadsheet data. First it uses transformer.`transform`_, which uses the header row to identify the transformer necessary to import the spreadsheet. That transformer turns each row of the spreadsheet into a structured record with the help of `mixins`_.py and `base`_.py. The list of records is sent to to_db.save(), which unpacks and stores the data. ``import_salary_data`` also keeps track of the unique organizations and positions that are imported so it can denormalize the stats when the import finishes.
+The `import_salary_data`_ management command runs through several modules to store spreadsheet data. First it uses transformer.`transform`_, which uses the header row to identify the transformer necessary to import the spreadsheet.
+
+That transformer turns each row of the spreadsheet into a structured record with the help of `mixins`_.py and `base`_.py. ``base.py`` defines the template of the record, and ``mixins.py`` provides functions to format the required data. Mixins are included in the definition of ``TransformedRecord``. However, mixins cannot handle all situations, and sometimes fields like ``CompensationType`` require special logic. You can override mixins by writing a custom `@property` in the transformer. Errors often happen at this stage when a transformer and its mixins fail to provide all the fields required by base.
+
+After each of the rows of the spreadsheet are converted to structured records, a list of records is sent to `to_db`_.save(), which unpacks and stores the data. ``import_salary_data`` also keeps track of the unique organizations and positions that are imported so it can denormalize the stats when the import finishes.
 
 That's a high-level view of transformers. Read the comments in ``mixins.py`` and check out the data template in ``base.py`` for more details on the specific attributes transformers require.
 
@@ -223,3 +231,4 @@ Tasks
 .. _transform: tx_salaries/utils/transformer.py
 .. _mixins: tx_salaries/utils/transformers/mixins.py
 .. _base: tx_salaries/utils/transformers/base.py
+.. _to_db: tx_salaries/utils/to_db.py
