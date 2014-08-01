@@ -38,6 +38,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     @property
     def compensation_type(self):
+        # TODO some job titles have PT
         return 'FT'
 
     @property

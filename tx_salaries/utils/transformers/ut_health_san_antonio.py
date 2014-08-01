@@ -16,7 +16,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'department': 'Department',
         'job_title': 'Title',
         'hire_date': 'Hire Date',
-        'compensation_type': 'FT/PT',
+        'type_code': 'FT/PT',
         'race': 'Race',
         'gender': 'Gender',
         'compensation': 'Gross Annual Salary',
@@ -33,7 +33,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     DATE_PROVIDED = date(2014, 1, 28)
 
-    description = 'Annual compensation'
+    description = 'Gross annual salary'
 
     URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_health_san_antonio/salaries/2014-01/Texas%20Tribune%20Request%2001-28-2014.xlsx'
 
@@ -44,6 +44,13 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             return False
         # Adjust to return False on invalid fields.  For example:
         return self.last_name.strip() != ''
+
+    @property
+    def compensation_type(self):
+        if self.type_code.strip() == 'Full-time':
+            return 'FT'
+        else:
+            return self.type_code.strip()
 
     @property
     def person(self):

@@ -20,7 +20,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'active': 'ACTIVE-GRP',
         'appt': 'APPT',
         'mo_hr': 'MO-HR',
-        'emp_type': 'TYPE'
+        'emp_type': 'TYPE',
     }
 
     ORGANIZATION_NAME = 'The University of Texas at Tyler'
@@ -80,12 +80,12 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             {
                 'tx_salaries.CompensationType': {
                     'name': compensation_type,
-                    'description': self.description
+                    'description': self.description,
                 },
                 'tx_salaries.Employee': {
                     'hire_date': self.hire_date,
                     'compensation': self.compensation,
-                    'tenure': self.calculate_tenure()
+                    'tenure': self.calculate_tenure(),
                 },
                 'tx_salaries.EmployeeTitle': {
                     'name': self.job_title,

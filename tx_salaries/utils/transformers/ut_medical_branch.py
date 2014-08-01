@@ -17,7 +17,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'race': 'RACE/ETHNICITY',
         'hire_date': 'LAST_HIRE_DT',
         'compensation': 'ANNUAL_PAY',
-        'longevity': 'ANNUALIZED_LONGEVITY'
+        'longevity': 'ANNUALIZED_LONGEVITY',
     }
 
     NAME_FIELDS = ('first_name', 'last_name', )
@@ -73,12 +73,12 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             {
                 'tx_salaries.CompensationType': {
                     'name': self.compensation_type,
-                    'description': self.description
+                    'description': self.description,
                 },
                 'tx_salaries.Employee': {
                     'hire_date': self.hire_date,
                     'compensation': compensation,
-                    'tenure': self.calculate_tenure()
+                    'tenure': self.calculate_tenure(),
                 },
                 'tx_salaries.EmployeeTitle': {
                     'name': self.job_title,

@@ -33,7 +33,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     ORGANIZATION_CLASSIFICATION = 'University'
 
     # TODO 14 people earn < 4000
-    compensation_type = 'Full Time'
+    compensation_type = 'FT'
     description = 'Annual compensation'
 
     DATE_PROVIDED = date(2014, 2, 14)

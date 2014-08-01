@@ -21,7 +21,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'gender': 'Sex',
         'status': 'LABEL FOR FT/PT STATUS',
         'compensation': 'Annual Rate if Applicable',
-        'hourly': 'Hourly Rate if Applicable'
+        'hourly': 'Hourly Rate if Applicable',
     }
 
     NAME_FIELDS = ('first_name', 'last_name', )
@@ -55,7 +55,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             return 'FT'
         else:
             # TODO need hours worked
-            return 'PT'
+            return 'Hourly'
 
     @property
     def description(self):
@@ -72,6 +72,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             {
                 'tx_salaries.CompensationType': {
                     'name': self.compensation_type,
+                    'description': self.description,
                 },
                 'tx_salaries.Employee': {
                     'hire_date': self.hire_date,
