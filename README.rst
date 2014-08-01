@@ -58,7 +58,7 @@ transform it.
 
 To generate a key, run the following command on your spreadsheet::
 
-    python manage generate_transformer_hash path/to/rio_grande_county.xls
+    python manage generate_transformer_hash path/to/rio_grande_county.xls --sheet=data_sheet --row=number_of_header_row
 
 The output should be a 40-character string.  Copy that value and open the
 ``tx_salaries/utils/transformers/__init__.py`` file which contains all of the
@@ -88,6 +88,8 @@ this::
     from . import mixins
 
     from datetime import date
+
+    # add if necessary: --sheet="Request data" --row=3
 
 
     class TransformedRecord(mixins.GenericCompensationMixin,
@@ -141,7 +143,9 @@ this::
     transform = base.transform_factory(TransformedRecord)
 
 Each of the ``LABEL FOR XXX`` fields should be adjusted to match the
-appropriate column in the given spreadsheet.
+appropriate column in the given spreadsheet. If the file requires special
+sheet or row handling, note the ``--sheet`` and ``--row`` flags as a comment
+at the top of the file.
 
 ``TransformedRecord`` now represents a generic record.  You may need to
 customize the various properties added by the mixins or replace them with
@@ -194,6 +198,12 @@ dictionary that must look something like this::
 
     }}
 
+That record is structured such that its keys and values match the models and kwargs for storing tx_people and tx_salaries models. How do spreadsheets get structured like that?
+
+The `import_salary_data`_ management command runs through several modules to store spreadsheet data. First it uses transformer.`transform`_, which uses the header row to identify the transformer necessary to import the spreadsheet. That transformer turns each row of the spreadsheet into a structured record with the help of `mixins`_.py and `base`_.py. The list of records is sent to to_db.save(), which unpacks and stores the data. ``import_salary_data`` also keeps track of the unique organizations and positions that are imported so it can denormalize the stats when the import finishes.
+
+That's a high-level view of transformers. Read the comments in ``mixins.py`` and check out the data template in ``base.py`` for more details on the specific attributes transformers require.
+
 Tasks
 -----
 * Document parallel usage once `Issue 2`_ is resolved.
@@ -208,3 +218,8 @@ Tasks
 .. _in2csv: http://csvkit.readthedocs.org/en/latest/scripts/in2csv.html
 .. _pip: http://www.pip-installer.org/en/latest/
 
+.. _import_salary_data: tx_salaries/management/commands/import_salary_data.py
+.. _transform: tx_salaries/utils/transformer.py
+.. _transform: tx_salaries/utils/transformer.py
+.. _mixins: tx_salaries/utils/transformers/mixins.py
+.. _base: tx_salaries/utils/transformers/base.py

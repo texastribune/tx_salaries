@@ -47,6 +47,7 @@ class BaseTransformedRecord(object):
         return u' '.join(name_fields)
 
     # TODO: Test
+    # Helper function for GenericPersonMixin
     def get_name(self):
         return self.get_cleavered_name().parse()
 
