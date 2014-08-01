@@ -3,8 +3,14 @@ from django.db import models
 
 class DenormalizeManagerMixin(object):
     def update_cohort(self, cohort, date_provided=False, **kwargs):
+        """
+        Save each of the fields for ``PositionStats`` and ``OrganizationStats``
+        models, which provide filtered ``Employee`` objects as the ``cohort``
+        parameter
+        """
         stats, created = self.get_or_create(**kwargs)
         total_in_cohort = cohort.count()
+        # Overall distribution
         stats.distribution = self.get_distribution(cohort, total_in_cohort, cohort)
         stats.highest_paid = (cohort.order_by('-compensation')
                                     .values_list('compensation', flat=True)[0])
@@ -25,6 +31,9 @@ class DenormalizeManagerMixin(object):
         stats.save()
 
     def get_median(self, cohort):
+        """
+        Calculate median salary for full-time employees of given cohort
+        """
         cohort = cohort.filter(compensation_type__name='FT')
         total_number = cohort.count()
         if total_number == 0:
@@ -46,6 +55,11 @@ class DenormalizeManagerMixin(object):
 
     def generate_stats(self, cohort, total_in_cohort, get_slices=False,
                        parent_cohort=False):
+        """
+        Calculate standard JSONField statistics
+
+        Used by ``get_tenures``, ``get_races``, ``male`` and ``female``
+        """
         total_number = cohort.count()
         if total_number > 0:
             data = {
@@ -62,6 +76,7 @@ class DenormalizeManagerMixin(object):
             data = {'total_number': 0}
 
         if get_slices:
+            # Generate distribution for male and female histograms
             data.update({'distribution': self.get_distribution(cohort,
                                                                total_in_cohort,
                                                                parent_cohort)})
@@ -94,6 +109,9 @@ class DenormalizeManagerMixin(object):
         ]
 
     def round_nearest(self, num, target, ceil=False, floor=False):
+        """
+        Helper function rounding distribution bins
+        """
         num = int(num)
         if floor or (not ceil and num % target < target / 2):
             return num - (num % target)
@@ -106,7 +124,8 @@ class DenormalizeManagerMixin(object):
         if parent_cohort.count() == 0:
             # The entity has no full-time employees to generate a distribution
             return None
-        # Set bounds of buckets using all employees so gender breakdowns are comparable
+        # Set bounds of buckets using all employees of the parent organization
+        # so gender breakdowns are comparable
         salaries = parent_cohort.aggregate(max=models.Max('compensation'),
                                            min=models.Min('compensation'))
         diff = salaries['max'] - salaries['min']
@@ -185,7 +204,7 @@ class OrganizationStatsManager(DenormalizeManagerMixin, models.Manager):
         #       Example: El Paso County Sheriff's Department instead
         #       of going all the way to El Paso County.
         if obj.parent:
-            # employee works for a department,
+            # Employee works for a department,
             # also calculate parent organization stats
             kwargs = {
                 'position__organization': obj,
