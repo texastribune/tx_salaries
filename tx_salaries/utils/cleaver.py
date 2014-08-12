@@ -6,10 +6,19 @@ regex_i = lambda a: re.compile(a, re.IGNORECASE)
 
 
 class DepartmentName(names.OrganizationName):
+    def upper_repl(match):
+        return match.group(0).upper()
+
     MAP = (
         (regex_i(r' OF '), ' of '),
         (regex_i(r' AT '), ' at '),
         (regex_i(r' THE '), ' the '),
+        (regex_i(r' TO '), ' to '),
+        (regex_i(r' FOR '), ' for '),
+        (regex_i(r"'S"), "'s"),
+        (regex_i(r' & '), ' and '),
+        (regex_i(r' AND '), ' and '),
+        (regex_i(r'\b([IXV]{1,3})\b'), upper_repl), # roman numerals
     )
 
     def case_name_parts(self):
@@ -23,6 +32,10 @@ class DepartmentName(names.OrganizationName):
 
 
 class DepartmentNameCleaver(cleaver.OrganizationNameCleaver):
+    """
+    Custom ``OrganizationNameCleaver`` for entity and job titles
+
+    """
     object_class = DepartmentName
 
     def __init__(self, name, object_class=None):
