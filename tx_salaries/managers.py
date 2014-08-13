@@ -160,11 +160,6 @@ class DenormalizeManagerMixin(object):
         
         step = math.floor(diff / decimal.Decimal(number_of_bins))
         
-        if number_of_bins == 2:
-            print number_of_bins, '*****************'
-        else:
-            print number_of_bins
-
         slices = []
         while start < salaries['max']:
             if start == salaries['min']:
