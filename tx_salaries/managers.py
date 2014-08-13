@@ -132,27 +132,47 @@ class DenormalizeManagerMixin(object):
                 step = diff / 6
             # Round start and step to nice numbers, and make the step bigger if
             # it would create more than 12 bars on the graph.
-            # if step > 70000 or diff / 50000 > 12:
-            #     step = self.round_nearest(step, 100000, ceil=True)
-            #     start = self.round_nearest(start, 100000, floor=True)
-            # elif step > 30000 or diff / 20000 > 12:
-            #     step = 50000
-            #     start = self.round_nearest(start, 10000, floor=True)
-            # elif step > 15000 or diff / 10000 > 12:
-            #     step = 20000
-            #     start = self.round_nearest(start, 10000, floor=True)
-            # elif step > 8000 or diff / 5000 > 12:
-            #     step = 10000
-            #     start = self.round_nearest(start, 10000, floor=True)
-            # elif step > 3000:
-            #     step = 5000
-            #     start = self.round_nearest(start, 1000, floor=True)
-            # elif step > 70:
-            #     step = self.round_nearest(step, 100)
-            #     start = self.round_nearest(start, 100, floor=True)
+            if step > 70000 or diff / 50000 > 12:
+                step = self.round_nearest(step, 100000, ceil=True)
+                start = self.round_nearest(start, 100000, floor=True)
+            elif step > 30000 or diff / 20000 > 12:
+                step = 50000
+                start = self.round_nearest(start, 10000, floor=True)
+            elif step > 15000 or diff / 10000 > 12:
+                step = 20000
+                start = self.round_nearest(start, 10000, floor=True)
+            elif step > 8000 or diff / 5000 > 12:
+                step = 10000
+                start = self.round_nearest(start, 10000, floor=True)
+            elif step > 3000:
+                step = 5000
+                start = self.round_nearest(start, 1000, floor=True)
+            elif step > 70:
+                step = self.round_nearest(step, 100)
+                start = self.round_nearest(start, 100, floor=True)
         else:
             print 'yay'
             step = diff / 10
+            # Round start and step to nice numbers, and make the step bigger if
+            # it would create more than 12 bars on the graph.
+            if step > 70000 or diff / 50000 > 12:
+                step = self.round_nearest(step, 100000, ceil=True)
+                start = self.round_nearest(start, 100000, floor=True)
+            elif step > 30000 or diff / 20000 > 12:
+                step = 50000
+                start = self.round_nearest(start, 10000, floor=True)
+            elif step > 15000 or diff / 10000 > 12:
+                step = 20000
+                start = self.round_nearest(start, 10000, floor=True)
+            elif step > 8000 or diff / 5000 > 12:
+                step = 10000
+                start = self.round_nearest(start, 10000, floor=True)
+            elif step > 3000:
+                step = 5000
+                start = self.round_nearest(start, 1000, floor=True)
+            elif step > 70:
+                step = self.round_nearest(step, 100)
+                start = self.round_nearest(start, 100, floor=True)
 
 
         slices = []
