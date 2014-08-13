@@ -123,9 +123,6 @@ class DenormalizeManagerMixin(object):
         
         # start = int(float(math.ceil(salaries['min']) / float(1200.0))) * 1200
    
-        if salaries['max']:
-            print end, salaries['max'], end < salaries['max']
-
         return_none = {
             'step': 0,
             'slices': [{
@@ -162,6 +159,11 @@ class DenormalizeManagerMixin(object):
                 number_of_bins = 6
         
         step = math.floor(diff / decimal.Decimal(number_of_bins))
+        
+        if number_of_bins == 2:
+            print number_of_bins, '*****************'
+        else:
+            print number_of_bins
 
         slices = []
         while start < salaries['max']:
