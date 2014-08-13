@@ -120,9 +120,7 @@ class DenormalizeManagerMixin(object):
             end = 1200
         else:
             end = int(math.ceil(float(salaries['max'])/1200.0)) * 1200
-        
-        # start = int(float(math.ceil(salaries['min']) / float(1200.0))) * 1200
-   
+           
         return_none = {
             'step': 0,
             'slices': [{
@@ -141,14 +139,12 @@ class DenormalizeManagerMixin(object):
             
         if cohort == parent_cohort: 
             number_of_bins = decimal.Decimal(math.ceil(math.sqrt(cohort.count())))  
-            if number_of_bins < 1:
-                return return_none
-            elif number_of_bins <= 6 or cohort_full_time.count() <= 10:
+            if number_of_bins <= 6 or cohort_full_time.count() <= 10:
                 number_of_bins = 6
             else:
                 number_of_bins = 12
         else:
-            number_of_bins = decimal.Decimal(math.ceil(math.sqrt(cohort.count())))
+            number_of_bins = decimal.Decimal(math.ceil(math.sqrt(parent_cohort.count())))
             if number_of_bins < 1:
                 return return_none
             elif diff < 20000:
