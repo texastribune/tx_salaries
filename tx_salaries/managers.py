@@ -153,7 +153,6 @@ class DenormalizeManagerMixin(object):
                 number_of_bins = 4
             else:
                 number_of_bins = 6
-        
         step = math.floor(diff / decimal.Decimal(number_of_bins))
         
         slices = []
