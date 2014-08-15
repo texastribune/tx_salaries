@@ -139,7 +139,7 @@ class DenormalizeManagerMixin(object):
             
         if cohort == parent_cohort: 
             number_of_bins = decimal.Decimal(math.ceil(math.sqrt(cohort.count())))  
-            if number_of_bins <= 6 or cohort_full_time.count() <= 10:
+            if number_of_bins <= 6 or parent_cohort_full_time.count() <= 10:
                 number_of_bins = 6
             else:
                 number_of_bins = 12
@@ -149,7 +149,7 @@ class DenormalizeManagerMixin(object):
                 return return_none
             elif diff < 20000:
                 number_of_bins = 3
-            elif diff < 40000 or cohort_full_time.count() <= 10:
+            elif diff < 40000 or parent_cohort_full_time.count() <= 10:
                 number_of_bins = 4
             else:
                 number_of_bins = 6
