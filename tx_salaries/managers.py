@@ -148,11 +148,11 @@ class DenormalizeManagerMixin(object):
             if number_of_bins < 1:
                 return return_none
             elif diff < 20000:
-                number_of_bins = 3
-            elif diff < 40000 or parent_cohort_full_time.count() <= 10:
-                number_of_bins = 4
-            else:
                 number_of_bins = 6
+            elif diff < 40000 or parent_cohort_full_time.count() <= 10:
+                number_of_bins = 8
+            else:
+                number_of_bins = 10
         step = math.floor(diff / decimal.Decimal(number_of_bins))
         
         slices = []
