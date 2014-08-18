@@ -52,7 +52,7 @@ class BaseTransformedRecord(object):
 
     # TODO: Test
     def get_cleavered_name(self):
-        return self.get_name_cleaver()(self.get_raw_name())
+        return self.get_name_cleaver()(self.get_raw_name)
 
     # TODO: Test
     def get_name_cleaver(self):

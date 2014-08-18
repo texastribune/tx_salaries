@@ -87,7 +87,7 @@ class DenormalizeManagerMixin(object):
                                    tenure__gte=10))
         twenty_years = cohort.filter(tenure__gt=20)
         return [
-            {'time': '1 year', 'stats': self.generate_stats(one_year, total_in_cohort)},
+            {'time': '1 year or less', 'stats': self.generate_stats(one_year, total_in_cohort)},
             {'time': '1-10 years', 'stats': self.generate_stats(more_than_one_year, total_in_cohort)},
             {'time': '10-20 years', 'stats': self.generate_stats(ten_years, total_in_cohort)},
             {'time': '20+ years', 'stats': self.generate_stats(twenty_years, total_in_cohort)}
@@ -101,8 +101,8 @@ class DenormalizeManagerMixin(object):
             return num + (target - num % target)
 
     def get_distribution(self, cohort, total_in_cohort, parent_cohort):
-        parent_cohort = parent_cohort.filter(compensation_type__name='FT')
-        cohort = cohort.filter(compensation_type__name='FT')
+        parent_cohort_full_time = parent_cohort.filter(compensation_type__name='FT')
+        cohort_full_time = cohort.filter(compensation_type__name='FT')
         if parent_cohort.count() == 0:
             # The entity has no full-time employees to generate a distribution
             return None
@@ -118,7 +118,7 @@ class DenormalizeManagerMixin(object):
                     'start': salaries['min'],
                     'end': salaries['max'],
                     'count': cohort.count(),
-                    'ratio': round((float(cohort.count()) / float(total_in_cohort)) * 100, 1)
+                    'ratio': round((float(cohort_full_time.count()) / float(total_in_cohort)) * 100, 1)
                 }]
             }
 
@@ -130,38 +130,58 @@ class DenormalizeManagerMixin(object):
                 step = diff / 3
             else:
                 step = diff / 6
+            # Round start and step to nice numbers, and make the step bigger if
+            # it would create more than 12 bars on the graph.
+            if step > 70000 or diff / 50000 > 12:
+                step = self.round_nearest(step, 100000, ceil=True)
+                start = self.round_nearest(start, 100000, floor=True)
+            elif step > 30000 or diff / 20000 > 12:
+                step = 50000
+                start = self.round_nearest(start, 10000, floor=True)
+            elif step > 15000 or diff / 10000 > 12:
+                step = 20000
+                start = self.round_nearest(start, 10000, floor=True)
+            elif step > 8000 or diff / 5000 > 12:
+                step = 10000
+                start = self.round_nearest(start, 10000, floor=True)
+            elif step > 3000:
+                step = 5000
+                start = self.round_nearest(start, 1000, floor=True)
+            elif step > 70:
+                step = self.round_nearest(step, 100)
+                start = self.round_nearest(start, 100, floor=True)
         else:
             step = diff / 10
+            # Round start and step to nice numbers, and make the step bigger if
+            # it would create more than 12 bars on the graph.
+            if step > 70000 or diff / 50000 > 12:
+                step = self.round_nearest(step, 100000, ceil=True)
+                start = self.round_nearest(start, 100000, floor=True)
+            elif step > 30000 or diff / 20000 > 12:
+                step = 50000
+                start = self.round_nearest(start, 10000, floor=True)
+            elif step > 15000 or diff / 10000 > 12:
+                step = 20000
+                start = self.round_nearest(start, 10000, floor=True)
+            elif step > 8000 or diff / 5000 > 12:
+                step = 10000
+                start = self.round_nearest(start, 10000, floor=True)
+            elif step > 3000:
+                step = 5000
+                start = self.round_nearest(start, 1000, floor=True)
+            elif step > 70:
+                step = self.round_nearest(step, 100)
+                start = self.round_nearest(start, 100, floor=True)
 
-        # Round start and step to nice numbers, and make the step bigger if
-        # it would create more than 12 bars on the graph.
-        if step > 70000 or diff / 50000 > 12:
-            step = self.round_nearest(step, 100000, ceil=True)
-            start = self.round_nearest(start, 100000, floor=True)
-        elif step > 30000 or diff / 20000 > 12:
-            step = 50000
-            start = self.round_nearest(start, 10000, floor=True)
-        elif step > 15000 or diff / 10000 > 12:
-            step = 20000
-            start = self.round_nearest(start, 10000, floor=True)
-        elif step > 8000 or diff / 5000 > 12:
-            step = 10000
-            start = self.round_nearest(start, 10000, floor=True)
-        elif step > 3000:
-            step = 5000
-            start = self.round_nearest(start, 1000, floor=True)
-        elif step > 70:
-            step = self.round_nearest(step, 100)
-            start = self.round_nearest(start, 100, floor=True)
 
         slices = []
         while start < salaries['max']:
             if start == salaries['min']:
-                cohort_total = (cohort.filter(compensation__gte=start,
+                cohort_total = (cohort_full_time.filter(compensation__gte=start,
                                               compensation__lte=start + step)
                                       .count())
             else:
-                cohort_total = (cohort.filter(compensation__gt=start,
+                cohort_total = (cohort_full_time.filter(compensation__gt=start,
                                               compensation__lte=start + step)
                                       .count())
             slices.append({
