@@ -15,3 +15,6 @@ class EmployeeIndex(indexes.SearchIndex, indexes.Indexable):
 
     def get_model(self):
         return Employee
+
+    def get_updated_field(self):
+        return 'updated'

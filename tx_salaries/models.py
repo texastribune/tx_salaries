@@ -94,6 +94,7 @@ class Employee(mixins.TimeTrackingMixin, mixins.ReducedDateStartAndEndMixin,
     slug = models.SlugField(max_length=255, null=True, blank=True, default=None)
     compensation = models.DecimalField(decimal_places=4, max_digits=12)
     compensation_type = models.ForeignKey(CompensationType)
+    updated = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
         return u'{title}, {person}'.format(title=self.position.post,
