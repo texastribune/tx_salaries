@@ -151,7 +151,6 @@ class DenormalizeManagerMixin(object):
                 step = self.round_nearest(step, 100)
                 start = self.round_nearest(start, 100, floor=True)
         else:
-            print 'yay'
             step = diff / 10
             # Round start and step to nice numbers, and make the step bigger if
             # it would create more than 12 bars on the graph.
