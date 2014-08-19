@@ -39,7 +39,9 @@ class BaseTransformedRecord(object):
             return self.get_mapped_value_key(key)
         elif self.is_mapped_value(key):
             return self.get_mapped_value(key)
-        raise AttributeError("{key} is unknown".format(key=key))
+        # Error if one of required as_dict attributes is not available
+        raise AttributeError("{key} is unknown. Are all of its attributes "
+                             "available?".format(key=key))
 
     # TODO: Test
     def get_raw_name(self):
@@ -47,6 +49,7 @@ class BaseTransformedRecord(object):
         return u' '.join(name_fields)
 
     # TODO: Test
+    # Helper function for GenericPersonMixin
     def get_name(self):
         return self.get_cleavered_name().parse()
 
@@ -63,6 +66,7 @@ class BaseTransformedRecord(object):
         if not self.is_valid:
             return
 
+        # Build the structured record with the required attributes
         d = copy(DEFAULT_DATA_TEMPLATE)
         d['original'] = self.data
 

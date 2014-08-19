@@ -27,6 +27,12 @@ def get_top_level_departments():
 
 
 class CompensationType(models.Model):
+    """
+    Classification of a compensation
+
+    Only compensations with name == ``FT`` are denormalized. The
+    ``description`` field is displayed to users on the web app.
+    """
     name_choices = (
         ('FT', 'Full Time'),
         ('PT', 'Part Time')
@@ -106,6 +112,7 @@ class Employee(mixins.TimeTrackingMixin, mixins.ReducedDateStartAndEndMixin,
 
 def create_stats_mixin(prefix):
     def generate_kwargs(field):
+        # Default options for ``DecimalField`` models
         return {
             'null': True,
             'blank': True,
@@ -114,6 +121,9 @@ def create_stats_mixin(prefix):
         }
 
     class StatisticsMixin(models.Model):
+        """
+        ``PositionStats`` and ``OrganizationStats`` models inherit these fields
+        """
         distribution = JSONField(null=True)
         highest_paid = models.DecimalField(**generate_kwargs('highest'))
         median_paid = models.DecimalField(**generate_kwargs('median'))
@@ -143,8 +153,7 @@ class PositionStats(create_stats_mixin('position'), models.Model):
         super(PositionStats, self).save(*args, **kwargs)
 
 
-class OrganizationStats(create_stats_mixin('organization'),
-        models.Model):
+class OrganizationStats(create_stats_mixin('organization'), models.Model):
     organization = models.OneToOneField(Organization, related_name='stats')
 
     objects = managers.OrganizationStatsManager()
