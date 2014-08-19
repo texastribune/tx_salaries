@@ -1,5 +1,6 @@
 from django.db import models
-
+import math
+import decimal
 
 class DenormalizeManagerMixin(object):
     def update_cohort(self, cohort, date_provided=False, **kwargs):
@@ -102,7 +103,7 @@ class DenormalizeManagerMixin(object):
                                    tenure__gte=10))
         twenty_years = cohort.filter(tenure__gt=20)
         return [
-            {'time': '1 year', 'stats': self.generate_stats(one_year, total_in_cohort)},
+            {'time': '1 year or less', 'stats': self.generate_stats(one_year, total_in_cohort)},
             {'time': '1-10 years', 'stats': self.generate_stats(more_than_one_year, total_in_cohort)},
             {'time': '10-20 years', 'stats': self.generate_stats(ten_years, total_in_cohort)},
             {'time': '20+ years', 'stats': self.generate_stats(twenty_years, total_in_cohort)}
@@ -119,68 +120,68 @@ class DenormalizeManagerMixin(object):
             return num + (target - num % target)
 
     def get_distribution(self, cohort, total_in_cohort, parent_cohort):
-        parent_cohort = parent_cohort.filter(compensation_type__name='FT')
-        cohort = cohort.filter(compensation_type__name='FT')
+        parent_cohort_full_time = parent_cohort.filter(compensation_type__name='FT')
+        cohort_full_time = cohort.filter(compensation_type__name='FT')
         if parent_cohort.count() == 0:
             # The entity has no full-time employees to generate a distribution
             return None
-        # Set bounds of buckets using all employees of the parent organization
-        # so gender breakdowns are comparable
-        salaries = parent_cohort.aggregate(max=models.Max('compensation'),
-                                           min=models.Min('compensation'))
-        diff = salaries['max'] - salaries['min']
+
+        # Set bounds of buckets using all employees so gender breakdowns are comparable
+        salaries = parent_cohort_full_time.aggregate(max=models.Max('compensation'),
+                                                     min=models.Min('compensation'))
+        start = salaries['min']
+        if start < 1200:
+            start = 0
+        else:
+            start = int(math.floor(float(salaries['min'])/1200.0)) * 1200
+        end = salaries['max']
+        if end < 1200:
+            end = 1200
+        else:
+            end = int(math.ceil(float(salaries['max'])/1200.0)) * 1200
+
+        return_none = {
+            'step': 0,
+            'slices': [{
+                'start': salaries['min'],
+                'end': salaries['max'],
+                'count': cohort.count(),
+                'ratio': round((float(cohort_full_time.count()) / float(total_in_cohort)) * 100, 1)
+            }]
+        }
+
+        diff = end - start
+
         if diff == 0:
             # All employees in the parent organization earn the same
-            return {
-                'step': 0,
-                'slices': [{
-                    'start': salaries['min'],
-                    'end': salaries['max'],
-                    'count': cohort.count(),
-                    'ratio': round((float(cohort.count()) / float(total_in_cohort)) * 100, 1)
-                }]
-            }
+            return return_none
 
-        start = salaries['min']
-        if cohort != parent_cohort:
-            if diff == 0:
-                step = diff / 1
-            elif diff < 20000:
-                step = diff / 3
+        if cohort == parent_cohort:
+            number_of_bins = decimal.Decimal(math.ceil(math.sqrt(cohort.count())))
+            if number_of_bins <= 6 or parent_cohort_full_time.count() <= 10:
+                number_of_bins = 6
             else:
-                step = diff / 6
+                number_of_bins = 12
         else:
-            step = diff / 10
-
-        # Round start and step to nice numbers, and make the step bigger if
-        # it would create more than 12 bars on the graph.
-        if step > 70000 or diff / 50000 > 12:
-            step = self.round_nearest(step, 100000, ceil=True)
-            start = self.round_nearest(start, 100000, floor=True)
-        elif step > 30000 or diff / 20000 > 12:
-            step = 50000
-            start = self.round_nearest(start, 10000, floor=True)
-        elif step > 15000 or diff / 10000 > 12:
-            step = 20000
-            start = self.round_nearest(start, 10000, floor=True)
-        elif step > 8000 or diff / 5000 > 12:
-            step = 10000
-            start = self.round_nearest(start, 10000, floor=True)
-        elif step > 3000:
-            step = 5000
-            start = self.round_nearest(start, 1000, floor=True)
-        elif step > 70:
-            step = self.round_nearest(step, 100)
-            start = self.round_nearest(start, 100, floor=True)
+            number_of_bins = decimal.Decimal(math.ceil(math.sqrt(parent_cohort.count())))
+            if number_of_bins < 1:
+                return return_none
+            elif diff < 20000:
+                number_of_bins = 6
+            elif diff < 40000 or parent_cohort_full_time.count() <= 10:
+                number_of_bins = 8
+            else:
+                number_of_bins = 10
+        step = math.floor(diff / decimal.Decimal(number_of_bins))
 
         slices = []
         while start < salaries['max']:
             if start == salaries['min']:
-                cohort_total = (cohort.filter(compensation__gte=start,
+                cohort_total = (cohort_full_time.filter(compensation__gte=start,
                                               compensation__lte=start + step)
                                       .count())
             else:
-                cohort_total = (cohort.filter(compensation__gt=start,
+                cohort_total = (cohort_full_time.filter(compensation__gt=start,
                                               compensation__lte=start + step)
                                       .count())
             slices.append({
@@ -192,6 +193,7 @@ class DenormalizeManagerMixin(object):
             start += step
         if not slices:
             return None
+
         return {'step': step, 'slices': slices}
 
 
