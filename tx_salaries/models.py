@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 from django.utils.text import slugify
 from jsonfield import JSONField
@@ -102,6 +104,10 @@ class Employee(mixins.TimeTrackingMixin, mixins.ReducedDateStartAndEndMixin,
     def save(self, *args, **kwargs):
         self.slug = slugify(unicode(self.position.person.name))
         super(Employee, self).save(*args, **kwargs)
+
+    @property
+    def hire_date_as_date(self):
+        return datetime.strptime(self.hire_date, '%Y-%m-%d')
 
 
 def create_stats_mixin(prefix):

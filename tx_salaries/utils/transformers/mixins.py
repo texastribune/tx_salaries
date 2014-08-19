@@ -108,7 +108,10 @@ class GenericPersonMixin(object):
         }
 
         if self.is_mapped_value('gender'):
-            r['gender'] = self.get_mapped_value('gender')
+            gender = self.get_mapped_value('gender')
+            if gender.split() == '':
+                gender = 'Not given'
+            r['gender'] = gender
 
         return r
 
@@ -121,8 +124,11 @@ class RaceMixin(object):
     """
     @property
     def race(self):
+        race = self.get_mapped_value('race').strip()
+        if race == '':
+            race = 'Not given'
         return {
-            'name': self.get_mapped_value('race')
+            'name': race
         }
 
 
@@ -144,7 +150,7 @@ class OrganizationMixin(object):
     Adds a generic ``organization`` property to the class
 
     This requires that the class mixing it in adds ``ORGANIZATION_NAME``
-    and ``CLASSICATION_TYPE`` properties of the main level agency or
+    and ``ORGANIZATION_CLASSIFICATION`` properties of the main level agency or
     department and needs a``department`` property.
     """
     @property
