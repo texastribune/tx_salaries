@@ -4,8 +4,14 @@ import decimal
 
 class DenormalizeManagerMixin(object):
     def update_cohort(self, cohort, date_provided=False, **kwargs):
+        """
+        Save each of the fields for ``PositionStats`` and ``OrganizationStats``
+        models, which provide filtered ``Employee`` objects as the ``cohort``
+        parameter
+        """
         stats, created = self.get_or_create(**kwargs)
         total_in_cohort = cohort.count()
+        # Overall distribution
         stats.distribution = self.get_distribution(cohort, total_in_cohort, cohort)
         stats.highest_paid = (cohort.order_by('-compensation')
                                     .values_list('compensation', flat=True)[0])
@@ -26,6 +32,9 @@ class DenormalizeManagerMixin(object):
         stats.save()
 
     def get_median(self, cohort):
+        """
+        Calculate median salary for full-time employees of given cohort
+        """
         cohort = cohort.filter(compensation_type__name='FT')
         total_number = cohort.count()
         if total_number == 0:
@@ -47,6 +56,11 @@ class DenormalizeManagerMixin(object):
 
     def generate_stats(self, cohort, total_in_cohort, get_slices=False,
                        parent_cohort=False):
+        """
+        Calculate standard JSONField statistics
+
+        Used by ``get_tenures``, ``get_races``, ``male`` and ``female``
+        """
         total_number = cohort.count()
         if total_number > 0:
             data = {
@@ -63,6 +77,7 @@ class DenormalizeManagerMixin(object):
             data = {'total_number': 0}
 
         if get_slices:
+            # Generate distribution for male and female histograms
             data.update({'distribution': self.get_distribution(cohort,
                                                                total_in_cohort,
                                                                parent_cohort)})
@@ -95,6 +110,9 @@ class DenormalizeManagerMixin(object):
         ]
 
     def round_nearest(self, num, target, ceil=False, floor=False):
+        """
+        Helper function rounding distribution bins
+        """
         num = int(num)
         if floor or (not ceil and num % target < target / 2):
             return num - (num % target)
@@ -107,9 +125,10 @@ class DenormalizeManagerMixin(object):
         if parent_cohort.count() == 0:
             # The entity has no full-time employees to generate a distribution
             return None
+
         # Set bounds of buckets using all employees so gender breakdowns are comparable
         salaries = parent_cohort_full_time.aggregate(max=models.Max('compensation'),
-                                           min=models.Min('compensation'))
+                                                     min=models.Min('compensation'))
         start = salaries['min']
         if start < 1200:
             start = 0
@@ -120,7 +139,7 @@ class DenormalizeManagerMixin(object):
             end = 1200
         else:
             end = int(math.ceil(float(salaries['max'])/1200.0)) * 1200
-           
+
         return_none = {
             'step': 0,
             'slices': [{
@@ -136,9 +155,9 @@ class DenormalizeManagerMixin(object):
         if diff == 0:
             # All employees in the parent organization earn the same
             return return_none
-            
-        if cohort == parent_cohort: 
-            number_of_bins = decimal.Decimal(math.ceil(math.sqrt(cohort.count())))  
+
+        if cohort == parent_cohort:
+            number_of_bins = decimal.Decimal(math.ceil(math.sqrt(cohort.count())))
             if number_of_bins <= 6 or parent_cohort_full_time.count() <= 10:
                 number_of_bins = 6
             else:
@@ -154,7 +173,7 @@ class DenormalizeManagerMixin(object):
             else:
                 number_of_bins = 10
         step = math.floor(diff / decimal.Decimal(number_of_bins))
-        
+
         slices = []
         while start < salaries['max']:
             if start == salaries['min']:
@@ -187,7 +206,7 @@ class OrganizationStatsManager(DenormalizeManagerMixin, models.Manager):
         #       Example: El Paso County Sheriff's Department instead
         #       of going all the way to El Paso County.
         if obj.parent:
-            # employee works for a department,
+            # Employee works for a department,
             # also calculate parent organization stats
             kwargs = {
                 'position__organization': obj,

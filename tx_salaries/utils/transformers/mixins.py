@@ -4,7 +4,12 @@ from datetime import date
 
 
 def title_case_property(key):
-    """Simple property for title casing a mapped value"""
+    """
+    Simple property for title casing a mapped value
+
+    TODO remove this? It makes a broad assumption that organization names and
+    job titles can be title cased when there are many edge cases.
+    """
     return property(lambda self: self.get_mapped_value(key).title())
 
 
@@ -16,12 +21,13 @@ class GenericCompensationMixin(object):
     following properties be available:
 
     * ``compensation_type``
+    # ``description``
     * ``hire_date``
     * ``compensation``
     * ``DATE_PROVIDED``
 
-    Expects hire_date to be given as YYYY-MM-DD
-    Override calculate_tenure in the transformer if this is not the case
+    Expects hire_date to be given as YYYY-MM-DD format.
+    Override calculate_tenure in the transformer if this is not the case.
     """
     def calculate_tenure(self):
         hire_date_data = map(int, self.hire_date.split('-'))

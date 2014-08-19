@@ -23,6 +23,13 @@ def convert_to_csv_reader(filename, sheet=None):
 
 
 def transform(filename, sheet=None, label_row=1):
+    """
+    Return a list of records to import for given spreadsheet filename
+
+    This uses get_transformers to find the transformers that match the header
+    row of a spreadsheet and executes the transformer to convert the
+    spreadsheet to importable records.
+    """
     reader = convert_to_csv_reader(filename, sheet=sheet)
     for i in range(1, int(label_row)):
         reader.next()
@@ -30,18 +37,21 @@ def transform(filename, sheet=None, label_row=1):
     transformers = get_transformers(labels)
 
     if len(transformers) > 1:
+        # Prompt user input if multiple transformers match the header row
         question = 'Which transformer would you like to use?\n'
         for i in range(0, len(transformers)):
             try:
                 question += '%i: %s\n' % (i, transformers[i][0])
             except TypeError:
-                raise Exception("Please list transformers with identical hashes as tuples")
+                raise Exception("Please list transformers with identical "
+                                "hashes as tuples")
         transformer_choice = int(input(question))
         transformer = transformers[transformer_choice][1]
 
     else:
         transformer = transformers[0]
 
+    # Transform file to importable records
     # TODO: Figure out a better way to pass a dict reader in
     data = transformer(labels, reader)
     return data

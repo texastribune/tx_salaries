@@ -4,6 +4,12 @@ from .. import models
 
 
 def save(data):
+    """
+    Unpack and save each of the items in a structured record from a transformer
+
+    Returns an object of the organizations and positions that it saved
+    so they can be denormalized at the end of the import.
+    """
     save_for_stats = {'organizations': set(), 'positions': set()}
 
     # TODO: Save source data
@@ -53,6 +59,7 @@ def save(data):
         models.Employee.objects.get_or_create(
             position=membership, compensation_type=compensation_type,
             title=title, **compensation['tx_salaries.Employee'])
+
     return save_for_stats
 
 
