@@ -22,7 +22,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     NAME_FIELDS = ('first_name', 'last_name', )
     ORGANIZATION_NAME = 'Alamo College'
 
-    POSSIBLE_COMPENSATION_KEYS = ('FT  or PT Semester Salary', 'Hourly Rate', )
+    POSSIBLE_COMPENSATION_KEYS = ('FT or PT Semester Salary', 'Hourly Rate', )
 
     @property
     def is_valid(self):

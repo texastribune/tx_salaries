@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 from django.utils.text import slugify
 from jsonfield import JSONField
@@ -23,11 +25,15 @@ def get_top_level_departments():
     """
     return (Organization.objects.select_related('stats')
             .filter(parent=None)
-            .exclude(children__members__employee=None))
+            .exclude(children__members__employee=None).exclude(stats=None))
 
 
 class CompensationType(models.Model):
-    name = models.CharField(max_length=250)
+    name_choices = (
+        ('FT', 'Full Time'),
+        ('PT', 'Part Time')
+    )
+    name = models.CharField(max_length=250, choices=name_choices)
     description = models.TextField()
     # TODO
     # calculator = models.CharField(choices=constants.AVAILABLE_CALCULATORS)
@@ -87,9 +93,10 @@ class Employee(mixins.TimeTrackingMixin, mixins.ReducedDateStartAndEndMixin,
     hire_date = fields.ReducedDateField()
     tenure = models.DecimalField(null=True, blank=True, decimal_places=4,
                                  max_digits=12)
-    slug = models.SlugField(null=True, blank=True, default=None)
+    slug = models.SlugField(max_length=255, null=True, blank=True, default=None)
     compensation = models.DecimalField(decimal_places=4, max_digits=12)
     compensation_type = models.ForeignKey(CompensationType)
+    updated = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
         return u'{title}, {person}'.format(title=self.position.post,
@@ -98,6 +105,10 @@ class Employee(mixins.TimeTrackingMixin, mixins.ReducedDateStartAndEndMixin,
     def save(self, *args, **kwargs):
         self.slug = slugify(unicode(self.position.person.name))
         super(Employee, self).save(*args, **kwargs)
+
+    @property
+    def hire_date_as_date(self):
+        return datetime.strptime(self.hire_date, '%Y-%m-%d')
 
 
 def create_stats_mixin(prefix):
@@ -110,6 +121,7 @@ def create_stats_mixin(prefix):
         }
 
     class StatisticsMixin(models.Model):
+        distribution = JSONField(null=True)
         highest_paid = models.DecimalField(**generate_kwargs('highest'))
         median_paid = models.DecimalField(**generate_kwargs('median'))
         lowest_paid = models.DecimalField(**generate_kwargs('lowest'))
@@ -119,7 +131,8 @@ def create_stats_mixin(prefix):
         male = JSONField()
         time_employed = JSONField()
         date_provided = models.DateField(null=True, blank=True)
-        slug = models.SlugField(null=True, blank=True, default=None)
+        slug = models.SlugField(max_length=255, null=True, blank=True,
+                                default=None)
 
         class Meta:
             abstract = True
