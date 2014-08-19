@@ -48,7 +48,6 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     def hire_date(self):
         return self.get_mapped_value('hire_date').split('T')[0]
 
-    @property
     def get_raw_name(self):
         middle_name_field = self.middle_name.strip()
 
