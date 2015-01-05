@@ -52,7 +52,6 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     @property
     def person(self):
         name = self.get_name()
-        print self.gender_map[self.gender.strip()]
         r = {
             'family_name': name.last,
             'given_name': name.first,
