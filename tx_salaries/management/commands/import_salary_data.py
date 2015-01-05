@@ -6,6 +6,8 @@ from os.path import basename
 
 from ...utils import to_db, transformer
 
+import requests
+
 
 def out(s):
     sys.stdout.write(s)
@@ -26,6 +28,15 @@ class Command(BaseCommand):
                     help='1=Every record; 2=100 records; 3=500 records'),
     )
 
+    def download_file(self, url, filename):
+        req = requests.get(url, stream=True)
+
+        with open(filename, 'wb') as fo:
+            for chunk in req.iter_content(1024):
+                if chunk:
+                    fo.write(chunk)
+                    fo.flush()
+
     def fetch_file(self, **kwargs):
         import importlib
         from os import system
@@ -39,7 +50,7 @@ class Command(BaseCommand):
         filename = basename(url)
 
         # Download file
-        system('curl %s -o %s' % (url, filename))
+        self.download_file(url, filename)
 
         self.import_file(filename, **kwargs)
         # Remove downloaded file

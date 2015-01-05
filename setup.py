@@ -27,7 +27,7 @@ for dirpath, dirnames, filenames in os.walk('tx_salaries'):
 
 setup(
     name='tx_salaries',
-    version='0.5.0',
+    version='0.6.0',
     description='Texas Tribune: tx_salaries',
     author='Tribune Tech',
     author_email='tech@texastribune.org',
@@ -38,6 +38,7 @@ setup(
         'csvkit==0.8',
         'django-jsonfield>=0.9',
         'name_cleaver==0.6.0',
+        'requests==2.5.1',
         'tx_people>=0.3.0',
     ],
     classifiers=[

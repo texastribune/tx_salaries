@@ -9,3 +9,4 @@ detox>=0.9.3
 tx-people>=1.2.0
 South>=0.8.3
 factory-boy>=2.3.1
+requests==2.5.1
