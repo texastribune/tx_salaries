@@ -5,6 +5,7 @@ from optparse import make_option
 from os.path import basename
 
 from ...utils import to_db, transformer
+from ... import models
 
 import requests
 
@@ -67,8 +68,33 @@ class Command(BaseCommand):
         records = transformer.transform(filename, kwargs['sheet'],
                                         kwargs['label_row'])
         verbosity = int(kwargs['verbosity'])
-        print "Processing %d records from %s" % (len(records),
-                                                 basename(filename))
+
+        try:
+            existing_org = models.Organization.objects.get(
+                name=records[0]['tx_people.Organization']['name'])
+        except models.Organization.DoesNotExist:
+            existing_org = None
+
+        if existing_org:
+            name = existing_org.name
+
+            reply = raw_input('"{}" is already in the database. '
+                              'In order to update, everything currently in '
+                              'the database concerning this organization must '
+                              'be deleted. Do you want to continue? '
+                              '(Y/n): '.format(name)).lower().strip()
+
+            if reply[0] == 'n':
+                self.stdout.write('Stopping. Did not touch "{}".'.format(name))
+                return
+
+            if reply[0] == 'y':
+                self.stdout.write('Deleting "{}"...'.format(name))
+                existing_org.delete()
+                self.stdout.write('Done! Moving on.')
+
+        self.stdout.write('Processing {} records from {}'.format(
+            len(records), basename(filename)))
 
         to_denormalize = {'organizations': set(), 'positions': set(),
                           'date_provided': records[0]['date_provided']}
