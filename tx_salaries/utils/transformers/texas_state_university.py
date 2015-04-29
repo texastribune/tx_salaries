@@ -2,6 +2,7 @@ from . import base
 from . import mixins
 
 from datetime import date
+from .. import cleaver
 
 
 class TransformedRecord(
@@ -12,28 +13,28 @@ class TransformedRecord(
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        'last_name': '',
-        'first_name': '',
+        # 'last_name': '',
+        # 'first_name': '',
         # 'middle_name': '', if needed
-        # 'full_name': '', if needed
+        'full_name': 'Name',
         # 'suffix': '', if needed
-        'department': '',
-        'job_title': '',
-        'hire_date': '',
-        'compensation': '',
-        'gender': '',
-        'race': '',
+        'department': 'Organizational Unit',
+        'job_title': 'Job Title',
+        'hire_date': 'Hire Date',
+        'compensation': 'ANNUAL 9 Month Calculation',
+        'gender': 'Gender',
+        'race': 'Ethnicity',
     }
 
     # The order of the name fields to build a full name.
     # If `full_name` is in MAP, you don't need this at all.
-    NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
+    # NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
 
     # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
-    ORGANIZATION_NAME = ''
+    ORGANIZATION_NAME = 'Texas State University'
 
     # What type of organization is this? This MUST match what we use on the site, double check against salaries.texastribune.org
-    ORGANIZATION_CLASSIFICATION = ''
+    ORGANIZATION_CLASSIFICATION = 'University'
 
     # ???
     compensation_type = 'FT'
@@ -42,12 +43,10 @@ class TransformedRecord(
     description = 'Annual salary'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2015, 2, 12)
+    DATE_PROVIDED = date(2015, 4, 8)
 
     # The URL to find the raw data in our S3 bucket.
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'midwestern_state_university/salaries/2015-02/'
-           'midwestern_state_university.xlsx')
+    URL = ('http://raw.texastribune.org.s3.amazonaws.com/texas_state_university/Texas_State_University04082015.xlsx')
 
     # How do they track gender? We need to map what they use to `F` and `M`.
     gender_map = {'Female': 'F', 'Male': 'M'}
@@ -56,11 +55,18 @@ class TransformedRecord(
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.last_name.strip() != ''
+        return self.full_name.strip() != ''
+
+    @property
+    def compensation(self):
+        if not self.get_mapped_value('compensation'):
+            return 0
+        return self.get_mapped_value('compensation')
 
     @property
     def person(self):
         name = self.get_name()
+        print name
         r = {
             'family_name': name.last,
             'given_name': name.first,
@@ -70,5 +76,23 @@ class TransformedRecord(
         }
 
         return r
+
+    # def get_raw_name(self):
+    #     split_name = self.full_name.split(' ')
+    #     last_name = split_name[0]
+    #     split_firstname = split_name[1].split(' ')
+    #     first_name = split_firstname[0]
+    #     if len(split_firstname) == 2 and len(split_firstname[1]) == 1:
+    #         middle_name = split_firstname[1]
+    #     else:
+    #         first_name = split_name[1]
+    #         middle_name = ''
+
+    #     return u' '.join([first_name, middle_name, last_name])
+
+    def get_name(self):
+        return cleaver.EmployeeNameCleaver(self.get_mapped_value('full_name')).parse()
+
+
 
 transform = base.transform_factory(TransformedRecord)
