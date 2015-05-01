@@ -92,7 +92,8 @@ class TransformedRecord(
             'given_name': name.first,
             'additional_name': name.middle,
             'name': unicode(name),
-            'gender': self.gender.strip()
+            'gender': self.gender.strip(),
+            'race': self.race_map[self.race.strip()]
         }
 
         return r
