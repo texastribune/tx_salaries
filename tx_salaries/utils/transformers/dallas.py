@@ -12,11 +12,7 @@ class TransformedRecord(
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        #'last_name': 'Last',
-        #'first_name': 'First',
-        #'middle_name': 'MI',
         'full_name': 'Name - Full',
-        # 'suffix': '', if needed
         'department': 'Process Level (Departmet)',
         'job_title': 'Job Code Description',
         'hire_date': 'Adjusted Hire Date',
@@ -25,10 +21,6 @@ class TransformedRecord(
         'gender': 'Gender',
         'race': 'Ethnicity',
     }
-
-    # The order of the name fields to build a full name.
-    # If `full_name` is in MAP, you don't need this at all.
-    #NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
 
     # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
     ORGANIZATION_NAME = 'Dallas'
@@ -44,15 +36,28 @@ class TransformedRecord(
            'dallas/salaries/2015-04/'
            'cityofdallas0415.xls')
 
-    # How do they track gender? We need to map what they use to `F` and `M`.
-    #gender_map = {'Female': 'F', 'Male': 'M'}
-
-    race_map = {'AMIN': 'American Indian', 'ASIN': 'Asian Indian', 'BLK': 'Black', 'CHIN': 'Chinese', 'CUBA': 'Cuban', 'FILI': 'Filipino', 'GUAM': 'Guamanian', 'HAWA': 'Native Hawaiian', 'JAPN': 'Japanese', 'KORN': 'Korean', 'MEXA': 'Mexican, Mexican Amer, Chicano', 'OASI': 'Other Asian', 'OTHR': 'Some Other Race', 'PACF': 'Other Pacific Islander', 'PUER': 'Puerto Rican', 'SAMO': 'Samoan', 'SPAN': 'Other Spanish/Hispanic/Latino', 'TWO': 'Two or More Races', 'VIET': 'Vietnamese', 'WHT': 'White'}
-
-    @property
-    def race(self):
-        ## i don't know what to do here!
-
+    race_map = {
+        'AMIN': 'American Indian',
+        'ASIN': 'Asian Indian',
+        'BLK': 'Black',
+        'CHIN': 'Chinese',
+        'CUBA': 'Cuban',
+        'FILI': 'Filipino',
+        'GUAM': 'Guamanian',
+        'HAWA': 'Native Hawaiian',
+        'JAPN': 'Japanese',
+        'KORN': 'Korean',
+        'MEXA': 'Mexican, Mexican Amer, Chicano',
+        'OASI': 'Other Asian',
+        'OTHR': 'Some Other Race',
+        'PACF': 'Other Pacific Islander',
+        'PUER': 'Puerto Rican',
+        'SAMO': 'Samoan',
+        'SPAN': 'Other Spanish/Hispanic/Latino',
+        'TWO': 'Two or More Races',
+        'VIET': 'Vietnamese',
+        'WHT': 'White',
+    }
 
     @property
     def compensation_type(self):
@@ -85,6 +90,12 @@ class TransformedRecord(
         return self.full_name.strip() != ''
 
     @property
+    def race(self):
+        return {
+            'name': self.race_map[self.get_mapped_value('race').strip()]
+        }
+
+    @property
     def person(self):
         name = self.get_name()
         r = {
@@ -92,8 +103,7 @@ class TransformedRecord(
             'given_name': name.first,
             'additional_name': name.middle,
             'name': unicode(name),
-            'gender': self.gender.strip(),
-            'race': self.race_map[self.race.strip()]
+            'gender': self.gender.strip()
         }
 
         return r
