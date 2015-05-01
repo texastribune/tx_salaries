@@ -2,7 +2,7 @@ from . import base
 from . import mixins
 
 from datetime import date
-
+from decimal import Decimal
 
 class TransformedRecord(
         mixins.GenericCompensationMixin,
@@ -19,7 +19,7 @@ class TransformedRecord(
         'compensation': 'Rate of Pay',
         'hours': 'Annual Hours',
         'gender': 'Gender',
-        'race': 'Ethnicity',
+        'nationality': 'Ethnicity',
     }
 
     # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
@@ -61,26 +61,27 @@ class TransformedRecord(
 
     @property
     def compensation_type(self):
-        if self.get_mapped_value('hours') < 2000:
+        if int(self.hours) < 2000:
             return 'PT'
         return 'FT'
 
     @property
     def description(self):
-        hours = self.get_mapped_value('hours')
+        hours = self.hours
 
         if not hours:
             return "Full-time salary"
 
-        if hours < 2000:
+        if int(hours) < 2000:
             return "Part-time salary"
 
         return "Full-time salary"
 
     @property
     def compensation(self):
-        if self.get_mapped_value('compensation') < 1000:
-            return self.get_mapped_value('compensation') * self.get_mapped_value('hours')
+        comp = Decimal(self.get_mapped_value('compensation'))
+        if comp < 1000:
+            return comp * int(self.hours)
         return self.get_mapped_value('compensation')
 
     # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
@@ -92,7 +93,7 @@ class TransformedRecord(
     @property
     def race(self):
         return {
-            'name': self.race_map[self.get_mapped_value('race').strip()]
+            'name': self.race_map[self.nationality.strip()]
         }
 
     @property
