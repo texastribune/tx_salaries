@@ -42,7 +42,7 @@ class TransformedRecord(
     description = 'Annual salary'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2015, 4, 12)
+    DATE_PROVIDED = date(2015, 4, 17)
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
