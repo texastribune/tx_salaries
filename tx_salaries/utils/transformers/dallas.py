@@ -61,8 +61,14 @@ class TransformedRecord(
 
     @property
     def compensation_type(self):
-        if int(self.hours) < 2000:
+        hours = self.hours
+
+        if not hours:
+            return 'FT'
+
+        if int(hours) < 2000:
             return 'PT'
+
         return 'FT'
 
     @property
@@ -80,6 +86,7 @@ class TransformedRecord(
     @property
     def compensation(self):
         comp = Decimal(self.get_mapped_value('compensation'))
+
         if comp < 1000:
             return comp * int(self.hours)
         return self.get_mapped_value('compensation')
