@@ -4,6 +4,7 @@ from . import mixins
 from datetime import date
 from .. import cleaver
 
+# --row=4
 
 class TransformedRecord(
         mixins.GenericCompensationMixin,
