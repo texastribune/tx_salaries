@@ -21,9 +21,10 @@ class TransformedRecord(
         'department': 'Organizational Unit',
         'job_title': 'Job Title',
         'hire_date': 'Hire Date',
-        'compensation': 'ANNUAL 9 Month Calculation',
+        'compensation': 'ANNUAL Calculation',
         'gender': 'Gender',
         'race': 'Ethnicity',
+        'compensation_category': 'Compensation Key',
     }
 
     # The order of the name fields to build a full name.
@@ -46,7 +47,7 @@ class TransformedRecord(
     DATE_PROVIDED = date(2015, 4, 8)
 
     # The URL to find the raw data in our S3 bucket.
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/texas_state_university/Texas_State_University04082015.xlsx')
+    URL = ('http://raw.texastribune.org.s3.amazonaws.com/texas_state_university/2015-04/Texas_State_University04082015.xlsx')
 
     # How do they track gender? We need to map what they use to `F` and `M`.
     gender_map = {'Female': 'F', 'Male': 'M'}
@@ -66,7 +67,7 @@ class TransformedRecord(
     @property
     def person(self):
         name = self.get_name()
-        print name
+
         r = {
             'family_name': name.last,
             'given_name': name.first,
