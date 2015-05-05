@@ -23,9 +23,9 @@ class TransformedRecord(
         'job_title': 'Job Title',
         'hire_date': 'Hire Date',
         'compensation': 'ANNUAL Calculation',
+        'compensation_key': 'Compensation Key',
         'gender': 'Gender',
         'race': 'Ethnicity',
-        'compensation_category': 'Compensation Key',
     }
 
     # The order of the name fields to build a full name.
@@ -40,9 +40,6 @@ class TransformedRecord(
 
     # ???
     compensation_type = 'FT'
-
-    # How would you describe the compensation field? We try to respect how they use their system.
-    description = 'Annual salary'
 
     # When did you receive the data? NOT when we added it to the site.
     DATE_PROVIDED = date(2015, 4, 8)
@@ -64,6 +61,16 @@ class TransformedRecord(
         if not self.get_mapped_value('compensation'):
             return 0
         return self.get_mapped_value('compensation')
+
+    @property
+    def description(self):
+        key = self.get_mapped_value('compensation_key')
+
+        if key == 'ANNUAL 9 Month Calculation':
+            return 'Annual 9 month calculation'
+
+        if key == 'ANNUAL 12 Month Calculation':
+            return 'Annual 12 month calculation'
 
     @property
     def person(self):
