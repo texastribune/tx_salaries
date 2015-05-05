@@ -71,7 +71,8 @@ class Command(BaseCommand):
 
         try:
             existing_org = models.Organization.objects.get(
-                name=records[0]['tx_people.Organization']['name'])
+                name=records[0]['tx_people.Organization']['name'],
+                parent=None)
         except models.Organization.DoesNotExist:
             existing_org = None
 
