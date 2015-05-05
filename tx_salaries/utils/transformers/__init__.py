@@ -11,6 +11,7 @@ from . import el_paso_county
 from . import houston
 from . import houston_community_college
 from . import katy_isd
+from . import metropolitan_transit_authority
 from . import midwestern_state_university
 from . import north_east_isd
 from . import pasadena_isd
@@ -50,6 +51,7 @@ TRANSFORMERS = {
     'a4f1152500a1c25df0705463266f75a9b15f6b5a': [houston_community_college.transform, ],
     '0809eca5428e583732e7939f7252398f5c4e6947': [katy_isd.transform, ],
     'd982fa55bf19391e9f756cf03614cdd3969c4311': [north_east_isd.transform, ],
+    'd84e2b3a0005d7d80672ccc80f5793cd07981439': [metropolitan_transit_authority.transform, ],
     '7af76c3e173736d45290ba2d657230a111dfd572': [midwestern_state_university.transform, ],
     '2252263014de05fa4efd240e0a3716c484495a93': [pasadena_isd.transform, ],
     '0e027f3d0038d81f570cbda2aeedf3dd1f720881': [potter_county.transform, ],
