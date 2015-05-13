@@ -22,7 +22,7 @@ class TransformedRecord(
         'hire_date': 'HIREDATE',
         'compensation': 'SALARY',
         'gender': 'SEX',
-        'race': 'ETH',
+        'nationality': 'ETH',
     }
 
     # The order of the name fields to build a full name.
@@ -49,6 +49,17 @@ class TransformedRecord(
            'austin_isd/salaries/2015-04/'
            'austin-isd.xls')
 
+    race_map = {
+        'W': 'White',
+        'B': 'Black',
+        'H': 'Hispanic',
+        'A': 'Asian',
+        'I': 'Indian',
+        'P': 'Pacific Islander',
+        'S': 'Samoan',
+        'M': 'Mixed Race',
+    }
+
     # How do they track gender? We need to map what they use to `F` and `M`.
     # gender_map = {'Female': 'F', 'Male': 'M'}
 
@@ -57,6 +68,12 @@ class TransformedRecord(
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.last_name.strip() != ''
+
+    @property
+    def race(self):
+        return {
+            'name': self.race_map[self.nationality.strip()]
+        }
 
     @property
     def person(self):
