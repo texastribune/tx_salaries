@@ -19,6 +19,7 @@ from . import texas_am_system
 from . import texas_state_university
 from . import texas_tech_system
 from . import texas_tech_university
+from . import university_of_houston
 from . import ut_austin
 from . import ut_arlington
 from . import ut_brownsville
@@ -61,6 +62,7 @@ TRANSFORMERS = {
         ('UT Permian Basin', ut_permian_basin.transform),
         ('UT Austin', ut_austin.transform),
         ('UT Arlington', ut_arlington.transform), ],
+    '85086ad3fc534ea5ec5a1c2ad1091de91608833a': [university_of_houston.transform, ],
     'a1cb75442f33c2f0152296838771087192643869': [ut_brownsville.transform, ],
     '719b1e2e9f6272be76b1fb56bb0f76d779fa1e09': [ut_dallas.transform, ],
     'e0c497dd91f02de6277c121c82667e7db125ba5c': [ut_el_paso.transform, ],
