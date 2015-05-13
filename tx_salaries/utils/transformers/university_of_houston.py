@@ -39,20 +39,18 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.last_name.strip() != ''
+        return self.full_name.strip() != ''
 
     @property
     def hire_date(self):
-        return self.get_mapped_value('hire_date').split('T')[0]
+        return self.get_mapped_value('hire_date').split('/')
 
-    # def get_raw_name(self):
-    #     middle_name_field = self.middle_name.strip()
-
-    #     if middle_name_field == '' or middle_name_field == '(null)':
-    #         self.NAME_FIELDS = ('first_name', 'last_name', )
-
-    #     name_fields = [getattr(self, a).strip() for a in self.NAME_FIELDS]
-    #     return u' '.join(name_fields)
+    @property
+    def compensation(self):
+        print 'hello'
+        if not self.get_mapped_value('compensation'):
+            return 0
+        return self.get_mapped_value('compensation')
 
     def get_raw_name(self):
         split_name = self.full_name.split(',')
