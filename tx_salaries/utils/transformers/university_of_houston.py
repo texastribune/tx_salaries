@@ -2,6 +2,7 @@ from . import base
 from . import mixins
 
 from datetime import date
+from .. import cleaver
 
 class TransformedRecord(mixins.GenericCompensationMixin,
         mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
@@ -41,16 +42,58 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         # Adjust to return False on invalid fields.  For example:
         return self.full_name.strip() != ''
 
-    @property
-    def hire_date(self):
-        return self.get_mapped_value('hire_date').split('/')
+    # @property
+    # def hire_date(self):
+    #     return self.get_mapped_value('hire_date').split('/')
+
+    # @property
+    # def compensation(self):
+    #     print 'hello'
+    #     if not self.get_mapped_value('compensation'):
+    #         return 0
+    #     return self.get_mapped_value('compensation')
+
+    def process_hire_date(self, hire_date):
+        # TODO five people don't have hire dates given
+        year = hire_date[0:4]
+        month = hire_date[4:6]
+        day = hire_date[6:8]
+        return "-".join([year, month, day])
+
+    def calculate_tenure(self, hire_date):
+        try:
+            hire_date_data = map(int, hire_date.split('-'))
+        except:
+            return None
+        hire_date = date(hire_date_data[0], hire_date_data[1],
+                         hire_date_data[2])
+        tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
+        if tenure < 0:
+            error_msg = ("An employee was hired after the data was provided.\n"
+                         "Is DATE_PROVIDED correct?")
+            raise ValueError(error_msg)
+        return tenure
 
     @property
-    def compensation(self):
-        print 'hello'
-        if not self.get_mapped_value('compensation'):
-            return 0
-        return self.get_mapped_value('compensation')
+    def compensations(self):
+        hire_date = self.process_hire_date(self.hire_date)
+        return [
+            {
+                'tx_salaries.CompensationType': {
+                    'name': self.compensation_type,
+                    'description': self.description
+                },
+                'tx_salaries.Employee': {
+                    'hire_date': hire_date,
+                    'compensation': self.compensation,
+                    'tenure': self.calculate_tenure(hire_date),
+                },
+                'tx_salaries.EmployeeTitle': {
+                    'name': unicode(cleaver.DepartmentNameCleaver(self.job_title)
+                                           .parse())
+                },
+            }
+        ]
 
     def get_raw_name(self):
         split_name = self.full_name.split(',')
