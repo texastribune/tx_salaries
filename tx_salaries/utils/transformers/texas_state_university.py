@@ -50,7 +50,7 @@ class TransformedRecord(
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'texas_state_university/2015-04/'
+           'texas_state_university/salaries/2015-04/'
            'Texas_State_University04082015.xlsx')
 
     # How do they track gender? We need to map what they use to `F` and `M`.
@@ -74,10 +74,10 @@ class TransformedRecord(
         key = self.get_mapped_value('compensation_key')
 
         if key == 'ANNUAL 9 Month Calculation':
-            return 'Annual 9 month calculation'
+            return 'Annualized 9-month salary'
 
         if key == 'ANNUAL 12 Month Calculation':
-            return 'Annual 12 month calculation'
+            return 'Annualized 12 month salary'
 
     @property
     def person(self):
