@@ -4,7 +4,9 @@ from . import mixins
 from datetime import date
 from .. import cleaver
 
-class TransformedRecord(mixins.GenericCompensationMixin,
+
+class TransformedRecord(
+        mixins.GenericCompensationMixin,
         mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
         mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
@@ -20,10 +22,13 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'race': 'Ethnic Grp',
     }
 
-    # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
+    # The name of the organization this WILL SHOW UP ON THE SITE,
+    # so double check it!
     ORGANIZATION_NAME = 'University of Houston'
 
-    # What type of organization is this? This MUST match what we use on the site, double check against salaries.texastribune.org
+    # What type of organization is this?
+    # This MUST match what we use on the site,
+    # double check against salaries.texastribune.org
     ORGANIZATION_CLASSIFICATION = 'University'
 
     compensation_type = 'FT'
@@ -35,23 +40,13 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     DATE_PROVIDED = date(2015, 4, 30)
     # Y/M/D agency provided the data
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/university_houston/salaries/2015-05/Texas%20Tribune.csv'
+    URL = ('http://raw.texastribune.org.s3.amazonaws.com/university_houston/'
+           'salaries/2015-05/Texas%20Tribune.csv')
 
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.full_name.strip() != ''
-
-    # @property
-    # def hire_date(self):
-    #     return self.get_mapped_value('hire_date').split('/')
-
-    # @property
-    # def compensation(self):
-    #     print 'hello'
-    #     if not self.get_mapped_value('compensation'):
-    #         return 0
-    #     return self.get_mapped_value('compensation')
 
     def process_hire_date(self, hire_date):
         # TODO five people don't have hire dates given
@@ -89,8 +84,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
                     'tenure': self.calculate_tenure(hire_date),
                 },
                 'tx_salaries.EmployeeTitle': {
-                    'name': unicode(cleaver.DepartmentNameCleaver(self.job_title)
-                                           .parse())
+                    'name': unicode(
+                        cleaver.DepartmentNameCleaver(self.job_title).parse())
                 },
             }
         ]
