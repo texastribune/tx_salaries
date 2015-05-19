@@ -54,9 +54,9 @@ class TransformedRecord(
         'B': 'Black',
         'H': 'Hispanic',
         'A': 'Asian',
-        'I': 'Indian',
+        'I': 'Did not respond',
         'P': 'Pacific Islander',
-        'S': 'Samoan',
+        'S': 'Asian',
         'M': 'Mixed Race',
     }
 
