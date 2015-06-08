@@ -56,9 +56,9 @@ Entries in the ``TRANSFORMERS`` dictionary are made up of a unique hash that
 serves as the key to a given spreadsheet and a callable function that can
 transform it.
 
-To generate a key, run the following command on your spreadsheet::
+To generate a key, run the following command in the [salaries.texastribune.org](https://github.com/texastribune/salaries.texastribune.org) virtualenv:
 
-    python manage generate_transformer_hash path/to/rio_grande_county.xls --sheet=data_sheet --row=number_of_header_row
+    python salaries/manage.py generate_transformer_hash path/to/rio_grande_county.xls --sheet=data_sheet --row=number_of_header_row
 
 The output should be a 40-character string.  Copy that value and open the
 ``tx_salaries/utils/transformers/__init__.py`` file which contains all of the
