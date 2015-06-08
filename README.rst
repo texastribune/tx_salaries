@@ -42,6 +42,21 @@ Data is imported using `csvkit`_, so it can import from any spreadsheet format
 that csvkit's `in2csv`_ understands.
 
 
+Start the salaries.texastribune.org server
+""""""""""""""""""""""""""""""""""""""""""
+
+In the terminal, go to [salaries.texastribune.org](https://github.com/texastribune/salaries.texastribune.org) repo. While the transformers live in tx_salaries, all of the data management happens in the salaries.texastribune repo, and that's where you'll run all of the commands in these instructions:
+
+1. `workon salaries-dev`
+2. `boot2docker down`
+3. `boot2docker up`
+4. `source .env`
+5. `make docker/db` or `make docker/refresh-db`
+6. `python salaries/manage.py runserver`
+
+Check localhost:8000, should be up and running.
+
+
 Writing a New Transformer
 """""""""""""""""""""""""
 This section walks you through creating a new importer.  We're going to use
@@ -157,7 +172,7 @@ that you just created.  Now you're ready to run the importer.
 
 Back on the command line, run this::
 
-    python manage import_salary_data /path/to/rio_grande_county.xls
+    python salaries/manage.py import_salary_data /path/to/rio_grande_county.xls
 
 Pay attention to any error messages you receive. Most transformer errors are due
 to missing data -- either the user didn't map to all the necessary fields,
