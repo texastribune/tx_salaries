@@ -56,7 +56,7 @@ TRANSFORMERS = {
     '7af76c3e173736d45290ba2d657230a111dfd572': [midwestern_state_university.transform, ],
     '2252263014de05fa4efd240e0a3716c484495a93': [pasadena_isd.transform, ],
     '0e027f3d0038d81f570cbda2aeedf3dd1f720881': [potter_county.transform, ],
-    '570473ae3491d7508853b1244b48a19f2ba32ecf': [san_antonio.transform, ],
+    'f53125485535c4619b16838160dc4bd41875389f': [san_antonio.transform, ],
     '690fc3890e8f893a7b1634de2df958846ad12a1b': [state_of_texas.transform, ],
     '96c50536164eeecade2194082544648d3bb4fd97': [tarrant_county.transform, ],
     'eb4e22c07597829d7b62f48e6f69dd2d29bf69e2': [texas_am_system.transform, ],

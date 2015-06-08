@@ -24,6 +24,7 @@ class TransformedRecord(
         'gender': 'GENDER4',
         'race': 'ETHNIC ORIGIN4',
         'last_day_paid': 'LAST DAY PAID',
+        'employee_type': 'EMPLOYEE TYPE',
     }
 
     # The order of the name fields to build a full name.
@@ -36,23 +37,40 @@ class TransformedRecord(
     # What type of organization is this? This MUST match what we use on the site, double check against salaries.texastribune.org
     ORGANIZATION_CLASSIFICATION = 'City'
 
-    # Where you will discover if they are full or part-time. Default should be FT
-    compensation_type = 'FT'
-    #I NEED TO GET MORE ON THIS
-
-    # How would you describe the compensation field? We try to respect how they use their system.
-    description = 'Annual salary'
-
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2015, 5, 1)
+    DATE_PROVIDED = date(2015, 5, 28)
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'san_antonio/salaries/2015-05/'
+           'san_antonio/salaries/2015-06/'
            'cityofsanantonio0515.xls')
 
     # How do they track gender? We need to map what they use to `F` and `M`.
     gender_map = {'FEMALE': 'F', 'MALE': 'M'}
+
+    @property
+    def compensation_type(self):
+        employee_type = self.employee_type
+
+        if employee_type == 'FULL TIME':
+            return 'FT'
+
+        if employee_type == 'PART TIME':
+            return 'PT'
+
+        return 'FT'
+
+    @property
+    def description(self):
+        employee_type = self.employee_type
+
+        if employee_type == 'FULL TIME':
+            return "Annual salary"
+
+        if employee_type == 'PART TIME':
+            return "Part-time annual salary"
+
+        return "Annual salary"
 
     @property
     def compensation(self):
@@ -63,8 +81,10 @@ class TransformedRecord(
     # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
     @property
     def is_valid(self):
-        # Adjust to return False on invalid fields.  For example:
-        return self.last_day_paid.strip() == ''
+        # Adjust to return False on invalid fields.
+        if (self.last_day_paid.strip() != '') or (self.employee_type.strip() == 'TEMP'):
+            return False
+        return True
 
     @property
     def person(self):
