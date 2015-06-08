@@ -1,5 +1,6 @@
 from . import alamo_colleges
 from . import allen_isd
+from . import austin_isd
 from . import austin
 from . import beaumont_isd
 from . import brownsville_isd
@@ -17,9 +18,11 @@ from . import north_east_isd
 from . import pasadena_isd
 from . import potter_county
 from . import san_antonio
+from . import rockwall_isd
 from . import state_of_texas
 from . import tarrant_county
 from . import texas_am_system
+from . import texas_state_university
 from . import texas_tech_system
 from . import texas_tech_university
 from . import ut_austin
@@ -40,6 +43,7 @@ from . import ut_tyler
 TRANSFORMERS = {
     'ddd655aafc883a905a0e2b3556c0e42b34f21d04': [alamo_colleges.transform, ],
     'f0d7f1733d2e76dc76f2aaea9ad7f6babf824975': [allen_isd.transform, ],
+    '2a51198f9949fc5d13a90f048b3a9eb7a8c1c0de': [austin_isd.transform, ],
     '3c71e58afb5d003074a2b7a196133ca28b4e0e3d': [austin.transform, ],
     'fc0eb7927ee4d39dab7602f01ab771eb49eb7512': [beaumont_isd.transform, ],
     '6e4bb90321c62a34296cad61c3800b1dd308257e': [brownsville_isd.transform, ],
@@ -57,9 +61,11 @@ TRANSFORMERS = {
     '2252263014de05fa4efd240e0a3716c484495a93': [pasadena_isd.transform, ],
     '0e027f3d0038d81f570cbda2aeedf3dd1f720881': [potter_county.transform, ],
     'f53125485535c4619b16838160dc4bd41875389f': [san_antonio.transform, ],
+    '5034d589091e79d58ee3c51766bd6ab05f08d3a5': [rockwall_isd.transform, ],
     '690fc3890e8f893a7b1634de2df958846ad12a1b': [state_of_texas.transform, ],
     '96c50536164eeecade2194082544648d3bb4fd97': [tarrant_county.transform, ],
     'eb4e22c07597829d7b62f48e6f69dd2d29bf69e2': [texas_am_system.transform, ],
+    '3382282e79ee58627aedd4703591928b09525af5': [texas_state_university.transform, ],
     'bc023bcf9e573ecdf8335ebafb24feec596e473f': [texas_tech_system.transform, ],
     'c60489252da989ab04f6a47a86265dc047dd367b': [texas_tech_university.transform, ],
     '177bf9500b4f73c649e30154c46e0c359d122a48': [
