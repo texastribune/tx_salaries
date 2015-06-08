@@ -32,6 +32,7 @@ from . import ut_el_paso
 from . import ut_health_houston
 from . import ut_health_tyler
 from . import ut_health_san_antonio
+from . import ut_md_anderson
 from . import ut_medical_branch
 from . import ut_pan_american
 from . import ut_permian_basin
@@ -77,6 +78,7 @@ TRANSFORMERS = {
     '92519b7c0eb91165eee92d7154f56c14aa3f2132': [ut_health_houston.transform, ],
     '16355b9afdb4766ce6578d8fbf6f70fd1bb9af47': [ut_health_tyler.transform, ],
     '8ee17cdd4cd042784d2f5a50df1996b0a9f5d731': [ut_health_san_antonio.transform, ],
+    'a70e63dd99026dd7ca0d9c5cd6a17fea15f261a7': [ut_md_anderson.transform, ],
     'a700c57e47d4c5ae5ec1d2354a0c0ce461c53869': [ut_medical_branch.transform, ],
     'bf2d8d6cad54567327b44050c507096885f925b7': [ut_pan_american.transform, ],
     '3eede716c96db3c302eaa2b9b3af6e176daf7727': [ut_san_antonio.transform, ],
