@@ -72,7 +72,7 @@ TRANSFORMERS = {
         ('UT Austin', ut_austin.transform),
         ('UT Arlington', ut_arlington.transform), ],
     'a1cb75442f33c2f0152296838771087192643869': [ut_brownsville.transform, ],
-    '719b1e2e9f6272be76b1fb56bb0f76d779fa1e09': [ut_dallas.transform, ],
+    '1124210f0bdca6e3713c422117cd721e38bff3cb': [ut_dallas.transform, ],
     'e0c497dd91f02de6277c121c82667e7db125ba5c': [ut_el_paso.transform, ],
     '92519b7c0eb91165eee92d7154f56c14aa3f2132': [ut_health_houston.transform, ],
     '16355b9afdb4766ce6578d8fbf6f70fd1bb9af47': [ut_health_tyler.transform, ],
