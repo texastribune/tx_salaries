@@ -36,7 +36,7 @@ Importing Data
 Data is imported using the ``import_salary_data`` management command.  You can run it once
 ``tx_salaries`` is properly installed like this::
 
-    python manage.py import_salary_data /path/to/some-salary-spreadsheet.xlsx
+    python salaries/manage.py import_salary_data /path/to/some-salary-spreadsheet.xlsx
 
 Data is imported using `csvkit`_, so it can import from any spreadsheet format
 that csvkit's `in2csv`_ understands.

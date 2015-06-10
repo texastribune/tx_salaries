@@ -18,10 +18,10 @@ class TransformedRecord(
         'hire_date': 'Hire Date',
         'compensation': 'Annual Salary',
         'gender': 'Gender',
-        'race': 'Race',
+        'ethnicity': 'Race',
     }
 
-    # The name of the organization â€“ this WILL SHOW UP ON THE SITE, so double check it!
+    # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
     ORGANIZATION_NAME = 'The University of Texas MD Anderson Cancer Center'
 
     # What type of organization is this? This MUST match what we use on the site, double check against salaries.texastribune.org
@@ -40,13 +40,29 @@ class TransformedRecord(
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/ut_md_anderson/salaries/2015_05/PIA%20-%20Texas%20Tribune%20-%202015.05.xlsx')
 
     # How do they track gender? We need to map what they use to `F` and `M`.
-    gender_map = {'Female': 'F', 'Male': 'M'}
+    gender_map = {'F': 'F', 'M': 'M'}
+
+    race_map = {
+        'AMIND': 'American Indian',
+        'WHITE': 'White',
+        'HISPA': 'Hispanic',
+        'ASIAN': 'Asian',
+        '2+RACE': 'Mixed Race',
+        'PACIF': 'Pacific Islander',
+        'BLACK': 'Black',
+    }
 
     # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.last_name.strip() != ''
+        return self.full_name.strip() != ''
+
+    @property
+    def race(self):
+        return {
+            'name': self.race_map[self.ethnicity.strip()]
+        }
 
     @property
     def person(self):

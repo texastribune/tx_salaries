@@ -3,10 +3,12 @@ Having problems?
 
 Here's a running list of common &amp; uncommon errors to help you build transformers.
 
+
 ERROR: AttributeError
 `AttributeError: is_valid is unknown. Are all of its attributes available?`
 
 WHAT IT MEANS: The `is_valid` function can't find the attributes based on the field it's checking. Check if you've set the correct field. For example, perhaps your map contains `full_name` and the `is_valid` function is checking for `last_name`.
+
 
 ERROR: KeyError
 ```
@@ -16,3 +18,11 @@ KeyError: u'F'
 ```
 
 WHAT IT MEANS: The `person` function isn't finding the right key to map `'gender'`. Check `gender_map`, and make sure you've provided the right key information.
+
+
+ERROR: SyntaxError: Non-ASCII character
+```
+SyntaxError: Non-ASCII character '\xc3' in file /.../transformer.py on line 24, but no encoding declared; see http://python.org/dev/peps/pep-0263/ for details
+```
+
+WHAT IT MEANS: You have a weird typo. Maybe something like `â€“` ? Delete that.
