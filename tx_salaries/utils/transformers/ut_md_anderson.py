@@ -18,7 +18,7 @@ class TransformedRecord(
         'hire_date': 'Hire Date',
         'compensation': 'Annual Salary',
         'gender': 'Gender',
-        'ethnicity': 'Race',
+        'nationality': 'Race',
     }
 
     # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
@@ -50,6 +50,7 @@ class TransformedRecord(
         '2+RACE': 'Mixed Race',
         'PACIF': 'Pacific Islander',
         'BLACK': 'Black',
+        '': 'Not given',
     }
 
     # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
@@ -61,7 +62,7 @@ class TransformedRecord(
     @property
     def race(self):
         return {
-            'name': self.race_map[self.ethnicity.strip()]
+            'name': self.race_map[self.nationality.strip()]
         }
 
     @property
