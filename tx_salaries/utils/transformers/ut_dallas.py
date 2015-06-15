@@ -16,7 +16,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'department': 'Dept Name',
         'job_title': 'Title',
         'hire_date': 'Hire Date',
-        'race': 'Ethnicity',
+        'nationality': 'Ethnicity',
         'gender': 'Gender',
         'compensation': 'Annual Rt',
     }
@@ -27,6 +27,22 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
           'ut_dallas/salaries/2015-05/ut_dallas.xls')
+
+    race_map = {
+        'AMIND': 'American Indian/Alaska Native',
+        'ASIAN': 'Asian or Pacific Islander',
+        'BLACK': 'Black, Non-Hispanic',
+        'CHN': 'Chinese',
+        'HISPA': 'Hispanic/Latino',
+        'HAWAIIAN': 'Native Hawaiian/Other Pacific Islander',
+        'KOR': 'Korean',
+        'OASN': 'Other Asian',
+        'NSPEC': 'Not Specified',
+        'WHITE': 'White',
+        'VIET': 'Vietnamese',
+        'PR': 'Puerto Rican',
+        'No response': 'No Response',
+    }
 
     compensation_type = 'FT'
 
@@ -44,6 +60,18 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     def compensation(self):
         raw = self.get_mapped_value('compensation')
         return raw.strip(' $').replace(',', '')
+
+    @property
+    def race(self):
+        raw = self.get_mapped_value('nationality')
+        races = raw.split(',')
+        if len(races) > 1:
+            return {
+                'name': 'Two or more races'
+            }
+        return {
+            'name': self.race_map[self.nationality.strip()]
+        }
 
     @property
     def person(self):
