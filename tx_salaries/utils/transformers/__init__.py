@@ -17,6 +17,7 @@ from . import midwestern_state_university
 from . import north_east_isd
 from . import pasadena_isd
 from . import potter_county
+from . import san_antonio
 from . import rockwall_isd
 from . import state_of_texas
 from . import tarrant_county
@@ -59,6 +60,7 @@ TRANSFORMERS = {
     '7af76c3e173736d45290ba2d657230a111dfd572': [midwestern_state_university.transform, ],
     '2252263014de05fa4efd240e0a3716c484495a93': [pasadena_isd.transform, ],
     '0e027f3d0038d81f570cbda2aeedf3dd1f720881': [potter_county.transform, ],
+    'f53125485535c4619b16838160dc4bd41875389f': [san_antonio.transform, ],
     '5034d589091e79d58ee3c51766bd6ab05f08d3a5': [rockwall_isd.transform, ],
     '690fc3890e8f893a7b1634de2df958846ad12a1b': [state_of_texas.transform, ],
     '96c50536164eeecade2194082544648d3bb4fd97': [tarrant_county.transform, ],
