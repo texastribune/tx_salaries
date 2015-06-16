@@ -48,7 +48,7 @@ class TransformedRecord(
         'WHITE': 'White',
         'HISPA': 'Hispanic',
         'ASIAN': 'Asian',
-        '2+RACE': 'Mixed Race',
+        '2+RACE': 'Mixed race',
         'PACIF': 'Pacific Islander',
         'BLACK': 'Black',
         '': 'Not given',
