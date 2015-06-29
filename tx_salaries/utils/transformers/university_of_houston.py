@@ -19,7 +19,7 @@ class TransformedRecord(
         'hire_date': 'Start Date',
         'compensation': 'Annual Rt',
         'gender': 'Sex',
-        'race': 'Ethnic Grp',
+        'nationality': 'Ethnic Grp',
     }
 
     # The name of the organization this WILL SHOW UP ON THE SITE,
@@ -35,6 +35,20 @@ class TransformedRecord(
 
     description = 'Annual salary'
 
+    race_map = {
+        'AMIND': 'American Indian/Alaska Native',
+        'WHITE': 'White',
+        'HISPA': 'Hispanic/Latino',
+        'ASIAN': 'Asian',
+        '2+RACE': 'Mixed race',
+        'PACIF': 'Native Hawaiian/Other Pacific Islander',
+        'BLACK': 'Black/African American',
+        'NSPEC': 'Not Specified',
+        # Needs verification from UH
+        'NHISP': 'White',
+        '': 'Not given',
+    }
+
     # How do they track gender? We need to map what they use to `F` and `M`.
     gender_map = {'F': 'F', 'M': 'M'}
 
@@ -48,6 +62,12 @@ class TransformedRecord(
         # Adjust to return False on invalid fields.  For example:
         return self.full_name.strip() != ''
 
+    @property
+    def race(self):
+        return {
+            'name': self.race_map[self.nationality.strip()]
+        }
+
     def process_hire_date(self, hire_date):
         # TODO five people don't have hire dates given
         year = hire_date[0:4]
@@ -57,7 +77,7 @@ class TransformedRecord(
 
     def calculate_tenure(self, hire_date):
         try:
-            hire_date_data = map(int, hire_date.split('-'))
+            hire_date_data = map(int, hire_date.split('/'))
         except:
             return None
         hire_date = date(hire_date_data[0], hire_date_data[1],
