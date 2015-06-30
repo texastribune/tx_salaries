@@ -72,8 +72,8 @@ TRANSFORMERS = {
     '177bf9500b4f73c649e30154c46e0c359d122a48': [
         ('UT System', ut_system.transform),
         ('UT Permian Basin', ut_permian_basin.transform),
-        ('UT Austin', ut_austin.transform),
         ('UT Arlington', ut_arlington.transform), ],
+    'c060338d45901eec05812e7b4093de4fa8081d4e': [ut_austin.transform, ],
     'a1cb75442f33c2f0152296838771087192643869': [ut_brownsville.transform, ],
     '1124210f0bdca6e3713c422117cd721e38bff3cb': [ut_dallas.transform, ],
     'e0c497dd91f02de6277c121c82667e7db125ba5c': [ut_el_paso.transform, ],
