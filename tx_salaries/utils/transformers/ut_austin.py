@@ -18,12 +18,13 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'first_name': 'NAME FIRST',
         'middle_name': 'NAME MIDDLE',
         'suffix_name': 'NAME SUFFIX',
-        'department': 'DEPARTMENT TITLE',
-        'job_title': 'JOB TITLE',
+        'department': 'DEPARTMENT',
+        'job_title': 'TITLE',
         'hire_date': 'CONTINUOUS EMPLOYMENT DATE',
+        'employee_type': 'EMPLOYMENT TYPE',
         'gender': 'GENDER',
-        'given_race': 'ETHNICITY',
-        'compensation': 'FY ALLOCATIONS',
+        'given_race': 'RACE',
+        'compensation': 'SALARY (FY ALLOCATION)',
     }
 
     gender_map = {'FEMALE': 'F', 'MALE': 'M'}
@@ -38,9 +39,9 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     compensation_type = 'FT'
     description = 'Annual compensation'
 
-    DATE_PROVIDED = date(2014, 2, 14)
+    DATE_PROVIDED = date(2015, 6, 29)
 
-    URL = 'http://s3.amazonaws.com/raw.texastribune.org/ut_austin/salaries/2014-02/TexasTribuneUTAustinSalaryData02-11-14.xlsx'
+    URL = 'http://s3.amazonaws.com/raw.texastribune.org/ut_austin/salaries/2015-06/ut_austin.xlsx'
 
     cleaver.DepartmentName.MAP = (cleaver.DepartmentName.MAP +
                                  ((cleaver.regex_i(r'vp '), 'Vice President '), ) +
