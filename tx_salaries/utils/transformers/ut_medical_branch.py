@@ -40,22 +40,18 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     @property
     def person(self):
+        name = self.get_name()
         data = {
-            'family_name': self.last_name,
-            'given_name': self.first_name,
-            'name': self.get_raw_name()
+            'family_name': name.last,
+            'given_name': name.first,
+            'name': unicode(name),
+            'gender': self.gender_map[self.gender.strip()]
         }
-        try:
-            data.update({
-                'gender': self.gender_map[self.gender.strip()]
-            })
-            return data
-        except KeyError:
-            return data
+
+        return data
 
     @property
     def compensation_type(self):
-
         if self.employee_type == 'Part-time':
             return 'PT'
         else:
@@ -63,7 +59,6 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     @property
     def description(self):
-
         if self.employee_type == 'Part-time':
             return "Part-time annual compensation"
         else:
@@ -79,24 +74,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             return float(salary) + float(longevity)
 
     @property
-    def compensations(self):
-        compensation = self.process_compensation()
-        return [
-            {
-                'tx_salaries.CompensationType': {
-                    'name': self.compensation_type,
-                    'description': self.description,
-                },
-                'tx_salaries.Employee': {
-                    'hire_date': self.hire_date,
-                    'compensation': compensation,
-                    'tenure': self.calculate_tenure(),
-                },
-                'tx_salaries.EmployeeTitle': {
-                    'name': self.job_title,
-                },
-            }
-        ]
-
+    def compensation(self):
+        return self.process_compensation()
 
 transform = base.transform_factory(TransformedRecord)
