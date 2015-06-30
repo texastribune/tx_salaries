@@ -23,7 +23,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     NAME_FIELDS = ('first_name', 'last_name', )
 
-    # gender_map = {'Female': 'F', 'Male': 'M'}
+    gender_map = {'Female': 'F', 'Male': 'M'}
 
     ORGANIZATION_NAME = 'The University of Texas Medical Branch at Galveston'
 
@@ -31,8 +31,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     DATE_PROVIDED = date(2015, 6, 24)
 
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_medical_branch/'
-        'salaries/2015-06/ut_medical_galveston.xlsx'
+    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_medical_branch/salaries/2015-06/ut_medical_galveston.xlsx'
 
     @property
     def is_valid(self):
@@ -44,17 +43,15 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         data = {
             'family_name': self.last_name,
             'given_name': self.first_name,
-            'name': self.get_raw_name(),
-            'gender': self.gender.strip()
+            'name': self.get_raw_name()
         }
-        return data
-        # try:
-        #     data.update({
-        #         'gender': self.gender_map[self.gender.strip()]
-        #     })
-        #     return data
-        # except KeyError:
-        #     return data
+        try:
+            data.update({
+                'gender': self.gender_map[self.gender.strip()]
+            })
+            return data
+        except KeyError:
+            return data
 
     @property
     def compensation_type(self):
