@@ -38,8 +38,7 @@ class TransformedRecord(
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'metropolitan_transit_authority/salaries/2015-04/'
-           'metropolitan_transit_authority.xls')
+           'ut_health_northeast/2015-06/ut_health_northeast.xls')
 
     race_map = {
         'AMIND': 'American Indian',
