@@ -81,7 +81,7 @@ TRANSFORMERS = {
     '16355b9afdb4766ce6578d8fbf6f70fd1bb9af47': [ut_health_tyler.transform, ],
     '8ee17cdd4cd042784d2f5a50df1996b0a9f5d731': [ut_health_san_antonio.transform, ],
     'a70e63dd99026dd7ca0d9c5cd6a17fea15f261a7': [ut_md_anderson.transform, ],
-    'a700c57e47d4c5ae5ec1d2354a0c0ce461c53869': [ut_medical_branch.transform, ],
+    '258ae8c47dc5b5bd842fb82569b1be7ba8c1bd7d': [ut_medical_branch.transform, ],
     'bf2d8d6cad54567327b44050c507096885f925b7': [ut_pan_american.transform, ],
     '3eede716c96db3c302eaa2b9b3af6e176daf7727': [ut_san_antonio.transform, ],
     '068d88f0ea10973339f5a4d57c8d806686d2df40': [ut_tyler.transform, ],

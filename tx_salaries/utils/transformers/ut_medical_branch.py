@@ -1,23 +1,26 @@
-from datetime import date
-
 from . import base
 from . import mixins
 
+from datetime import date
 
-class TransformedRecord(mixins.GenericCompensationMixin,
-        mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
+class TransformedRecord(
+        mixins.GenericCompensationMixin,
+        mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
+        mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
+
     MAP = {
-        'last_name': 'FAMILY_NAME',
-        'first_name': 'GIVEN_NAME',
+        'last_name': 'FAMILY NAME',
+        'first_name': 'GIVEN NAME',
         'department': 'DEPARTMENT',
         'job_title': 'JOBTITLE',
         'gender': 'GENDER',
         'race': 'RACE/ETHNICITY',
-        'hire_date': 'LAST_HIRE_DT',
-        'compensation': 'ANNUAL_PAY',
-        'longevity': 'ANNUALIZED_LONGEVITY',
+        'hire_date': 'LAST HIRE DATE',
+        'compensation': 'ANNUAL PAY',
+        'longevity': 'ANNUALIZED LONGEVITY',
+        'employee_type': 'FULL/PART TIME',
     }
 
     NAME_FIELDS = ('first_name', 'last_name', )
@@ -26,16 +29,37 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_NAME = 'The University of Texas Medical Branch at Galveston'
 
-    # TODO current app uses University Hospital
     ORGANIZATION_CLASSIFICATION = 'University Hospital'
 
-    # TODO not given on spreadsheet, but they appear to give part time
-    compensation_type = 'FT'
-    description = 'Annual compensation'
+    DATE_PROVIDED = date(2015, 6, 24)
 
-    DATE_PROVIDED = date(2014, 1, 27)
+    URL = ('http://raw.texastribune.org.s3.amazonaws.com/ut_medical_branch/'
+            'salaries/2015-06/ut_medical_galveston.xlsx')
 
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_medical_branch/salaries/2014-01/Texas%20Tribune%20Salary%20PIA.xlsx'
+    @property
+    def compensation_type(self):
+
+        if self.employee_type == 'Part-time':
+            return 'PT'
+        else:
+            return 'FT'
+
+    @property
+    def description(self):
+
+        if self.employee_type == 'Part-time':
+            return "Part-time annual compensation"
+        else:
+            return "Annual compensation"
+
+    @property
+    def compensation(self):
+        if self.get_mapped_value('longevity') == '0':
+            return self.get_mapped_value('compensation')
+        else:
+            longevity = self.get_mapped_value('longevity')
+            salary = self.get_mapped_value('compensation')
+            return float(salary) + float(longevity)
 
     @property
     def is_valid(self):
@@ -48,43 +72,10 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             'family_name': self.last_name,
             'given_name': self.first_name,
             'name': self.get_raw_name(),
+            'gender': self.gender_map[self.gender.strip()]
         }
-        try:
-            data.update({
-                'gender': self.gender_map[self.gender.strip()]
-            })
-            return data
-        except KeyError:
-            return data
 
-    def process_compensation(self):
-        #TODO longevity is in addition to base annual_pay, add if applicable
-        if self.longevity.strip() == '0':
-            return self.compensation
-        else:
-            longevity = self.longevity.strip().replace(',', '')
-            salary = self.compensation.strip().replace(',', '')
-            return float(salary) + float(longevity)
-
-    @property
-    def compensations(self):
-        compensation = self.process_compensation()
-        return [
-            {
-                'tx_salaries.CompensationType': {
-                    'name': self.compensation_type,
-                    'description': self.description,
-                },
-                'tx_salaries.Employee': {
-                    'hire_date': self.hire_date,
-                    'compensation': compensation,
-                    'tenure': self.calculate_tenure(),
-                },
-                'tx_salaries.EmployeeTitle': {
-                    'name': self.job_title,
-                },
-            }
-        ]
+        return data
 
 
 transform = base.transform_factory(TransformedRecord)
