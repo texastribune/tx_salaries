@@ -53,7 +53,7 @@ class TransformedRecord(
         'Native Hawiian or Other Pacific (Not Hispanic/Latino)': 'Native Hawiian or Other Pacific (Not Hispanic/Latino)',
         'Black or African American (Not Hispanic or Latino)': 'Black or African American (Not Hispanic or Latino)',
         'HAWAIIAN': 'Native Hawaiian/Other Pacific Islander',
-        'UKN': 'Unknown',
+        'UKN': 'Not Known',
         'Hispanic or Latino': 'Hispanic or Latino',
         'Not Known': 'Not Known',
     }
