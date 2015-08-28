@@ -78,7 +78,7 @@ TRANSFORMERS = {
     'a1cb75442f33c2f0152296838771087192643869': [ut_brownsville.transform, ],
     '1124210f0bdca6e3713c422117cd721e38bff3cb': [ut_dallas.transform, ],
     'e0c497dd91f02de6277c121c82667e7db125ba5c': [ut_el_paso.transform, ],
-    '92519b7c0eb91165eee92d7154f56c14aa3f2132': [ut_health_houston.transform, ],
+    '05673091618034bf2f3c1aa338669cc5a57894c2': [ut_health_houston.transform, ],
     '6f13d4a1fd50874ee952b4f07058d027c9ef2a44': [ut_health_northeast.transform, ],
     '16355b9afdb4766ce6578d8fbf6f70fd1bb9af47': [ut_health_tyler.transform, ],
     '8ee17cdd4cd042784d2f5a50df1996b0a9f5d731': [ut_health_san_antonio.transform, ],
