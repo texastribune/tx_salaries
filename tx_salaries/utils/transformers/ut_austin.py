@@ -94,13 +94,10 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             'given_name': name.first,
             'name': unicode(name),
         }
-        try:
-            r.update({
-                'gender': self.gender_map[self.gender.strip()]
-            })
-            return r
-        except KeyError:
-            return r
+        if self.is_mapped_value('gender'):
+            r['gender'] = self.gender_map[self.gender.strip()]
+
+        return r
 
     def calculate_tenure(self, hire_date):
         try:
