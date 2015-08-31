@@ -3,8 +3,6 @@ from datetime import date
 from . import base
 from . import mixins
 
-from .. import cleaver
-
 class TransformedRecord(mixins.GenericCompensationMixin,
         mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
         mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
@@ -36,18 +34,6 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     URL = 'http://s3.amazonaws.com/raw.texastribune.org/ut_austin/salaries/2015-06/ut_austin.xlsx'
 
-    cleaver.DepartmentName.MAP = (cleaver.DepartmentName.MAP +
-                                 ((cleaver.regex_i(r'vp '), 'Vice President '), ) +
-                                 ((cleaver.regex_i(r'^Its '), 'ITS '), ) +
-                                 ((cleaver.regex_i(r'^Kut '), 'KUT '), ) +
-                                 ((cleaver.regex_i(r'^Phr '), 'PHR '), ) +
-                                 ((cleaver.regex_i(r'^Fs '), 'FS '), ) +
-                                 ((cleaver.regex_i(r'^Dns '), 'DNS '), ) +
-                                 ((cleaver.regex_i(r'^Pmcs '), 'PMCS '), ) +
-                                 ((cleaver.regex_i(r'^Bfs '), 'BFS '), ) +
-                                 ((cleaver.regex_i(r'Aces - It '), 'ACES - IT '), ) +
-                                 ((cleaver.regex_i(r'Uteach'), 'UTeach'), ))
-
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
@@ -72,8 +58,6 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         if employee_type == 'PART TIME':
             return 'PT'
 
-        return 'FT'
-
     @property
     def description(self):
         employee_type = self.employee_type
@@ -84,8 +68,6 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         if employee_type == 'PART TIME':
             return "Part-time annual salary"
 
-        return "Annual salary"
-
     @property
     def person(self):
         name = self.get_name()
@@ -93,10 +75,9 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             'family_name': name.last,
             'given_name': name.first,
             'name': unicode(name),
+            'gender': self.gender_map[self.gender.strip()],
         }
-        if self.is_mapped_value('gender'):
-            r['gender'] = self.gender_map[self.gender.strip()]
-
+        print r
         return r
 
     def calculate_tenure(self, hire_date):
@@ -134,20 +115,10 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         ]
 
     @property
-    def post(self):
-        return {'label': (unicode(cleaver.DepartmentNameCleaver(self.job_title)
-                                         .parse()))}
-
-    @property
     def race(self):
         race = self.given_race.strip()
         if race == '':
             race = 'Not given'
         return {'name': race}
-
-    @property
-    def department_as_child(self):
-        return [{'name': unicode(cleaver.DepartmentNameCleaver(self.department)
-                                        .parse()), }, ]
 
 transform = base.transform_factory(TransformedRecord)
