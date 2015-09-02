@@ -95,7 +95,7 @@ class TransformedRecord(
     def race(self):
         race = self.given_race.strip()
         if race == '':
-            race = 'Not given'
+            race = 'UNKNOWN'
         return {'name': race}
 
 
