@@ -106,6 +106,6 @@ class TransformedRecord(
         tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
         if tenure < 0:
             tenure = 0
-        return tenure
+        return tenure if tenure >= 0 else 0
 
 transform = base.transform_factory(TransformedRecord)
