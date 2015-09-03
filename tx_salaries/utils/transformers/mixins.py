@@ -128,11 +128,20 @@ class RaceMixin(object):
 
     Requires a ``race`` property to be available.
     """
+    TWO_OR_MORE_RACE_STRING = 'Two or More Races'
+
     @property
     def race(self):
-        race = self.get_mapped_value('race').strip()
-        if race == '':
-            race = 'Not given'
+        race = self.get_mapped_value('race')
+
+        # race is a marge cell and
+        # therefore we should return "Two or More Races"
+        if type(race) == list:
+            race = self.TWO_OR_MORE_RACE_STRING
+        else:
+            race = race.strip()
+            if race == '':
+                race = 'Not given'
         return {
             'name': race
         }

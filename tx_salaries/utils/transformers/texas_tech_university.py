@@ -18,9 +18,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'name': 'Name',
         'job_title': 'Title',
         'last_name': 'Last Name',
-        'hire_date': 'Hire Date',
-        'pay_status': 'FT or PT Status',
-        'compensation': 'Salary',
+        'hire_date': 'Original Hire Date',
+        'compensation': 'Annual Salary',
         'race': 'Race',
         'gender': 'Gender',
     }
@@ -37,7 +36,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     # All employees are full-time right now
     compensation_type = 'Full Time'
 
-    DATE_PROVIDED = date(2013, 7, 31)
+    DATE_PROVIDED = date(2015, 4, 8)
 
     URL = 'http://raw.texastribune.org.s3.amazonaws.com/texas_tech_university/salaries/2013-07/Faculty%20Open%20Records%20-%20Tribune.xlsx'
 

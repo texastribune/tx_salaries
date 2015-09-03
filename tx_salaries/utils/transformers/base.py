@@ -131,19 +131,35 @@ def generic_merge_cell_transform(labels, source, record_class):
     the new row.  The CSV reader that we currently use can not handle
     these rows, so we must do it ourselves.
     """
-    data = []
+    rows = []
     last_row = None
-    for raw_row in source:
+    for i, raw_row in enumerate(source):
         row = dict(zip(labels, raw_row))
-        if not raw_row[0].strip() and last_row:
-            for key, value in last_row.items():
-                if not row[key]:
-                    row[key] = last_row[key]
+        if not raw_row[0].strip():  # if the row is missing data, then we
+                                    # know any cell in it used to be a merge cell in the row above
+            assert(last_row, "Row %i is missing values and cannot be reconciled" % i)
+            for key, value in last_row.items():     # so we iterate through each key, value pair
+                                                    # in the last (complete) row and transform
+                                                    # the value of keys that we match in our incomplete row
+                                                    # to be an array, including all the values
+                                                    # that were in the merge cell
+                if row[key].strip():
+                    if type(last_row[key]) == list:
+                        last_row[key].append(row[key])
+                    else:
+                        last_row[key] = [last_row[key], row[key]]
+        else:   # if it's not missing data, then we know it is the first (but not necessarily final) row
+                # with information about a person, so we should both add it to our list of rows
+                # and set last_row to equal it
+            last_row = row
+            rows.append(row)
 
+    data = []
+    for row in rows:
         record = record_class(row)
         if record.is_valid:
             data.append(record.as_dict())
-        last_row = row
+
     return data
 
 
