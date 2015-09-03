@@ -27,7 +27,7 @@ class GenericCompensationMixin(object):
     * ``DATE_PROVIDED``
 
     Expects hire_date to be given as YYYY-MM-DD format.
-    Override calculate_tenure in the transformer if this is not the case.
+    Override hire_date with @property if that is not the case.
     """
     def calculate_tenure(self):
         hire_date_data = map(int, self.hire_date.split('-'))
