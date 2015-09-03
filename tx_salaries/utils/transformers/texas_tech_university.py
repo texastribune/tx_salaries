@@ -40,6 +40,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     description = 'This is not a real description'
 
     DATE_PROVIDED = date(2015, 4, 8)
+    EMPLOYEES_HIRED_AFTER_SUBMISSION = True
 
     URL = 'http://raw.texastribune.org.s3.amazonaws.com/texas_tech_university/salaries/2013-07/Faculty%20Open%20Records%20-%20Tribune.xlsx'
 
