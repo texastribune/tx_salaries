@@ -24,6 +24,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'gender': 'Gender',
     }
 
+    compensation_type = 'FT'
+
     gender_map = {'Female': 'F', 'Femail': 'F', 'Male': 'M'}
 
     NAME_FIELDS = ('name', )
@@ -35,6 +37,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     # All employees are full-time right now
     compensation_type = 'Full Time'
+    description = 'This is not a real description'
 
     DATE_PROVIDED = date(2015, 4, 8)
 

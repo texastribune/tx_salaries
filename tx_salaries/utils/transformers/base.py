@@ -137,7 +137,7 @@ def generic_merge_cell_transform(labels, source, record_class):
         row = dict(zip(labels, raw_row))
         if not raw_row[0].strip():  # if the row is missing data, then we
                                     # know any cell in it used to be a merge cell in the row above
-            assert(last_row, "Row %i is missing values and cannot be reconciled" % i)
+            assert last_row, "Row %i is missing values and cannot be reconciled" % i
             for key, value in last_row.items():     # so we iterate through each key, value pair
                                                     # in the last (complete) row and transform
                                                     # the value of keys that we match in our incomplete row
