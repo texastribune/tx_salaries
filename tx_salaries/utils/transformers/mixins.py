@@ -35,10 +35,18 @@ class GenericCompensationMixin(object):
                          hire_date_data[2])
         tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
         if tenure < 0:
-            error_msg = ("An employee was hired after the data was provided.\n"
+            def throw_error():
+                error_msg = ("An employee was hired after the data was provided.\n"
                          "Is DATE_PROVIDED correct?")
-            raise ValueError(error_msg)
-        return tenure
+                raise ValueError(error_msg)
+            if hasattr(self, 'EMPLOYEES_HIRED_AFTER_SUBMISSION'):
+                if not self.EMPLOYEES_HIRED_AFTER_SUBMISSION:
+                    throw_error()
+            else:
+                throw_error()
+
+        return tenure if tenure >= 0 else 0  # prevent us from putting a negative number
+                                             # into our tenure aggregation
 
     @property
     def compensations(self):
