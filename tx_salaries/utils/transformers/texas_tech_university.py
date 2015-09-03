@@ -77,11 +77,6 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         if type(job_title) == list:
             return '/'.join(job_title).title()
 
-    @property
-    def hire_date(self): # reformat hire date
-        month_day_year = self.get_mapped_value('hire_date').strip().split(' ')[0].split('/')
-        return '-'.join([month_day_year[2], month_day_year[0], month_day_year[1]])
-
 
 
 transform = base.transform_factory(record_class=TransformedRecord,
