@@ -3,30 +3,28 @@ from datetime import date
 from . import base
 from . import mixins
 
-from .. import cleaver
+class TransformedRecord(
+    mixins.GenericCompensationMixin,
+    mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
+    mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
+    mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+    mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
-# http://raw.texastribune.org.s3.amazonaws.com/ut_austin/salaries/2014-02/TexasTribuneUTAustinSalaryData02-11-14.xlsx
-
-
-class TransformedRecord(mixins.GenericCompensationMixin,
-        mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
-        mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
-        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-        mixins.LinkMixin, base.BaseTransformedRecord):
     MAP = {
         'last_name': 'NAME LAST',
         'first_name': 'NAME FIRST',
         'middle_name': 'NAME MIDDLE',
         'suffix_name': 'NAME SUFFIX',
-        'department': 'DEPARTMENT TITLE',
-        'job_title': 'JOB TITLE',
+        'department': 'DEPARTMENT',
+        'job_title': 'TITLE',
         'hire_date': 'CONTINUOUS EMPLOYMENT DATE',
+        'employee_type': 'EMPLOYMENT TYPE',
         'gender': 'GENDER',
-        'given_race': 'ETHNICITY',
-        'compensation': 'FY ALLOCATIONS',
+        'given_race': 'RACE',
+        'compensation': 'SALARY (FY ALLOCATION)',
     }
 
-    gender_map = {'FEMALE': 'F', 'MALE': 'M'}
+    gender_map = {u'FEMALE': u'F', u'MALE': u'M', u'': u'Unknown'}
 
     NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
 
@@ -34,33 +32,18 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_CLASSIFICATION = 'University'
 
-    # TODO not given, 29 < 4000
-    compensation_type = 'FT'
-    description = 'Annual compensation'
+    DATE_PROVIDED = date(2015, 6, 29)
 
-    DATE_PROVIDED = date(2014, 2, 14)
-
-    URL = 'http://s3.amazonaws.com/raw.texastribune.org/ut_austin/salaries/2014-02/TexasTribuneUTAustinSalaryData02-11-14.xlsx'
-
-    cleaver.DepartmentName.MAP = (cleaver.DepartmentName.MAP +
-                                 ((cleaver.regex_i(r'vp '), 'Vice President '), ) +
-                                 ((cleaver.regex_i(r'^Its '), 'ITS '), ) +
-                                 ((cleaver.regex_i(r'^Kut '), 'KUT '), ) +
-                                 ((cleaver.regex_i(r'^Phr '), 'PHR '), ) +
-                                 ((cleaver.regex_i(r'^Fs '), 'FS '), ) +
-                                 ((cleaver.regex_i(r'^Dns '), 'DNS '), ) +
-                                 ((cleaver.regex_i(r'^Pmcs '), 'PMCS '), ) +
-                                 ((cleaver.regex_i(r'^Bfs '), 'BFS '), ) +
-                                 ((cleaver.regex_i(r'Aces - It '), 'ACES - IT '), ) +
-                                 ((cleaver.regex_i(r'Uteach'), 'UTeach'), ))
+    URL = 'http://s3.amazonaws.com/raw.texastribune.org/ut_austin/salaries/2015-06/ut_austin.xlsx'
 
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.last_name.strip() != ''
 
-    def process_hire_date(self, hire_date):
-        #19 cases
+    @property
+    def hire_date(self):
+        hire_date = self.get_mapped_value('hire_date')
         if hire_date.strip() == "":
             return ""
         year = hire_date[0:4]
@@ -69,82 +52,60 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         return "-".join([year, month, day])
 
     @property
-    def get_raw_name(self):
-        # TODO include suffix
-        if self.middle_name.strip() == '':
-            self.NAME_FIELDS = ('first_name', 'last_name')
-        name_fields = [getattr(self, a).strip() for a in self.NAME_FIELDS]
-        return u' '.join(name_fields)
+    def gender(self):
+        sex = self.gender_map[self.get_mapped_value('gender')]
+        if sex.strip() == "":
+            return ""
+        return sex.strip()
+
+    @property
+    def compensation_type(self):
+        employee_type = self.employee_type
+
+        if employee_type == 'FULL TIME':
+            return 'FT'
+
+        if employee_type == 'PART TIME':
+            return 'PT'
+
+    @property
+    def description(self):
+        employee_type = self.employee_type
+
+        if employee_type == 'FULL TIME':
+            return "Annual salary"
+
+        if employee_type == 'PART TIME':
+            return "Part-time annual salary"
 
     @property
     def person(self):
-        data = {
-            'family_name': self.last_name.strip(),
-            'given_name': self.first_name.strip(),
-            'name': self.get_raw_name,
+        name = self.get_name()
+        r = {
+            'family_name': name.last,
+            'given_name': name.first,
+            'additional_name': name.middle,
+            'name': unicode(name),
+            'gender': self.gender,
         }
-        try:
-            gender = self.gender.strip()
-            if gender == '':
-                gender = 'Not given'
-            else:
-                gender = self.gender_map[gender]
-            data.update({
-                'gender': gender
-            })
-            return data
-        except KeyError:
-            return data
 
-    def calculate_tenure(self, hire_date):
-        try:
-            hire_date_data = map(int, hire_date.split('-'))
-        except:
-            return None
-        hire_date = date(hire_date_data[0], hire_date_data[1],
-                         hire_date_data[2])
-        tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
-        if tenure < 0:
-            error_msg = ("An employee was hired after the data was provided.\n"
-                         "Is DATE_PROVIDED correct?")
-            raise ValueError(error_msg)
-        return tenure
-
-    @property
-    def compensations(self):
-        hire_date = self.process_hire_date(self.hire_date)
-        return [
-            {
-                'tx_salaries.CompensationType': {
-                    'name': self.compensation_type,
-                    'description': self.description
-                },
-                'tx_salaries.Employee': {
-                    'hire_date': hire_date,
-                    'compensation': self.compensation,
-                    'tenure': self.calculate_tenure(hire_date),
-                },
-                'tx_salaries.EmployeeTitle': {
-                    'name': self.job_title,
-                },
-            }
-        ]
-
-    @property
-    def post(self):
-        return {'label': (unicode(cleaver.DepartmentNameCleaver(self.job_title)
-                                         .parse()))}
+        return r
 
     @property
     def race(self):
         race = self.given_race.strip()
         if race == '':
-            race = 'Not given'
+            race = 'UNKNOWN'
         return {'name': race}
 
-    @property
-    def department_as_child(self):
-        return [{'name': unicode(cleaver.DepartmentNameCleaver(self.department)
-                                        .parse()), }, ]
+
+    def calculate_tenure(self):
+        hire_date_data = map(int, self.hire_date.split('-'))
+        hire_date = date(hire_date_data[0], hire_date_data[1],
+                         hire_date_data[2])
+        tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
+        if tenure < 0:
+            tenure = 0
+        return tenure
 
 transform = base.transform_factory(TransformedRecord)
