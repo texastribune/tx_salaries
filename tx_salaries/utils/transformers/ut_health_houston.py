@@ -15,8 +15,9 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'job_title': 'Job Title',
         'gender': 'Sex',
         'race': 'Ethnic Grp',
-        'hire_date': 'Current Hire Date',
+        'hire_date': 'Start Date',
         'compensation': 'Total Comp Rate',
+        'compensation_type': 'Full/Part',
     }
 
     NAME_FIELDS = ('first_name', 'last_name', )
@@ -27,12 +28,21 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     ORGANIZATION_CLASSIFICATION = 'University Hospital'
 
     # TODO not given on spreadsheet, but they appear to give part time
-    compensation_type = 'FT'
-    description = 'Annual compensation'
 
-    DATE_PROVIDED = date(2014, 1, 29)
+    @property
+    def compensation_type(self):
+        if self.get_mapped_value('compensation_type') == 'F':
+            return 'FT'
+        elif self.get_mapped_value('compensation_type') == 'P':
+            return 'PT'
+        else:
+            return ''
 
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_health_houston/salaries/2014-01/Employee%20Salary%201-29-2014%20%282%29.xls'
+    description = 'Annual compensation' # Should still be called annual compenstation?
+
+    DATE_PROVIDED = date(2015, 8, 10)
+
+    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_health_houston/salaries/2015-08/ut_health_science_center_houston.xlsx'
 
     @property
     def is_valid(self):
