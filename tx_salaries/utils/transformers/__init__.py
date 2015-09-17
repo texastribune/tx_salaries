@@ -67,7 +67,7 @@ TRANSFORMERS = {
     '5034d589091e79d58ee3c51766bd6ab05f08d3a5': [rockwall_isd.transform, ],
     '690fc3890e8f893a7b1634de2df958846ad12a1b': [state_of_texas.transform, ],
     '96c50536164eeecade2194082544648d3bb4fd97': [tarrant_county.transform, ],
-    'eb4e22c07597829d7b62f48e6f69dd2d29bf69e2': [texas_am_system.transform, ],
+    'e1af1d516d482dc89008704156ed2cc4e40ea18e': [texas_am_system.transform, ],
     '3382282e79ee58627aedd4703591928b09525af5': [texas_state_university.transform, ],
     'bc023bcf9e573ecdf8335ebafb24feec596e473f': [texas_tech_system.transform, ],
     'c60489252da989ab04f6a47a86265dc047dd367b': [texas_tech_university.transform, ],
