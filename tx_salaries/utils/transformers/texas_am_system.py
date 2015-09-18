@@ -46,6 +46,7 @@ class TransformedRecord(
         '6': 'Native Hawaiian or Other Pacific Islander',
         '7': 'Two or More Races',
         '8': 'Not Specified',
+        '': 'Not Specified',
     }
 
     @property
