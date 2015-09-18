@@ -22,9 +22,11 @@ class TransformedRecord(
         'gender': 'Sex',
         'minority_code': 'EEOMinorityCode',
         'organization_name': 'MbrName',
+        'rate': 'AnnualTermMonths',
+        'full_or_part_time': 'FullorPartTime',
     }
 
-    NAME_FIELDS = ('first_name', 'last_name', )
+    NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
 
     ORGANIZATION_CLASSIFICATION = 'University'
 
@@ -33,9 +35,6 @@ class TransformedRecord(
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
            'texas_a%26m_university_system/salaries/2015-09/'
            'tamu_2015-09-09.xlsx')
-
-    compensation_type = 'FT'
-    description = 'Annual compensation'
 
     race_map = {
         '1': 'White (Not Hispanic or Latino)',
@@ -56,6 +55,21 @@ class TransformedRecord(
             'children': self.department_as_child,
             'classification': self.ORGANIZATION_CLASSIFICATION,
         }
+
+    @property
+    def description(self):
+        rate = self.get_mapped_value('rate')
+        rate = rate.rstrip('0').rstrip('.') if '.' in rate else rate
+        return '{rate}-month salary'.format(rate=rate)
+
+    @property
+    def compensation_type(self):
+        full_or_part_time = self.get_mapped_value('full_or_part_time')
+
+        if full_or_part_time == 'F':
+            return 'FT'
+
+        return 'PT'
 
     @property
     def is_valid(self):
