@@ -6,6 +6,7 @@ from .. import cleaver
 
 # --row=4
 
+
 class TransformedRecord(
         mixins.GenericCompensationMixin,
         mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
@@ -32,10 +33,13 @@ class TransformedRecord(
     # If `full_name` is in MAP, you don't need this at all.
     # NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
 
-    # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
+    # The name of the organization this WILL SHOW UP ON THE SITE,
+    # so double check it!
     ORGANIZATION_NAME = 'Texas State University'
 
-    # What type of organization is this? This MUST match what we use on the site, double check against salaries.texastribune.org
+    # What type of organization is this?
+    # This MUST match what we use on the site,
+    # double check against salaries.texastribune.org
     ORGANIZATION_CLASSIFICATION = 'University'
 
     # ???
@@ -45,12 +49,15 @@ class TransformedRecord(
     DATE_PROVIDED = date(2015, 4, 8)
 
     # The URL to find the raw data in our S3 bucket.
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/texas_state_university/2015-04/Texas_State_University04082015.xlsx')
+    URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
+           'texas_state_university/salaries/2015-04/'
+           'Texas_State_University04082015.xlsx')
 
     # How do they track gender? We need to map what they use to `F` and `M`.
     gender_map = {'Female': 'F', 'Male': 'M'}
 
-    # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
+    # This is how the loader checks for valid people.
+    # Defaults to checking to see if `last_name` is empty.
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
@@ -67,10 +74,10 @@ class TransformedRecord(
         key = self.get_mapped_value('compensation_key')
 
         if key == 'ANNUAL 9 Month Calculation':
-            return 'Annual 9 month calculation'
+            return 'Annualized 9-month salary'
 
         if key == 'ANNUAL 12 Month Calculation':
-            return 'Annual 12 month calculation'
+            return 'Annualized 12 month salary'
 
     @property
     def person(self):
@@ -86,22 +93,9 @@ class TransformedRecord(
 
         return r
 
-    # def get_raw_name(self):
-    #     split_name = self.full_name.split(' ')
-    #     last_name = split_name[0]
-    #     split_firstname = split_name[1].split(' ')
-    #     first_name = split_firstname[0]
-    #     if len(split_firstname) == 2 and len(split_firstname[1]) == 1:
-    #         middle_name = split_firstname[1]
-    #     else:
-    #         first_name = split_name[1]
-    #         middle_name = ''
-
-    #     return u' '.join([first_name, middle_name, last_name])
-
     def get_name(self):
-        return cleaver.EmployeeNameCleaver(self.get_mapped_value('full_name')).parse()
-
+        return cleaver.EmployeeNameCleaver(
+            self.get_mapped_value('full_name')).parse()
 
 
 transform = base.transform_factory(TransformedRecord)

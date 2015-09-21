@@ -4,71 +4,64 @@ from . import mixins
 from datetime import date
 
 
-# http://raw.texastribune.org.s3.amazonaws.com/ut_dallas/salaries/2014-02/FOIA%20Request%20-%20Tribune.xlsx
-
-class TransformedRecord(mixins.GenericCompensationMixin,
+class TransformedRecord(
+        mixins.GenericCompensationMixin,
         mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
         mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
+
     MAP = {
         'full_name': 'Name',
-        'department': 'Dept Name',
-        'job_title': 'Title',
+        'department': 'Department',
+        'job_title': 'Job Title',
         'hire_date': 'Hire Date',
-        'nationality': 'Ethnicity',
+        'compensation': 'Annual Salary',
         'gender': 'Gender',
-        'compensation': 'Annual Rt',
+        'nationality': 'Race',
     }
 
-    ORGANIZATION_NAME = 'University of Texas at Dallas'
+    # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
+    ORGANIZATION_NAME = 'The University of Texas MD Anderson Cancer Center'
 
-    ORGANIZATION_CLASSIFICATION = 'University'
+    # What type of organization is this? This MUST match what we use on the site, double check against salaries.texastribune.org
+    ORGANIZATION_CLASSIFICATION = 'University Hospital'
 
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-          'ut_dallas/salaries/2015-05/ut_dallas.xls')
-
-    race_map = {
-        'AMIND': 'American Indian/Alaska Native',
-        'ASIAN': 'Asian or Pacific Islander',
-        'BLACK': 'Black, Non-Hispanic',
-        'CHN': 'Chinese',
-        'HISPA': 'Hispanic/Latino',
-        'HAWAIIAN': 'Native Hawaiian/Other Pacific Islander',
-        'KOR': 'Korean',
-        'OASN': 'Other Asian',
-        'NSPEC': 'Not Specified',
-        'WHITE': 'White',
-        'VIET': 'Vietnamese',
-        'PR': 'Puerto Rican',
-        'No response': 'No Response',
-    }
-
+    # ???
     compensation_type = 'FT'
 
     # How would you describe the compensation field? We try to respect how they use their system.
-    description = 'Annual Rate'
+    description = 'Annual salary'
 
-    DATE_PROVIDED = date(2015, 5, 27)
+    # When did you receive the data? NOT when we added it to the site.
+    DATE_PROVIDED = date(2015, 5, 26)
 
+    # The URL to find the raw data in our S3 bucket.
+    URL = ('http://raw.texastribune.org.s3.amazonaws.com/ut_md_anderson'
+           '/salaries/2015-05/PIA%20-%20Texas%20Tribune%20-%202015.05.xlsx')
+
+    # How do they track gender? We need to map what they use to `F` and `M`.
+    gender_map = {'F': 'F', 'M': 'M'}
+
+    race_map = {
+        'AMIND': 'American Indian',
+        'WHITE': 'White',
+        'HISPA': 'Hispanic',
+        'ASIAN': 'Asian',
+        '2+RACE': 'Mixed race',
+        'PACIF': 'Pacific Islander',
+        'BLACK': 'Black',
+        '': 'Not given',
+    }
+
+    # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.full_name.strip() != ''
 
     @property
-    def compensation(self):
-        raw = self.get_mapped_value('compensation')
-        return raw.strip(' $').replace(',', '')
-
-    @property
     def race(self):
-        raw = self.get_mapped_value('nationality')
-        races = raw.split(',')
-        if len(races) > 1:
-            return {
-                'name': 'Two or more races'
-            }
         return {
             'name': self.race_map[self.nationality.strip()]
         }
@@ -81,7 +74,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             'given_name': name.first,
             'additional_name': name.middle,
             'name': unicode(name),
-            'gender': self.gender.strip()
+            'gender': self.gender_map[self.gender.strip()]
         }
 
         return r

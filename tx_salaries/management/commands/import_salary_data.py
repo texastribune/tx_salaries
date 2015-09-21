@@ -69,28 +69,32 @@ class Command(BaseCommand):
                                         kwargs['label_row'])
         verbosity = int(kwargs['verbosity'])
 
-        try:
-            existing_org = models.Organization.objects.get(
-                name=records[0]['tx_people.Organization']['name'])
-        except models.Organization.DoesNotExist:
-            existing_org = None
+        all_orgs = set([i['tx_people.Organization']['name'] for i in records])
 
-        if existing_org:
-            name = existing_org.name
+        existing_orgs = models.Organization.objects.filter(
+            name__in=all_orgs,
+            parent=None)
 
-            reply = raw_input('"{}" is already in the database. '
-                              'In order to update, everything currently in '
-                              'the database concerning this organization must '
-                              'be deleted. Do you want to continue? '
-                              '(Y/n): '.format(name)).lower().strip()
+        if existing_orgs:
+
+            self.stdout.write('The following organizations '
+                              'already exist in the database:')
+
+            for org in existing_orgs:
+                self.stdout.write(org.name)
+
+            reply = raw_input('In order to update, everything currently in '
+                              'the database concerning these organizations '
+                              'must be deleted. Do you want to continue? '
+                              '(Y/n): ').lower().strip()
 
             if reply[0] == 'n':
-                self.stdout.write('Stopping. Did not touch "{}".'.format(name))
+                self.stdout.write('Stopping. Did not touch anything.')
                 return
 
             if reply[0] == 'y':
-                self.stdout.write('Deleting "{}"...'.format(name))
-                existing_org.delete()
+                self.stdout.write('Deleting organizations...')
+                existing_orgs.delete()
                 self.stdout.write('Done! Moving on.')
 
         self.stdout.write('Processing {} records from {}'.format(

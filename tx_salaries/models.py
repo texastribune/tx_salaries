@@ -23,7 +23,7 @@ def get_top_level_departments():
     Note: This only works for the current situation of non-nested
     departments.
     """
-    return Organization.objects.filter(parent=None)
+    return Organization.objects.filter(parent=None, stats__isnull=False)
 
 
 class CompensationType(models.Model):
