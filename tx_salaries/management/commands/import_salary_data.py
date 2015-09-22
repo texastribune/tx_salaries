@@ -65,8 +65,9 @@ class Command(BaseCommand):
             self.import_file(filename, **kwargs)
 
     def import_file(self, filename, **kwargs):
-        records = transformer.transform(filename, kwargs['sheet'],
-                                        kwargs['label_row'])
+        records, warnings = transformer.transform(filename, kwargs['sheet'],
+                                                  kwargs['label_row'])
+
         verbosity = int(kwargs['verbosity'])
 
         all_orgs = set([i['tx_people.Organization']['name'] for i in records])
@@ -124,3 +125,6 @@ class Command(BaseCommand):
             out('\n')
 
         to_db.denormalize(to_denormalize)
+
+        for warning in warnings:
+            print warning
