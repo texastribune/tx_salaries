@@ -88,5 +88,5 @@ TRANSFORMERS = {
     '258ae8c47dc5b5bd842fb82569b1be7ba8c1bd7d': [ut_medical_branch.transform, ],
     'bf2d8d6cad54567327b44050c507096885f925b7': [ut_pan_american.transform, ],
     '3eede716c96db3c302eaa2b9b3af6e176daf7727': [ut_san_antonio.transform, ],
-    '068d88f0ea10973339f5a4d57c8d806686d2df40': [ut_tyler.transform, ],
+    'de0167927d7162fb025b72c76a1fc157f081c00b': [ut_tyler.transform, ],
 }
