@@ -127,4 +127,4 @@ class Command(BaseCommand):
         to_db.denormalize(to_denormalize)
 
         for warning in warnings:
-            print warning
+            self.stdout.write(warning)
