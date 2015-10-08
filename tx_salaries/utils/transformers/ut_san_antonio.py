@@ -3,79 +3,71 @@ from datetime import date
 from . import base
 from . import mixins
 
-from .. import cleaver
+class TransformedRecord(
+    mixins.GenericCompensationMixin,
+    mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
+    mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
+    mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+    mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
-
-class TransformedRecord(mixins.GenericCompensationMixin,
-        mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
-        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
     MAP = {
-        'last_name': 'Last Name',
-        'first_name': 'First Name',
+        'full_name': 'Name',
         'department': 'Department',
         'job_title': 'Job Title',
         'hire_date': 'Hire Date',
-        'race': 'Ethnicity',
-        'gender': 'Sex',
-        'compensation': 'Annual Salary',
+        'AMIND': 'American Indian',
+        'ASIAN': 'Asian',
+        'BLACK': 'Black',
+        'HISPA': 'Hispanic',
+        'NSPEC': 'Unspecified',
+        'PACIF': 'Pacific Islander',
+        'WHITE': 'White',
+        'gender': 'Gender',
+        'compensation': 'Rate',
+        'employment_type': 'Full/Part',
+        'employment_frequency': 'Freq',
+        'hours': 'Stnd Hrs/Wk'
     }
 
-    NAME_FIELDS = ('first_name', 'last_name', )
-
-    gender_map = {'Female': 'F', 'Male': 'M'}
+    gender_map = {'Female': 'F', 'Male': 'M', 'Unknown': 'U'}
 
     ORGANIZATION_NAME = 'University of Texas at San Antonio'
 
     ORGANIZATION_CLASSIFICATION = 'University'
 
-    # TODO 45 earn < 10,000
-    compensation_type = 'FT'
-    description = 'Annual compensation'
+    DATE_PROVIDED = date(2015, 10, 7)
 
-    DATE_PROVIDED = date(2014, 1, 21)
-
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_san_antonio/salaries/2014-01/Hill1931-responsive.xls'
-
-    cleaver.DepartmentName.MAP = (cleaver.DepartmentName.MAP +
-                                 ((cleaver.regex_i(r' Vc '), ' VC '), ) +
-                                 ((cleaver.regex_i(r' Svcs '), ' SVCS '), ) +
-                                 ((cleaver.regex_i(r' Svc'), ' SVC'), ) +
-                                 ((cleaver.regex_i(r'Coe '), 'COE '), ) +
-                                 ((cleaver.regex_i(r'Cob-Asc'), 'COB-ASC'), ) +
-                                 ((cleaver.regex_i(r' Ofc '), ' OFC '), ) +
-                                 ((cleaver.regex_i(r'Cos '), 'COS '), ) +
-                                 ((cleaver.regex_i(r' Seri'), ' SERI'), ) +
-                                 ((cleaver.regex_i(r'Ihdr'), 'IHDR'), ) +
-                                 ((cleaver.regex_i(r'Mbc'), 'MBC'), ) +
-                                 ((cleaver.regex_i(r'^Itc'), 'ITC'), ) +
-                                 ((cleaver.regex_i(r'Swtaac'), 'SWTAAC'), ) +
-                                 ((cleaver.regex_i(r'^Vp-'), 'VP-'), ) +
-                                 ((cleaver.regex_i(r'^Tx'), 'TX'), ) +
-                                 ((cleaver.regex_i(r'^Tv'), 'TV'), ) +
-                                 ((cleaver.regex_i(r'^Rsc '), 'RSC '), ) +
-                                 ((cleaver.regex_i(r'^Rsch '), 'RSCH '), ) +
-                                 ((cleaver.regex_i(r' Rsrcs '), ' RSRCS '), ) +
-                                 ((cleaver.regex_i(r'- Cob'), '- COB'), ))
+    URL = ('http://raw.texastribune.org.s3.amazonaws.com/ut_san_antonio/'
+            'salaries/2015-10/utsanantonio.xls')
 
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.last_name.strip() != '' and self.hire_date.strip() != ''
 
-    def calculate_tenure(self):
-        try:
-            hire_date_data = map(int, self.hire_date.split('-'))
-        except:
-            return None
-        hire_date = date(hire_date_data[0], hire_date_data[1],
-                         hire_date_data[2])
-        tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
-        if tenure < 0:
-            error_msg = ("An employee was hired after the data was provided.\n"
-                         "Is DATE_PROVIDED correct?")
-            raise ValueError(error_msg)
-        return tenure
+    @property
+    def compensation_type(self):
+        emp_type = self.employment_type
+
+        if emp_type == 'F':
+            return 'FT'
+
+        if emp_type == 'P':
+            return 'PT'
+
+    @property
+    def description(self):
+        freq = self.employment_frequency
+
+        if freq == 'A':
+            return "Full-time salary"
+
+        if freq == 'H':
+            return "Hourly rate"
+
+        if freq == 'C':
+            return "Contract salary"
+
 
     @property
     def compensations(self):
@@ -98,16 +90,6 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         ]
 
     @property
-    def post(self):
-        return {'label': (unicode(cleaver.DepartmentNameCleaver(self.job_title)
-                                         .parse()))}
-
-    @property
-    def department_as_child(self):
-        return [{'name': unicode(cleaver.DepartmentNameCleaver(self.department)
-                                        .parse()), }, ]
-
-    @property
     def person(self):
         data = {
             'family_name': self.last_name,
@@ -121,6 +103,19 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             return data
         except KeyError:
             return data
+
+    def get_raw_name(self):
+        split_name = self.full_name.split(',')
+        last_name = split_name[0]
+        split_firstname = split_name[1].split(' ')
+        first_name = split_firstname[0]
+        if len(split_firstname) == 2 and len(split_firstname[1]) == 1:
+            middle_name = split_firstname[1]
+        else:
+            first_name = split_name[1]
+            middle_name = ''
+
+        return u' '.join([first_name, middle_name, last_name])
 
 
 transform = base.transform_factory(TransformedRecord)
