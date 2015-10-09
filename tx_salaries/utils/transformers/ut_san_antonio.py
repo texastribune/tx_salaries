@@ -29,6 +29,16 @@ class TransformedRecord(
         'hours': 'Stnd Hrs/Wk'
     }
 
+    race_map = {
+        'AMIND': 'American Indian',
+        'ASIAN': 'Asian Indian',
+        'BLACK': 'Black',
+        'HISPA': 'Hispanic',
+        'NSPEC': 'Unspecified',
+        'PACIF': 'Pacific Islander',
+        'WHITE': 'White'
+    }
+
     gender_map = {'Female': 'F', 'Male': 'M', 'Unknown': 'U'}
 
     ORGANIZATION_NAME = 'University of Texas at San Antonio'
@@ -43,7 +53,7 @@ class TransformedRecord(
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.last_name.strip() != '' and self.hire_date.strip() != ''
+        return self.full_name.strip() != ''
 
     @property
     def compensation_type(self):
@@ -60,7 +70,7 @@ class TransformedRecord(
         freq = self.employment_frequency
 
         if freq == 'A':
-            return "Full-time salary"
+            return "Annual salary"
 
         if freq == 'H':
             return "Hourly rate"
@@ -71,23 +81,23 @@ class TransformedRecord(
 
     @property
     def compensations(self):
-        return [
-            {
-                'tx_salaries.CompensationType': {
-                    'name': self.compensation_type,
-                    'description': self.description
-                },
-                'tx_salaries.Employee': {
-                    'hire_date': self.hire_date,
-                    'compensation': self.compensation,
-                    'tenure': self.calculate_tenure(),
-                },
-                'tx_salaries.EmployeeTitle': {
-                    'name': unicode(cleaver.DepartmentNameCleaver(self.job_title)
-                                           .parse())
-                },
-            }
-        ]
+        return self.race_map[self.race.strip()]
+
+    @property
+    def race(self):
+        amind = self.AMIND
+        asian = self.ASIAN
+        black = self.BLACK
+        hisp = self.HISPA
+        pacif = self.PACIF
+        white = self.WHITE
+        unspec = self.NSPEC
+
+
+
+        return {
+            'name': self.race_map[self.nationality.strip()]
+        }
 
     @property
     def person(self):
