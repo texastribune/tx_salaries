@@ -15,18 +15,17 @@ class TransformedRecord(
         'department': 'Department',
         'job_title': 'Job Title',
         'hire_date': 'Hire Date',
-        'AMIND': 'American Indian',
-        'ASIAN': 'Asian',
-        'BLACK': 'Black',
-        'HISPA': 'Hispanic',
-        'NSPEC': 'Unspecified',
-        'PACIF': 'Pacific Islander',
-        'WHITE': 'White',
+        'AMIND': 'AMIND',
+        'ASIAN': 'ASIAN',
+        'BLACK': 'BLACK',
+        'HISPA': 'HISPA',
+        'NSPEC': 'NSPEC',
+        'PACIF': 'PACIF',
+        'WHITE': 'WHITE',
         'gender': 'Gender',
         'compensation': 'Rate',
         'employment_type': 'Full/Part',
         'employment_frequency': 'Freq',
-        'hours': 'Stnd Hrs/Wk'
     }
 
     race_map = {
@@ -81,22 +80,25 @@ class TransformedRecord(
 
     @property
     def compensations(self):
-        return self.race_map[self.race.strip()]
+        return self.get_mapped_value('compensation')
 
     @property
     def race(self):
-        amind = self.AMIND
-        asian = self.ASIAN
-        black = self.BLACK
-        hisp = self.HISPA
-        pacif = self.PACIF
-        white = self.WHITE
-        unspec = self.NSPEC
+        races = [AMIND,ASIAN,BLACK,HISPA,NSPEC,PACIF,WHITE]
+        raceList = []
+        for race in races:
+            if self.race == '1'
+                raceList.append(race)
 
+        print raceList
+        #for each var, loop through function
+        #if var == '1', push into array
+        #if array length > 1, say two or more races
+        #else find racemap value of variable name
 
 
         return {
-            'name': self.race_map[self.nationality.strip()]
+            'name': self.race_map[self.race.strip()]
         }
 
     @property
