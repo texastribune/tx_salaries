@@ -1,7 +1,7 @@
-from datetime import date
-
 from . import base
 from . import mixins
+
+from datetime import date
 
 class TransformedRecord(
     mixins.GenericCompensationMixin,
@@ -24,8 +24,8 @@ class TransformedRecord(
         'WHITE': 'WHITE',
         'gender': 'Gender',
         'compensation': 'Rate',
-        'employment_type': 'Full/Part',
-        'employment_frequency': 'Freq',
+        'status': 'Full/Part',
+        'employment_frequency': 'Freq'
     }
 
     race_map = {
@@ -38,7 +38,8 @@ class TransformedRecord(
         'WHITE': 'White'
     }
 
-    gender_map = {'Female': 'F', 'Male': 'M', 'Unknown': 'U'}
+    # How do they track gender? We need to map what they use to `F` and `M`.
+    # gender_map = {'F': 'F', 'M': 'M', 'U': 'Unknown'}
 
     ORGANIZATION_NAME = 'University of Texas at San Antonio'
 
@@ -56,7 +57,7 @@ class TransformedRecord(
 
     @property
     def compensation_type(self):
-        emp_type = self.employment_type
+        emp_type = self.status
 
         if emp_type == 'F':
             return 'FT'
@@ -77,44 +78,41 @@ class TransformedRecord(
         if freq == 'C':
             return "Contract salary"
 
-
-    @property
-    def compensations(self):
-        return self.get_mapped_value('compensation')
-
     @property
     def race(self):
-        races = [AMIND,ASIAN,BLACK,HISPA,NSPEC,PACIF,WHITE]
+        #races = [self.AMIND,self.ASIAN,self.BLACK,self.HISPA,self.NSPEC,self.PACIF,self.WHITE]
+        #print races
         raceList = []
-        for race in races:
-            if self.race == '1'
-                raceList.append(race)
+        for indivRace in self.race_map:
+            print indivRace
+            if self.indivRace == '1':
+                raceList.append("yes")
 
         print raceList
+
+        #   why doesn't it work when i actually reference the value/???
         #for each var, loop through function
         #if var == '1', push into array
         #if array length > 1, say two or more races
         #else find racemap value of variable name
 
 
-        return {
-            'name': self.race_map[self.race.strip()]
-        }
+        # return {
+        #     'name': self.race_map[self.race.strip()]
+        # }
 
     @property
     def person(self):
-        data = {
-            'family_name': self.last_name,
-            'given_name': self.first_name,
-            'name': self.get_raw_name(),
+        name = self.get_name()
+        r = {
+            'family_name': name.last,
+            'given_name': name.first,
+            'additional_name': name.middle,
+            'name': unicode(name),
+            'gender': self.gender.strip()
         }
-        try:
-            data.update({
-                'gender': self.gender_map[self.gender.strip()]
-            })
-            return data
-        except KeyError:
-            return data
+
+        return r
 
     def get_raw_name(self):
         split_name = self.full_name.split(',')
