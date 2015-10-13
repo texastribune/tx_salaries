@@ -21,6 +21,7 @@ class TransformedRecord(
         'employee_type': 'Full/Part',
         'gender': 'Sex',
         'nationality': 'Ethnic Grp',
+        'campus': 'Campus',
     }
 
     # The name of the organization this WILL SHOW UP ON THE SITE,
@@ -49,13 +50,29 @@ class TransformedRecord(
         '': 'Not given',
     }
 
+    campus_map = {
+        'HR730': 'University of Houston - Main Campus',
+        'HR759': 'University of Houston - Clear Lake',
+        'HR765': 'University of Houston - Victoria',
+        'HR783': 'University of Houston System',
+        'HR784': 'University of Houston Downtown',
+    }
+
     # How do they track gender? We need to map what they use to `F` and `M`.
     gender_map = {'F': 'F', 'M': 'M'}
 
     DATE_PROVIDED = date(2015, 9, 16)
     # Y/M/D agency provided the data
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/university_houston/'
-           'salaries/2015-05/TexasTribune_UH_Salaries.csv')
+           'salaries/2015-09/Texas%20Tribune%2020150908.xlsx')
+
+    @property
+    def organization(self):
+        return {
+            'name': self.campus_map[self.campus.strip()],
+            'children': self.department_as_child,
+            'classification': self.ORGANIZATION_CLASSIFICATION,
+        }
 
     @property
     def is_valid(self):
