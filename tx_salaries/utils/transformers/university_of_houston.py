@@ -26,7 +26,7 @@ class TransformedRecord(
 
     # The name of the organization this WILL SHOW UP ON THE SITE,
     # so double check it!
-    ORGANIZATION_NAME = 'University of Houston'
+    # ORGANIZATION_NAME = 'University of Houston'
 
     # What type of organization is this?
     # This MUST match what we use on the site,
@@ -51,11 +51,11 @@ class TransformedRecord(
     }
 
     campus_map = {
-        'HR730': 'University of Houston - Main Campus',
-        'HR759': 'University of Houston - Clear Lake',
-        'HR765': 'University of Houston - Victoria',
+        'HR730': 'University of Houston',
+        'HR759': 'University of Houston-Clear Lake',
+        'HR765': 'University of Houston-Victoria',
         'HR783': 'University of Houston System',
-        'HR784': 'University of Houston Downtown',
+        'HR784': 'University of Houston-Downtown',
     }
 
     # How do they track gender? We need to map what they use to `F` and `M`.
