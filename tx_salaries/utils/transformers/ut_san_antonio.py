@@ -56,6 +56,12 @@ class TransformedRecord(
         return self.full_name.strip() != ''
 
     @property
+    def compensation(self):
+        if not self.get_mapped_value('compensation'):
+            return 0
+        return self.get_mapped_value('compensation')
+
+    @property
     def compensation_type(self):
         emp_type = self.status
 
