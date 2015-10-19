@@ -30,7 +30,7 @@ class TransformedRecord(
 
     race_map = {
         'AMIND': 'American Indian',
-        'ASIAN': 'Asian Indian',
+        'ASIAN': 'Asian',
         'BLACK': 'Black',
         'HISPA': 'Hispanic',
         'NSPEC': 'Unspecified',
@@ -93,6 +93,10 @@ class TransformedRecord(
         if len(raceList) > 1:
             return {
                 'name': 'Two or more races'
+            }
+        elif len(raceList) == 0:
+            return {
+                'name': 'Unknown'
             }
         else:
             return {
