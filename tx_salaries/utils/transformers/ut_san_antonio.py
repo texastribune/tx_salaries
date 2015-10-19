@@ -80,26 +80,24 @@ class TransformedRecord(
 
     @property
     def race(self):
-        #races = [self.AMIND,self.ASIAN,self.BLACK,self.HISPA,self.NSPEC,self.PACIF,self.WHITE]
-        #print races
+        races = [self.AMIND,self.ASIAN,self.BLACK,self.HISPA,self.NSPEC,self.PACIF,self.WHITE]
+        raceNames = ['AMIND','ASIAN','BLACK','HISPA','NSPEC','PACIF','WHITE']
+        i = 0
         raceList = []
-        for indivRace in self.race_map:
-            print indivRace
-            if self.indivRace == '1':
-                raceList.append("yes")
 
-        print raceList
+        for indivRace in races:
+            if indivRace == u'1':
+                raceList.append(self.race_map[raceNames[i].strip()])
+            i += 1
 
-        #   why doesn't it work when i actually reference the value/???
-        #for each var, loop through function
-        #if var == '1', push into array
-        #if array length > 1, say two or more races
-        #else find racemap value of variable name
-
-
-        # return {
-        #     'name': self.race_map[self.race.strip()]
-        # }
+        if len(raceList) > 1:
+            return {
+                'name': 'Two or more races'
+            }
+        else:
+            return {
+                'name': raceList[0]
+            }
 
     @property
     def person(self):
