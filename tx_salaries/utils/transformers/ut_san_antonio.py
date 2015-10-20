@@ -29,17 +29,17 @@ class TransformedRecord(
     }
 
     race_map = {
-        'AMIND': 'American Indian',
+        'AMIND': 'American Indian or Alaskan Native',
         'ASIAN': 'Asian',
-        'BLACK': 'Black',
-        'HISPA': 'Hispanic',
-        'NSPEC': 'Unspecified',
-        'PACIF': 'Pacific Islander',
+        'BLACK': 'Black or African American',
+        'HISPA': 'Hispanic or Latino',
+        'NSPEC': 'Not specified',
+        'PACIF': 'Native Hawaiian or Pacific Islander',
         'WHITE': 'White'
     }
 
     # How do they track gender? We need to map what they use to `F` and `M`.
-    gender_map = {u'F': u'F', u'M': u'M', u'U': u'Unknown'}
+    # gender_map = {u'F': u'F', u'M': u'M', u'U': u'Unknown'}
 
     ORGANIZATION_NAME = 'University of Texas at San Antonio'
 
@@ -105,7 +105,7 @@ class TransformedRecord(
             }
         elif len(raceList) == 0:
             return {
-                'name': 'Unknown'
+                'name': 'Not given'
             }
         else:
             return {
@@ -120,7 +120,7 @@ class TransformedRecord(
             'given_name': name.first,
             'additional_name': name.middle,
             'name': unicode(name),
-            'gender': self.gender_map[self.gender.strip()]
+            'gender': self.gender.strip()
         }
         return r
 
