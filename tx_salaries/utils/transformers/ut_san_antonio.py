@@ -39,7 +39,7 @@ class TransformedRecord(
     }
 
     # How do they track gender? We need to map what they use to `F` and `M`.
-    # gender_map = {'F': 'F', 'M': 'M', 'U': 'Unknown'}
+    gender_map = {u'F': u'F', u'M': u'M', u'U': u'Unknown'}
 
     ORGANIZATION_NAME = 'University of Texas at San Antonio'
 
@@ -73,9 +73,12 @@ class TransformedRecord(
 
     @property
     def description(self):
+        emp_type = self.status
         freq = self.employment_frequency
 
         if freq == 'A':
+            if emp_type == 'P':
+                return "Part-time annual salary"
             return "Annual salary"
 
         if freq == 'H':
@@ -117,9 +120,8 @@ class TransformedRecord(
             'given_name': name.first,
             'additional_name': name.middle,
             'name': unicode(name),
-            'gender': self.gender.strip()
+            'gender': self.gender_map[self.gender.strip()]
         }
-
         return r
 
     def get_raw_name(self):
