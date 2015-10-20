@@ -24,17 +24,18 @@ class TransformedRecord(
         'rate': 'Hourly Rat'
     }
 
-    gender_map = {u'FEMALE': u'F', u'MALE': u'M', u'': u'Unknown'}
+    gender_map = {u'Female': u'F', u'Male': u'M'}
 
-    NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
+    NAME_FIELDS = ('first_name', 'last_name', )
 
-    ORGANIZATION_NAME = 'University of Texas at Austin'
+    ORGANIZATION_NAME = 'Travis County'
 
-    ORGANIZATION_CLASSIFICATION = 'University'
+    ORGANIZATION_CLASSIFICATION = 'County'
 
-    DATE_PROVIDED = date(2015, 6, 29)
+    DATE_PROVIDED = date(2015, 10, 13)
 
-    URL = 'http://s3.amazonaws.com/raw.texastribune.org/ut_austin/salaries/2015-06/ut_austin.xlsx'
+    URL = ('http://s3.amazonaws.com/raw.texastribune.org/travis_county/'
+        'salaries/2015-10/traviscounty.xlsx')
 
     @property
     def is_valid(self):
