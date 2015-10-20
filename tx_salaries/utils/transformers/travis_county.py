@@ -26,7 +26,7 @@ class TransformedRecord(
 
     gender_map = {u'Female': u'F', u'Male': u'M'}
 
-    NAME_FIELDS = ('first_name', 'last_name', )
+    NAME_FIELDS = ('first_name', 'last_name')
 
     ORGANIZATION_NAME = 'Travis County'
 
@@ -44,7 +44,7 @@ class TransformedRecord(
 
     @property
     def hire_date(self):
-        hire_date = self.get_mapped_value('hire_date')
+        hire_date = self.hire_date
         if hire_date.strip() == "":
             return ""
         year = hire_date[0:4]
@@ -53,20 +53,12 @@ class TransformedRecord(
         return "-".join([year, month, day])
 
     @property
-    def gender(self):
-        sex = self.gender_map[self.get_mapped_value('gender')]
-        if sex.strip() == "":
-            return ""
-        return sex.strip()
-
-    @property
     def compensation_type(self):
-        employee_type = self.employee_type
+        status = self.status
 
-        if employee_type == 'FULL TIME':
+        if 'Full time' in status:
             return 'FT'
-
-        if employee_type == 'PART TIME':
+        else:
             return 'PT'
 
     @property
@@ -87,7 +79,7 @@ class TransformedRecord(
             'given_name': name.first,
             'additional_name': name.middle,
             'name': unicode(name),
-            'gender': self.gender,
+            'gender': self.gender_map[self.gender.strip()],
         }
 
         return r
@@ -96,7 +88,7 @@ class TransformedRecord(
     def race(self):
         race = self.given_race.strip()
         if race == '':
-            race = 'UNKNOWN'
+            race = 'Not given'
         return {'name': race}
 
 
