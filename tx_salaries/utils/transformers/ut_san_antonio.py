@@ -115,13 +115,18 @@ class TransformedRecord(
     @property
     def person(self):
         name = self.get_name()
+        gender = self.get_mapped_value('gender')
         r = {
             'family_name': name.last,
             'given_name': name.first,
             'additional_name': name.middle,
             'name': unicode(name),
-            'gender': self.gender.strip()
         }
+
+        if gender.split() == 'U':
+            gender = 'Unknown'
+        r['gender'] = gender.split()
+
         return r
 
     def get_raw_name(self):
