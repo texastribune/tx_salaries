@@ -55,7 +55,7 @@ TRANSFORMERS = {
     'c81582dc5ef3233848c0cbe13d9047d2e5a6dbde': [dallas_county.transform, ],
     'b3ac361fd078f04d8035cef647ac839ef3f0f353': [eanes_isd.transform, ],
     'd18ad5c9635a40de15b0ead0e8f8fe97b8ccca31': [el_paso_county.transform, ],
-    'fe075cbd88973ebfc8d177dfd27aed40da7088e6': [houston.transform, ],
+    'b91a9f78c4db005d73b11c228f30657ced7ed3c7': [houston.transform, ],
     'a4f1152500a1c25df0705463266f75a9b15f6b5a': [houston_community_college.transform, ],
     '0809eca5428e583732e7939f7252398f5c4e6947': [katy_isd.transform, ],
     'd982fa55bf19391e9f756cf03614cdd3969c4311': [north_east_isd.transform, ],
