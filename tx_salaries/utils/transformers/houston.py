@@ -31,7 +31,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     DATE_PROVIDED = date(2015, 10, 20)
     # Y/M/D agency provided the data
 
-    URL = "http://raw.texastribune.org.s3.amazonaws.com/houston/salaries/2014-07/TPIA-Texas%20Tribune.xlsx"
+    URL = "http://raw.texastribune.org.s3.amazonaws.com/houston/salaries/2015-10/houston.xlsx"
 
     gender_map = {'Female': 'F', 'Male': 'M'}
 
@@ -41,7 +41,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.hire_date.strip() != ''
+        return self.last_name.strip() != ''
 
 
     @property
