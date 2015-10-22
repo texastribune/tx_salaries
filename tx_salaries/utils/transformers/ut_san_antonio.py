@@ -39,7 +39,7 @@ class TransformedRecord(
     }
 
     # How do they track gender? We need to map what they use to `F` and `M`.
-    # gender_map = {u'F': u'F', u'M': u'M', u'U': u'Unknown'}
+    gender_map = {u'F': u'F', u'M': u'M', u'U': u'Unknown'}
 
     ORGANIZATION_NAME = 'University of Texas at San Antonio'
 
@@ -121,11 +121,8 @@ class TransformedRecord(
             'given_name': name.first,
             'additional_name': name.middle,
             'name': unicode(name),
+            'gender': self.gender_map[self.gender.strip()]
         }
-
-        if gender.split() == 'U':
-            gender = 'Unknown'
-        r['gender'] = gender.split()
 
         return r
 
