@@ -80,4 +80,4 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
 
 transform = base.transform_factory(record_class=TransformedRecord,
-        transform_func=base.generic_merge_cell_transform)
+        transform_func=base.generic_merge_cell_transform())

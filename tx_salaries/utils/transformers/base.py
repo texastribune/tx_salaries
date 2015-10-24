@@ -100,6 +100,16 @@ def create_hash_for_record(record, exclude=None):
         for key in exclude:
             del data_for_hash[key]
 
+    # we have to deal with the scenario where we're dealing with lists from merge cell function
+    for key in data_for_hash:
+        if type(data_for_hash[key]) == list:
+            # sort stuff alphabetically so that someone with ['African American', 'Hispanic'] during
+            # one import and ['Hispanic', 'African American'] the next is still considered the same person,
+            # eliminate duplicates for the same reason (['Male', 'Male'], ['Male'] should be considered the same,
+            # this is clearly a clerical error)
+            # then join it all as a string
+            data_for_hash[key] = ''.join(sorted(list(set(data_for_hash[key]))))
+
     hash_string = re.sub(u'[\s.,-]', u'', u"::".join(data_for_hash.values()))
     return hashlib.sha1(hash_string.encode('utf-8')).hexdigest()
 
@@ -122,45 +132,68 @@ def generic_transform(labels, source, record_class):
     return data
 
 
-def generic_merge_cell_transform(labels, source, record_class):
+class generic_merge_cell_transform:
     """
-    General purpose transform function for data sources with merge-cells
+    General purpose transform callable for data sources with merge-cells
 
     Spreadsheets with merge cells, such as those provided by the Texas
     Tech System, require that data from the previous row be merged into
-    the new row.  The CSV reader that we currently use can not handle
-    these rows, so we must do it ourselves.
+    the new row.  The CSV reader that we currently use cannot handle
+    these rows, so we must do it ourselves. This function returns a list of values
+    for any cell that was a merge cell.
+
+    The function assumes that any row missing values not
+    in the keys_to_exclude_from_merge_detections list was part of a merged row before
+    xlsx broke all merged rows out into their own separate rows
     """
-    rows = []
-    last_row = None
-    for i, raw_row in enumerate(source):
-        row = dict(zip(labels, raw_row))
-        if not raw_row[0].strip():  # if the row is missing data, then we
-                                    # know any cell in it used to be a merge cell in the row above
-            assert last_row, "Row %i is missing values and cannot be reconciled" % i
-            for key, value in last_row.items():     # so we iterate through each key, value pair
-                                                    # in the last (complete) row and transform
-                                                    # the value of keys that we match in our incomplete row
-                                                    # to be an array, including all the values
-                                                    # that were in the merge cell
-                if row[key].strip():
-                    if type(last_row[key]) == list:
-                        last_row[key].append(row[key])
-                    else:
-                        last_row[key] = [last_row[key], row[key]]
-        else:   # if it's not missing data, then we know it is the first (but not necessarily final) row
-                # with information about a person, so we should both add it to our list of rows
-                # and set last_row to equal it
-            last_row = row
-            rows.append(row)
+    def __init__(self, keys_to_exclude_from_merge_detection=[]):
+        self.keys_to_exclude_from_merge_detection = keys_to_exclude_from_merge_detection
 
-    data = []
-    for row in rows:
-        record = record_class(row)
-        if record.is_valid:
-            data.append(record.as_dict())
+    def row_is_missing_data(self, labels, raw_row):
+        """
+        Separate method for telling whether or not row is empty. Intended to
+        provide abiltiy to alter generic_merge_cell_transform for the
+        quirks of different data sources without needing a full understanding/dive
+        into the internals, as would be required if it was an actual function
+        """
+        for label, cell in zip(labels, raw_row):
+            if not cell.strip() and label not in self.keys_to_exclude_from_merge_detection:
+                return True
 
-    return data
+        return False
+
+    def __call__(self, labels, source, record_class):
+
+        rows = []
+        last_row = None
+        for i, raw_row in enumerate(source):
+            row = dict(zip(labels, raw_row))
+            if self.row_is_missing_data(labels, raw_row):  # if the row is missing data, then we
+                                        # know any cell in it used to be a merge cell in the row above
+                assert last_row, "Row %i is missing values and cannot be reconciled" % i
+                for key, value in last_row.items():     # so we iterate through each key, value pair
+                                                        # in the last (complete) row and transform
+                                                        # the value of keys that we match in our incomplete row
+                                                        # to be an array, including all the values
+                                                        # that were in the merge cell
+                    if row[key].strip():
+                        if type(last_row[key]) == list:
+                            last_row[key].append(row[key])
+                        else:
+                            last_row[key] = [last_row[key], row[key]]
+            else:   # if it's not missing data, then we know it is the first (but not necessarily final) row
+                    # with information about a person, so we should both add it to our list of rows
+                    # and set last_row to equal it
+                last_row = row
+                rows.append(row)
+
+        data = []
+        for row in rows:
+            record = record_class(row)
+            if record.is_valid:
+                data.append(record.as_dict())
+
+        return data
 
 
 def transform_factory(record_class, transform_func=None):
