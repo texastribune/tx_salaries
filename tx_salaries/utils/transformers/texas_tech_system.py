@@ -1,6 +1,7 @@
 from . import base
 from . import mixins
 from datetime import date
+from decimal import Decimal
 
 GENDER_COLUMN_KEY = 'Gender'
 RACE_COLUMN_KEY = 'Race'
@@ -29,6 +30,21 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     URL = ('http:///www.google.com/')
     DATE_PROVIDED = date(2015, 10, 16)
     description = 'Annual Salary'
+
+    @property
+    def job_title(self):
+        job_title = self.get_mapped_value('job_title')
+        if type(job_title) == list:
+            return '/'.join(sorted(list(set(job_title))))
+        return job_title
+
+    @property
+    def compensation(self):
+        compensation = self.get_mapped_value('compensation')
+        if type(compensation) == list:
+            return sum([Decimal(value) for value in compensation])
+        assert type(compensation) == str or type(compensation) == unicode
+        return compensation
 
     @property
     def compensation_type(self):
