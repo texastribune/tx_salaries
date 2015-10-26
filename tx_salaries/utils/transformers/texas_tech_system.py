@@ -65,8 +65,11 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         }
 
         gender = self.gender
-        if gender.split() == '':
+        if len(gender.strip()) == 0:
             gender = 'Not given'
+        else:
+            gender = gender[0]
+            assert gender == 'M' or gender =='F'
         r['gender'] = gender
 
         return r
