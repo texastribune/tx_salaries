@@ -71,12 +71,19 @@ class TransformedRecord(
     @property
     def description(self):
         employee_type = self.employee_type
+        pay_rate = self.compensation.strip()
+
+        print pay_rate
 
         if employee_type == 'Full-Time':
             return 'Gross annual salary'
 
         if employee_type == 'Part-Time':
-            return 'Part-time annual salary'
+            #weird ones that were hourly
+            if pay_rate == '$10.40' or pay_rate == '$9.75' or pay_rate == '$8.00':
+                return 'Part-time hourly rate'
+            else:
+                return 'Part-time annual salary'
 
         if employee_type == 'PRN':
             return 'Part-time "as needed" annual salary'
