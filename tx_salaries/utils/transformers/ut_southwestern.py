@@ -14,7 +14,6 @@ class TransformedRecord(
         'last_name': 'Last Name',
         'first_name': 'First Name',
         'middle_name': 'Middle Name',
-        'suffix_name': 'NAME SUFFIX',
         'department': 'Department',
         'job_title': 'Title',
         'hire_date': 'Hire Date',
@@ -24,9 +23,7 @@ class TransformedRecord(
         'compensation': ' Gross Annual Salary ',
     }
 
-    gender_map = {u'Female': u'F', u'Male': u'M', u'': u'Unknown'}
-
-    NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
+    gender_map = {'Female': 'F', 'Male': 'M', '': 'Unknown'}
 
     ORGANIZATION_NAME = 'UT Southwestern Medical Center'
 
@@ -50,13 +47,6 @@ class TransformedRecord(
         month = hire_date[4:6]
         day = hire_date[6:8]
         return "-".join([year, month, day])
-
-    @property
-    def gender(self):
-        sex = self.gender_map[self.get_mapped_value('gender')]
-        if sex.strip() == "":
-            return ""
-        return sex.strip()
 
     @property
     def compensation_type(self):
@@ -86,7 +76,7 @@ class TransformedRecord(
             'given_name': name.first,
             'additional_name': name.middle,
             'name': unicode(name),
-            'gender': self.gender,
+            'gender': self.gender_map[self.gender.strip()],
         }
 
         return r
