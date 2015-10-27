@@ -19,7 +19,7 @@ class TransformedRecord(
         'hire_date': 'Hire Date',
         'employee_type': 'Employment Type',
         'gender': 'Gender',
-        'given_race': 'Race',
+        'race': 'Race',
         'compensation': ' Gross Annual Salary ',
     }
 
@@ -59,25 +59,30 @@ class TransformedRecord(
             tenure = 0
         return tenure
 
-    # @property
-    # def compensation_type(self):
-    #     employee_type = self.employee_type
-    #
-    #     if employee_type == 'FULL TIME':
-    #         return 'FT'
-    #
-    #     if employee_type == 'PART TIME':
-    #         return 'PT'
-    #
-    # @property
-    # def description(self):
-    #     employee_type = self.employee_type
-    #
-    #     if employee_type == 'FULL TIME':
-    #         return "Annual salary"
-    #
-    #     if employee_type == 'PART TIME':
-    #         return "Part-time annual salary"
+    @property
+    def compensation_type(self):
+        employee_type = self.employee_type
+
+        if employee_type == 'Full-Time':
+            return 'FT'
+        else:
+            return 'PT'
+
+    @property
+    def description(self):
+        employee_type = self.employee_type
+
+        if employee_type == 'Full-Time':
+            return 'Gross annual salary'
+
+        if employee_type == 'Part-Time':
+            return 'Part-time annual salary'
+
+        if employee_type == 'PRN':
+            return 'Part-time "as needed" annual salary'
+
+        if employee_type == 'WIP':
+            return 'Part-time Weekend Incentive Program salary'
 
     @property
     def person(self):
