@@ -73,10 +73,10 @@ class TransformedRecord(
         employee_type = self.employee_type
 
         if employee_type == 'FULL TIME':
-            return "Annual salary"
+            return "Fiscal year allocation"
 
         if employee_type == 'PART TIME':
-            return "Part-time annual salary"
+            return "Part-time compensation"
 
     @property
     def person(self):
