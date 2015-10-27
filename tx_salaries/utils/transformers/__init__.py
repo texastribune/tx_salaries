@@ -40,6 +40,7 @@ from . import ut_medical_branch
 from . import ut_pan_american
 from . import ut_permian_basin
 from . import ut_san_antonio
+from . import ut_southwestern
 from . import ut_system
 from . import ut_tyler
 
@@ -88,5 +89,6 @@ TRANSFORMERS = {
     '258ae8c47dc5b5bd842fb82569b1be7ba8c1bd7d': [ut_medical_branch.transform, ],
     'bf2d8d6cad54567327b44050c507096885f925b7': [ut_pan_american.transform, ],
     '3eede716c96db3c302eaa2b9b3af6e176daf7727': [ut_san_antonio.transform, ],
+    '5714aa39bed15a7d032097c2aa0be7df68507e56': [ut_southwestern.transform, ],
     '068d88f0ea10973339f5a4d57c8d806686d2df40': [ut_tyler.transform, ],
 }
