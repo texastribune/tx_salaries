@@ -20,7 +20,7 @@ class TransformedRecord(
         'employee_type': 'Employment Type',
         'gender': 'Gender',
         'race': 'Race',
-        'compensation': ' Gross Annual Salary ',
+        'compensation': 'Gross Annual Salary',
     }
 
     gender_map = {'Female': 'F', 'Male': 'M', '': 'Unknown'}
@@ -34,10 +34,12 @@ class TransformedRecord(
     URL = ('http://s3.amazonaws.com/raw.texastribune.org/ut_southwestern_medical'
         '/salaries/2015-08/ut_southwestern.xlsx')
 
+
+
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.last_name.strip() != '' && self.compensation.strip() != '-'
+        return self.compensation.strip() != '$-'
 
 
     @property
