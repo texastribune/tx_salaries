@@ -36,8 +36,6 @@ class TransformedRecord(
     URL = ('http://s3.amazonaws.com/raw.texastribune.org/ut_southwestern_medical'
         '/salaries/2015-08/ut_southwestern.xlsx')
 
-
-
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
@@ -82,7 +80,8 @@ class TransformedRecord(
 
         if employee_type == 'Part-Time':
             #weird ones that were hourly
-            if pay_rate == '10.4' or pay_rate == '9.75' or pay_rate == '8':
+            if pay_rate == '10.4' or pay_rate == '9.75'
+            or pay_rate == '8' or pay_rate == '4.16':
                 return 'Part-time hourly rate'
             else:
                 return 'Part-time annual salary'
