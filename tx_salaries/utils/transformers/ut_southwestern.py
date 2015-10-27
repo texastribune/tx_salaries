@@ -25,6 +25,8 @@ class TransformedRecord(
 
     gender_map = {'Female': 'F', 'Male': 'M', '': 'Unknown'}
 
+    NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
+
     ORGANIZATION_NAME = 'UT Southwestern Medical Center'
 
     ORGANIZATION_CLASSIFICATION = 'University Hospital'
@@ -39,7 +41,7 @@ class TransformedRecord(
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.compensation.strip() != '$-'
+        return self.compensation.strip() != '0'
 
 
     @property
@@ -75,14 +77,12 @@ class TransformedRecord(
         employee_type = self.employee_type
         pay_rate = self.compensation.strip()
 
-        print pay_rate
-
         if employee_type == 'Full-Time':
             return 'Gross annual salary'
 
         if employee_type == 'Part-Time':
             #weird ones that were hourly
-            if pay_rate == '$10.40' or pay_rate == '$9.75' or pay_rate == '$8.00':
+            if pay_rate == '10.4' or pay_rate == '9.75' or pay_rate == '8':
                 return 'Part-time hourly rate'
             else:
                 return 'Part-time annual salary'
