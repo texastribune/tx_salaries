@@ -34,7 +34,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         '': 'Not given'
     }
 
-    gender_map = {'Female': 'F', 'Male': 'M', 'Unknown': 'U'}
+    gender_map = {'Female': 'F', 'Male': 'M', 'Unknown': 'Not given'}
 
     @property
     def person(self):
