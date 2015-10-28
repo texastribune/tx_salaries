@@ -80,8 +80,8 @@ class TransformedRecord(
 
         if employee_type == 'Part-Time':
             #weird ones that were hourly
-            if pay_rate == '10.4' or pay_rate == '9.75'
-            or pay_rate == '8' or pay_rate == '4.16':
+            if (pay_rate == '10.4' or pay_rate == '9.75'
+                or pay_rate == '8' or pay_rate == '4.16'):
                 return 'Part-time hourly rate'
             else:
                 return 'Part-time annual salary'
