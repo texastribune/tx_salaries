@@ -1,126 +1,143 @@
-from datetime import date
-
 from . import base
 from . import mixins
 
-from .. import cleaver
+from datetime import date
 
+class TransformedRecord(
+    mixins.GenericCompensationMixin,
+    mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
+    mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
+    mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+    mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
-class TransformedRecord(mixins.GenericCompensationMixin,
-        mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
-        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
     MAP = {
-        'last_name': 'Last Name',
-        'first_name': 'First Name',
+        'full_name': 'Name',
         'department': 'Department',
         'job_title': 'Job Title',
         'hire_date': 'Hire Date',
-        'race': 'Ethnicity',
-        'gender': 'Sex',
-        'compensation': 'Annual Salary',
+        'AMIND': 'AMIND',
+        'ASIAN': 'ASIAN',
+        'BLACK': 'BLACK',
+        'HISPA': 'HISPA',
+        'NSPEC': 'NSPEC',
+        'PACIF': 'PACIF',
+        'WHITE': 'WHITE',
+        'gender': 'Gender',
+        'compensation': 'Rate',
+        'status': 'Full/Part',
+        'employment_frequency': 'Freq'
     }
 
-    NAME_FIELDS = ('first_name', 'last_name', )
+    race_map = {
+        'AMIND': 'American Indian or Alaskan Native',
+        'ASIAN': 'Asian',
+        'BLACK': 'Black or African American',
+        'HISPA': 'Hispanic or Latino',
+        'NSPEC': 'Not specified',
+        'PACIF': 'Native Hawaiian or Pacific Islander',
+        'WHITE': 'White'
+    }
 
-    gender_map = {'Female': 'F', 'Male': 'M'}
+    # How do they track gender? We need to map what they use to `F` and `M`.
+    gender_map = {'F': 'F', 'M': 'M', 'U': 'Unknown'}
 
     ORGANIZATION_NAME = 'University of Texas at San Antonio'
 
     ORGANIZATION_CLASSIFICATION = 'University'
 
-    # TODO 45 earn < 10,000
-    compensation_type = 'FT'
-    description = 'Annual compensation'
+    DATE_PROVIDED = date(2015, 10, 7)
 
-    DATE_PROVIDED = date(2014, 1, 21)
-
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_san_antonio/salaries/2014-01/Hill1931-responsive.xls'
-
-    cleaver.DepartmentName.MAP = (cleaver.DepartmentName.MAP +
-                                 ((cleaver.regex_i(r' Vc '), ' VC '), ) +
-                                 ((cleaver.regex_i(r' Svcs '), ' SVCS '), ) +
-                                 ((cleaver.regex_i(r' Svc'), ' SVC'), ) +
-                                 ((cleaver.regex_i(r'Coe '), 'COE '), ) +
-                                 ((cleaver.regex_i(r'Cob-Asc'), 'COB-ASC'), ) +
-                                 ((cleaver.regex_i(r' Ofc '), ' OFC '), ) +
-                                 ((cleaver.regex_i(r'Cos '), 'COS '), ) +
-                                 ((cleaver.regex_i(r' Seri'), ' SERI'), ) +
-                                 ((cleaver.regex_i(r'Ihdr'), 'IHDR'), ) +
-                                 ((cleaver.regex_i(r'Mbc'), 'MBC'), ) +
-                                 ((cleaver.regex_i(r'^Itc'), 'ITC'), ) +
-                                 ((cleaver.regex_i(r'Swtaac'), 'SWTAAC'), ) +
-                                 ((cleaver.regex_i(r'^Vp-'), 'VP-'), ) +
-                                 ((cleaver.regex_i(r'^Tx'), 'TX'), ) +
-                                 ((cleaver.regex_i(r'^Tv'), 'TV'), ) +
-                                 ((cleaver.regex_i(r'^Rsc '), 'RSC '), ) +
-                                 ((cleaver.regex_i(r'^Rsch '), 'RSCH '), ) +
-                                 ((cleaver.regex_i(r' Rsrcs '), ' RSRCS '), ) +
-                                 ((cleaver.regex_i(r'- Cob'), '- COB'), ))
+    URL = ('http://raw.texastribune.org.s3.amazonaws.com/ut_san_antonio/'
+            'salaries/2015-10/utsanantonio.xls')
 
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.last_name.strip() != '' and self.hire_date.strip() != ''
-
-    def calculate_tenure(self):
-        try:
-            hire_date_data = map(int, self.hire_date.split('-'))
-        except:
-            return None
-        hire_date = date(hire_date_data[0], hire_date_data[1],
-                         hire_date_data[2])
-        tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
-        if tenure < 0:
-            error_msg = ("An employee was hired after the data was provided.\n"
-                         "Is DATE_PROVIDED correct?")
-            raise ValueError(error_msg)
-        return tenure
+        return self.full_name.strip() != ''
 
     @property
-    def compensations(self):
-        return [
-            {
-                'tx_salaries.CompensationType': {
-                    'name': self.compensation_type,
-                    'description': self.description
-                },
-                'tx_salaries.Employee': {
-                    'hire_date': self.hire_date,
-                    'compensation': self.compensation,
-                    'tenure': self.calculate_tenure(),
-                },
-                'tx_salaries.EmployeeTitle': {
-                    'name': unicode(cleaver.DepartmentNameCleaver(self.job_title)
-                                           .parse())
-                },
+    def compensation(self):
+        if not self.get_mapped_value('compensation'):
+            return 0
+        return self.get_mapped_value('compensation')
+
+    @property
+    def compensation_type(self):
+        emp_type = self.status
+
+        if emp_type == 'F':
+            return 'FT'
+
+        if emp_type == 'P':
+            return 'PT'
+
+    @property
+    def description(self):
+        emp_type = self.status
+        freq = self.employment_frequency
+
+        if freq == 'A':
+            if emp_type == 'P':
+                return "Part-time annual salary"
+            return "Annual salary"
+
+        if freq == 'H':
+            return "Hourly rate"
+
+        if freq == 'C':
+            return "Contract salary"
+
+    @property
+    def race(self):
+        races = [self.AMIND,self.ASIAN,self.BLACK,self.HISPA,self.NSPEC,self.PACIF,self.WHITE]
+        raceNames = ['AMIND','ASIAN','BLACK','HISPA','NSPEC','PACIF','WHITE']
+        i = 0
+        raceList = []
+
+        for indivRace in races:
+            if indivRace == u'1':
+                raceList.append(self.race_map[raceNames[i].strip()])
+            i += 1
+
+        if len(raceList) > 1:
+            return {
+                'name': 'Two or more races'
             }
-        ]
-
-    @property
-    def post(self):
-        return {'label': (unicode(cleaver.DepartmentNameCleaver(self.job_title)
-                                         .parse()))}
-
-    @property
-    def department_as_child(self):
-        return [{'name': unicode(cleaver.DepartmentNameCleaver(self.department)
-                                        .parse()), }, ]
+        elif len(raceList) == 0:
+            return {
+                'name': 'Not given'
+            }
+        else:
+            return {
+                'name': raceList[0]
+            }
 
     @property
     def person(self):
-        data = {
-            'family_name': self.last_name,
-            'given_name': self.first_name,
-            'name': self.get_raw_name(),
+        name = self.get_name()
+        gender = self.get_mapped_value('gender')
+        r = {
+            'family_name': name.last,
+            'given_name': name.first,
+            'additional_name': name.middle,
+            'name': unicode(name),
+            'gender': self.gender_map[self.gender.strip()]
         }
-        try:
-            data.update({
-                'gender': self.gender_map[self.gender.strip()]
-            })
-            return data
-        except KeyError:
-            return data
+
+        return r
+
+    def get_raw_name(self):
+        split_name = self.full_name.split(',')
+        last_name = split_name[0]
+        split_firstname = split_name[1].split(' ')
+        first_name = split_firstname[0]
+        if len(split_firstname) == 2 and len(split_firstname[1]) == 1:
+            middle_name = split_firstname[1]
+        else:
+            first_name = split_name[1]
+            middle_name = ''
+
+        return u' '.join([first_name, middle_name, last_name])
 
 
 transform = base.transform_factory(TransformedRecord)
