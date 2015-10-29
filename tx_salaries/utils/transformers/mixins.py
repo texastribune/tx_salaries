@@ -46,6 +46,8 @@ class GenericCompensationMixin(object):
                 user_feedback = raw_input("There is an employee or employees in the data with a hire date in the future. Enter y if this is correct: ")
                 if user_feedback[0].lower() == 'y':
                     self.EMPLOYEES_HIRED_AFTER_SUBMISSION = True
+                else:
+                    throw_error()
 
         return tenure if tenure >= 0 else 0  # prevent us from putting a negative number
                                              # into our tenure aggregation
