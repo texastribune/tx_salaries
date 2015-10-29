@@ -27,7 +27,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     NAME_FIELDS = ('name',)
     ORGANIZATION_NAME = 'Texas Tech University'
 
-    URL = ('http:///www.google.com/')
+    URL = ('http://raw.texastribune.org.s3.amazonaws.com/texas_tech/2015-10/texas-tech.xlsx')
     DATE_PROVIDED = date(2015, 10, 16)
     description = 'Annual Salary'
 
@@ -50,8 +50,9 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     def compensation_type(self):
         pay_split = self.pay_status.split(' ')[0]
         # assert pay_split == 'FT' or pay_split == 'PT'
-        if (pay_split == 'FT' and pay_split == 'PT'):
-            return 'FT' # for now, till clarification, so I can debug code
+        if not (pay_split =='FT' or pay_split =='PT'):
+            # dealing with return to work people. I manually altered those who are fulltime to have 'FT' in front
+            return 'PT'
         return pay_split
 
     @property
