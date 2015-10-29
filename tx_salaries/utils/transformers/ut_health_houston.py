@@ -101,7 +101,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     DATE_PROVIDED = date(2015, 10, 8)
 
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_health_houston/salaries/2015-08/ut_health_science_center_houston.xlsx'
+    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_health_houston/salaries/2015-10/uthsca-2015-10-8.xlsx'
 
     @property
     def is_valid(self):
