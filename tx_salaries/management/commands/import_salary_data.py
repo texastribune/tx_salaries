@@ -83,19 +83,22 @@ class Command(BaseCommand):
             for org in existing_orgs:
                 self.stdout.write(org.name)
 
-            reply = raw_input('In order to update, everything currently in '
-                              'the database concerning these organizations '
-                              'must be deleted. Do you want to continue? '
-                              '(Y/n): ').lower().strip()
+            reply_invalid = True
 
-            if reply[0] == 'n':
-                self.stdout.write('Stopping. Did not touch anything.')
-                return
-
-            if reply[0] == 'y':
-                self.stdout.write('Deleting organizations...')
-                existing_orgs.delete()
-                self.stdout.write('Done! Moving on.')
+            while (reply_invalid):
+                reply = raw_input('In order to update, everything currently in '
+                                  'the database concerning these organizations '
+                                  'must be deleted. Do you want to continue? '
+                                  '(Y/n): ').lower().strip()
+                if reply[0].lower() == 'n' or reply[0].lower() == 'y':
+                    reply_invalid = False
+                    if reply[0].lower() == 'n':
+                        self.stdout.write('Stopping. Did not touch anything.')
+                        return
+                    if reply[0].lower() == 'y':
+                        self.stdout.write('Deleting organizations...')
+                        existing_orgs.delete()
+                        self.stdout.write('Done! Moving on.')
 
         self.stdout.write('Processing {} records from {}'.format(
             len(records), basename(filename)))
