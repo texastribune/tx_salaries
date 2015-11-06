@@ -77,7 +77,6 @@ TRANSFORMERS = {
     'c60489252da989ab04f6a47a86265dc047dd367b': [texas_tech_university.transform, ],
     '63ca4b9cd0465cb3daaad24b070689a0c065d863': [texas_womans_university.transform, ],
     '177bf9500b4f73c649e30154c46e0c359d122a48': [
-        ('UT System', ut_system.transform),
         ('UT Permian Basin', ut_permian_basin.transform),
         ('UT Arlington', ut_arlington.transform), ],
     'dd1cd3cde7c95e8b5155c252b3baf9f72dad7856': [university_of_houston.transform, ],
@@ -93,6 +92,7 @@ TRANSFORMERS = {
     '258ae8c47dc5b5bd842fb82569b1be7ba8c1bd7d': [ut_medical_branch.transform, ],
     'bf2d8d6cad54567327b44050c507096885f925b7': [ut_pan_american.transform, ],
     '3eede716c96db3c302eaa2b9b3af6e176daf7727': [ut_san_antonio.transform, ],
+    'fe980380568d4efbc398522dfd71a3e872ea33ac': [ut_system.transform, ],
     '5714aa39bed15a7d032097c2aa0be7df68507e56': [ut_southwestern.transform, ],
     'fd66132338a69d2fb76faa1d91b6f0d21ffc5aec': [ut_san_antonio.transform, ],
     '068d88f0ea10973339f5a4d57c8d806686d2df40': [ut_tyler.transform, ],

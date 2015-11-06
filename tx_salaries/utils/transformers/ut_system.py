@@ -3,30 +3,23 @@ from datetime import date
 from . import base
 from . import mixins
 
-from .. import cleaver
-
 
 class TransformedRecord(mixins.GenericCompensationMixin,
         mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
     MAP = {
-        'last_name': 'NAME LAST',
-        'first_name': 'NAME FIRST',
-        'middle_name': 'NAME MIDDLE',
-        'suffix_name': 'NAME SUFFIX',
-        'department': 'DEPARTMENT TITLE',
-        'job_title': 'JOB TITLE',
-        'hire_date': 'CONTINUOUS EMPLOYMENT DATE',
-        'status': 'LABEL FOR FT/PT STATUS',
-        'race': 'ETHNICITY',
-        'gender': 'GENDER',
-        'compensation': 'FY ALLOCATIONS',
+        'last_name': 'Last',
+        'first_name': 'First',
+        'department': 'Dept Descr',
+        'job_title': 'Job Title',
+        'hire_date': 'Start Date',
+        'nationality': 'ETHNICITY',
+        'gender': 'Sex',
+        'compensation': 'Annual Rt',
     }
 
-    NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
-
-    gender_map = {'FEMALE': 'F', 'MALE': 'M'}
+    NAME_FIELDS = ('first_name', 'last_name', )
 
     ORGANIZATION_NAME = 'University of Texas System Administration'
 
@@ -36,9 +29,20 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     compensation_type = 'FT'
     description = 'Annual compensation'
 
-    DATE_PROVIDED = date(2014, 2, 14)
+    DATE_PROVIDED = date(2015, 10, 14)
 
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_system/salaries/2014-02/TexasTribuneUTSystemSalaryData02-11-14.xlsx'
+    URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
+           'ut_system/salaries/2015-10/ut_system.xls')
+
+    race_map = {
+        'WHITE': 'White',
+        'BLACK': 'Black',
+        'HISPA': 'Hispanic',
+        'ASIAN': 'Asian',
+        'AMIND': 'American Indian',
+        'PACIF': 'Pacific Islander',
+        '42': 'Not given',
+    }
 
     @property
     def is_valid(self):
@@ -46,76 +50,23 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         return self.last_name.strip() != ''
 
     @property
-    def get_raw_name(self):
-        # TODO include suffix
-        if self.middle_name.strip() == '':
-            self.NAME_FIELDS = ('first_name', 'last_name')
-        name_fields = [getattr(self, a).strip() for a in self.NAME_FIELDS]
-        return u' '.join(name_fields)
+    def race(self):
+        return {
+            'name': self.race_map[self.nationality.strip()]
+        }
 
     @property
     def person(self):
-        data = {
-            'family_name': self.last_name.strip(),
-            'given_name': self.first_name.strip(),
-            'name': self.get_raw_name,
+        name = self.get_name()
+        r = {
+            'family_name': name.last,
+            'given_name': name.first,
+            'additional_name': name.middle,
+            'name': unicode(name),
+            'gender': self.gender.strip()
         }
-        try:
-            data.update({
-                'gender': self.gender_map[self.gender.strip()]
-            })
-            return data
-        except KeyError:
-            return data
 
-    def process_hire_date(self, hire_date):
-        year = hire_date[0:4]
-        month = hire_date[4:6]
-        day = hire_date[6:8]
-        return "-".join([year, month, day])
-
-    def calculate_tenure(self, hire_date):
-        try:
-            hire_date_data = map(int, hire_date.split('-'))
-        except:
-            return None
-        hire_date = date(hire_date_data[0], hire_date_data[1],
-                         hire_date_data[2])
-        tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
-        if tenure < 0:
-            error_msg = ("An employee was hired after the data was provided.\n"
-                         "Is DATE_PROVIDED correct?")
-            raise ValueError(error_msg)
-        return tenure
-
-    @property
-    def compensations(self):
-        hire_date = self.process_hire_date(self.hire_date)
-        return [
-            {
-                'tx_salaries.CompensationType': {
-                    'name': self.compensation_type,
-                    'description': self.description
-                },
-                'tx_salaries.Employee': {
-                    'hire_date': hire_date,
-                    'compensation': self.compensation,
-                    'tenure': self.calculate_tenure(hire_date)
-                },
-                'tx_salaries.EmployeeTitle': {
-                    'name': self.job_title,
-                },
-            }
-        ]
-
-    @property
-    def given_race(self):
-        return {'name': self.race.strip()}
-
-    @property
-    def department_as_child(self):
-        return [{'name': unicode(cleaver.DepartmentNameCleaver(self.department)
-                                        .parse()), }, ]
+        return r
 
 
 transform = base.transform_factory(TransformedRecord)
