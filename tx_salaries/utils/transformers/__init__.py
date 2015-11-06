@@ -4,6 +4,7 @@ from . import austin_isd
 from . import austin
 from . import beaumont_isd
 from . import brownsville_isd
+from . import cypress_fairbanks_isd
 from . import collin_college
 from . import dallas
 from . import dallas_county
@@ -25,6 +26,7 @@ from . import texas_am_system
 from . import texas_state_university
 from . import texas_tech_system
 from . import texas_tech_university
+from . import university_of_houston
 from . import texas_womans_university
 from . import ut_austin
 from . import ut_arlington
@@ -52,6 +54,7 @@ TRANSFORMERS = {
     'fc0eb7927ee4d39dab7602f01ab771eb49eb7512': [beaumont_isd.transform, ],
     '6e4bb90321c62a34296cad61c3800b1dd308257e': [brownsville_isd.transform, ],
     '39bcb735ae0a6d3b9bddb839337680abf76be1fd': [collin_college.transform, ],
+    '7c9088d4ddd84422e7ccc26b986bd7d6c4c6fd45': [cypress_fairbanks_isd.transform, ],
     '1a55d6050f034d84f6551cd629e46805c8788297': [dallas.transform, ],
     'c81582dc5ef3233848c0cbe13d9047d2e5a6dbde': [dallas_county.transform, ],
     'b3ac361fd078f04d8035cef647ac839ef3f0f353': [eanes_isd.transform, ],
@@ -77,6 +80,7 @@ TRANSFORMERS = {
         ('UT System', ut_system.transform),
         ('UT Permian Basin', ut_permian_basin.transform),
         ('UT Arlington', ut_arlington.transform), ],
+    'dd1cd3cde7c95e8b5155c252b3baf9f72dad7856': [university_of_houston.transform, ],
     '2115235d43a6f292c7a37e26e12cd0e77a683a1a': [ut_austin.transform, ],
     'a1cb75442f33c2f0152296838771087192643869': [ut_brownsville.transform, ],
     '1124210f0bdca6e3713c422117cd721e38bff3cb': [ut_dallas.transform, ],
@@ -90,5 +94,6 @@ TRANSFORMERS = {
     'bf2d8d6cad54567327b44050c507096885f925b7': [ut_pan_american.transform, ],
     '3eede716c96db3c302eaa2b9b3af6e176daf7727': [ut_san_antonio.transform, ],
     '5714aa39bed15a7d032097c2aa0be7df68507e56': [ut_southwestern.transform, ],
+    'fd66132338a69d2fb76faa1d91b6f0d21ffc5aec': [ut_san_antonio.transform, ],
     '068d88f0ea10973339f5a4d57c8d806686d2df40': [ut_tyler.transform, ],
 }
