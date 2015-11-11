@@ -12,76 +12,59 @@ class TransformedRecord(
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        #'last_name': 'Last',
-        #'first_name': 'First',
-        #'middle_name': 'MI',
-        'full_name': 'Name - Full'
-        # 'suffix': '', if needed
-        'department': 'Process Level (Departmet)',
-        'job_title': 'Job Code Description',
-        'hire_date': 'Adjusted Hire Date',
-        'compensation': ' Rate of Pay ',
-        'hours': 'Annual Hours',
+        'full_name': 'Name',
+        'department': 'Department',
+        'job_title': 'Job Title',
+        'hire_date': 'Hire Date',
+        'compensation': 'Annual Salary',
         'gender': 'Gender',
-        'race': 'Ethnicity',
+        'nationality': 'Race',
     }
 
-    # The order of the name fields to build a full name.
-    # If `full_name` is in MAP, you don't need this at all.
-    #NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
-
     # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
-    ORGANIZATION_NAME = 'Dallas'
+    ORGANIZATION_NAME = 'The University of Texas MD Anderson Cancer Center'
 
     # What type of organization is this? This MUST match what we use on the site, double check against salaries.texastribune.org
-    ORGANIZATION_CLASSIFICATION = 'City'
+    ORGANIZATION_CLASSIFICATION = 'University Hospital'
 
     # ???
-    #compensation_type = 'FT'
+    compensation_type = 'FT'
 
     # How would you describe the compensation field? We try to respect how they use their system.
-    #description = 'Rate of Pay'
+    description = 'Annual salary'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2015, 4, 29)
+    DATE_PROVIDED = date(2015, 5, 26)
 
     # The URL to find the raw data in our S3 bucket.
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'dallas/salaries/2015-04/'
-           'cityofdallas0415.xls')
+    URL = ('http://raw.texastribune.org.s3.amazonaws.com/ut_md_anderson'
+           '/salaries/2015-05/PIA%20-%20Texas%20Tribune%20-%202015.05.xlsx')
 
     # How do they track gender? We need to map what they use to `F` and `M`.
-    #gender_map = {'Female': 'F', 'Male': 'M'}
+    gender_map = {'F': 'F', 'M': 'M'}
 
-    @property
-    def compensation_type(self):
-        if self.get_mapped_value('hours') < 2000:
-            return 'PT'
-        return 'FT'
-
-    @property
-    def description(self):
-        hours = self.get_mapped_value('hours')
-
-        if not hours:
-            return "Full-time salary"
-
-        if hours < 2000:
-            return "Part-time salary"
-
-        return "Full-time salary"
-
-    @property
-    def compensation(self):
-        if self.get_mapped_value('compensation') < 1000:
-            return self.get_mapped_value('compensation') * self.get_mapped_value('hours')
-        return self.get_mapped_value('compensation')
+    race_map = {
+        'AMIND': 'American Indian',
+        'WHITE': 'White',
+        'HISPA': 'Hispanic',
+        'ASIAN': 'Asian',
+        '2+RACE': 'Mixed race',
+        'PACIF': 'Pacific Islander',
+        'BLACK': 'Black',
+        '': 'Not given',
+    }
 
     # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.full_name.strip() != ''
+
+    @property
+    def race(self):
+        return {
+            'name': self.race_map[self.nationality.strip()]
+        }
 
     @property
     def person(self):
@@ -91,13 +74,13 @@ class TransformedRecord(
             'given_name': name.first,
             'additional_name': name.middle,
             'name': unicode(name),
-            'gender': self.gender.strip()
+            'gender': self.gender_map[self.gender.strip()]
         }
 
         return r
 
     def get_raw_name(self):
-        split_name = self.full_name.split(', ')
+        split_name = self.full_name.split(',')
         last_name = split_name[0]
         split_firstname = split_name[1].split(' ')
         first_name = split_firstname[0]

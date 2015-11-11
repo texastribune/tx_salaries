@@ -62,9 +62,6 @@ class BaseTransformedRecord(object):
         return cleaver.EmployeeNameCleaver
 
     def as_dict(self):
-        # Stop early if this isn't valid
-        if not self.is_valid:
-            return
 
         # Build the structured record with the required attributes
         d = copy(DEFAULT_DATA_TEMPLATE)
