@@ -12,17 +12,15 @@ class TransformedRecord(
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        'full_name': 'FULL NAME',
-        # 'first_name': 'First Name',
-        # 'middle_name': '', if needed
-        # 'full_name': '', if needed
-        # 'suffix': '', if needed
-        'department': 'ORGANIZATION',
-        'job_title': 'JOB TITLE',
-        'hire_date': 'HIRE DATE',
-        'compensation': 'SALARY',
-        'gender': 'GENDER',
-        'race': 'RACE',
+        'full_name': 'Employee Name',
+        'department': 'Organization/Department',
+        'job_title': 'Job Title',
+        'hire_date': 'Hire Date',
+        'compensation': 'Salary',
+        'gender': 'Gender',
+        'race': 'Ethnicity',
+        'employee_type': 'Employee Type',
+        'hours_worked': 'Hours Worked',
     }
 
     # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
@@ -38,11 +36,11 @@ class TransformedRecord(
     description = 'Salary'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2015, 5, 20)
+    DATE_PROVIDED = date(2015, 11, 10)
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'dallas_isd/salaries/2015-06/dallas_isd.xlsx')
+           'dallas_isd/salaries/2015-11/dallas_isd.xlsx')
 
     # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
     @property
@@ -62,9 +60,8 @@ class TransformedRecord(
         r = {
             'family_name': name.last,
             'given_name': name.first,
-            'additional_name': name.middle,
             'name': unicode(name),
-            'gender': self.gender_map[self.gender.strip()]
+            'gender': self.gender
         }
 
         return r
