@@ -29,25 +29,17 @@ class GenericCompensationMixin(object):
     Expects hire_date to be given as YYYY-MM-DD format.
     Override hire_date with @property if that is not the case.
     """
+    EMPLOYEES_HIRED_AFTER_SUBMISSION = False
     def calculate_tenure(self):
         hire_date_data = map(int, self.hire_date.split('-'))
         hire_date = date(hire_date_data[0], hire_date_data[1],
                          hire_date_data[2])
         tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
         if tenure < 0:
-            def throw_error():
+            if not self.EMPLOYEES_HIRED_AFTER_SUBMISSION:
                 error_msg = ("An employee was hired after the data was provided.\n"
                          "Is DATE_PROVIDED correct?")
                 raise ValueError(error_msg)
-            if hasattr(self, 'EMPLOYEES_HIRED_AFTER_SUBMISSION'):
-                if not self.EMPLOYEES_HIRED_AFTER_SUBMISSION:
-                    throw_error()
-            else:
-                user_feedback = raw_input("There is an employee or employees in the data with a hire date in the future. Enter y if this is correct: ")
-                if user_feedback[0].lower() == 'y':
-                    self.EMPLOYEES_HIRED_AFTER_SUBMISSION = True
-                else:
-                    throw_error()
 
         return tenure if tenure >= 0 else 0  # prevent us from putting a negative number
                                              # into our tenure aggregation
