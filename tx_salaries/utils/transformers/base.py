@@ -99,6 +99,16 @@ def create_hash_for_record(record, exclude=None):
         for key in exclude:
             del data_for_hash[key]
 
+    # we have to deal with the scenario where we're dealing with lists from merge cell function
+    for key in data_for_hash:
+        if type(data_for_hash[key]) == list:
+            # sort stuff alphabetically so that someone with ['African American', 'Hispanic'] during
+            # one import and ['Hispanic', 'African American'] the next is still considered the same person,
+            # eliminate duplicates for the same reason (['Male', 'Male'], ['Male'] should be considered the same,
+            # this is clearly a clerical error)
+            # then join it all as a string
+            data_for_hash[key] = ''.join(sorted(list(set(data_for_hash[key]))))
+
     hash_string = re.sub(u'[\s.,-]', u'', u"::".join(data_for_hash.values()))
     return hashlib.sha1(hash_string.encode('utf-8')).hexdigest()
 
