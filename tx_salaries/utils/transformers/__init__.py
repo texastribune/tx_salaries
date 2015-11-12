@@ -72,10 +72,11 @@ TRANSFORMERS = {
     'bc023bcf9e573ecdf8335ebafb24feec596e473f': [texas_tech_system.transform, ],
     'c60489252da989ab04f6a47a86265dc047dd367b': [texas_tech_university.transform, ],
     '63ca4b9cd0465cb3daaad24b070689a0c065d863': [texas_womans_university.transform, ],
+    '13d8e7c97bb23b93e81bf4db1117193baefc30cd': [ut_arlington.transform],
     '177bf9500b4f73c649e30154c46e0c359d122a48': [
         ('UT System', ut_system.transform),
         ('UT Permian Basin', ut_permian_basin.transform),
-        ('UT Arlington', ut_arlington.transform), ],
+    ],
     '2115235d43a6f292c7a37e26e12cd0e77a683a1a': [ut_austin.transform, ],
     'a1cb75442f33c2f0152296838771087192643869': [ut_brownsville.transform, ],
     '1124210f0bdca6e3713c422117cd721e38bff3cb': [ut_dallas.transform, ],
