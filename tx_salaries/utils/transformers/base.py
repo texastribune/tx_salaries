@@ -19,6 +19,8 @@ DEFAULT_DATA_TEMPLATE = {
 
 
 class BaseTransformedRecord(object):
+    REJECT_ALL_IF_INVALID_RECORD_EXISTS = True
+
     def __init__(self, data=None, **kwargs):
         self.data = data
 
@@ -97,16 +99,6 @@ def create_hash_for_record(record, exclude=None):
         for key in exclude:
             del data_for_hash[key]
 
-    # we have to deal with the scenario where we're dealing with lists from merge cell function
-    for key in data_for_hash:
-        if type(data_for_hash[key]) == list:
-            # sort stuff alphabetically so that someone with ['African American', 'Hispanic'] during
-            # one import and ['Hispanic', 'African American'] the next is still considered the same person,
-            # eliminate duplicates for the same reason (['Male', 'Male'], ['Male'] should be considered the same,
-            # this is clearly a clerical error)
-            # then join it all as a string
-            data_for_hash[key] = ''.join(sorted(list(set(data_for_hash[key]))))
-
     hash_string = re.sub(u'[\s.,-]', u'', u"::".join(data_for_hash.values()))
     return hashlib.sha1(hash_string.encode('utf-8')).hexdigest()
 
@@ -122,11 +114,18 @@ def generic_transform(labels, source, record_class):
     used directly via ``transform_factory``.
     """
     data = []
+    warnings = []
     for raw_record in source:
         record = record_class(dict(zip(labels, raw_record)))
         if record.is_valid:
             data.append(record.as_dict())
-    return data
+        else:
+            warnings.append("WARNING: RECORD INVALID; {0}".format(record.data))
+    if warnings and record_class.REJECT_ALL_IF_INVALID_RECORD_EXISTS:
+        raise ValueError("Aborting the transformation because invalid records exist,"
+                         "and there is no override to accept invalid records."
+                         "{0}".format(['\n'.join(warnings)]))
+    return data, warnings
 
 
 class generic_merge_cell_transform:
@@ -185,12 +184,20 @@ class generic_merge_cell_transform:
                 rows.append(row)
 
         data = []
+        warnings = []
         for row in rows:
             record = record_class(row)
             if record.is_valid:
                 data.append(record.as_dict())
+            else:
+                warnings.append("WARNING: RECORD INVALID; {0}".format(record.data))
+        
+        if warnings and record_class.REJECT_ALL_IF_INVALID_RECORD_EXISTS:
+            raise ValueError("Aborting the transformation because invalid records exist,"
+                             "and there is no override to accept invalid records.\n"
+                             "{0}".format(['\n'.join(warnings)]))
 
-        return data
+        return data, warnings
 
 
 def transform_factory(record_class, transform_func=None):
