@@ -6,7 +6,6 @@ from . import mixins
 
 class TransformedRecord(mixins.GenericCompensationMixin,
         mixins.GenericDepartmentMixin,
-        mixins.GenericJobTitleMixin,
         mixins.MembershipMixin,
         mixins.OrganizationMixin,
         mixins.PostMixin,
@@ -18,12 +17,13 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'name': 'Name',
         'job_title': 'Title',
         'last_name': 'Last Name',
-        'hire_date': 'Hire Date',
-        'pay_status': 'FT or PT Status',
-        'compensation': 'Salary',
+        'hire_date': 'Original Hire Date',
+        'compensation': 'Annual Salary',
         'race': 'Race',
         'gender': 'Gender',
     }
+
+    compensation_type = 'FT'
 
     gender_map = {'Female': 'F', 'Femail': 'F', 'Male': 'M'}
 
@@ -36,8 +36,10 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     # All employees are full-time right now
     compensation_type = 'Full Time'
+    description = 'This is not a real description'
 
-    DATE_PROVIDED = date(2013, 7, 31)
+    DATE_PROVIDED = date(2015, 4, 8)
+    EMPLOYEES_HIRED_AFTER_SUBMISSION = True
 
     URL = 'http://raw.texastribune.org.s3.amazonaws.com/texas_tech_university/salaries/2013-07/Faculty%20Open%20Records%20-%20Tribune.xlsx'
 
@@ -69,6 +71,13 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             'gender': self.gender_map[self.gender]
         }
 
+    @property
+    def job_title(self): # People can have more than one job title -_-
+        job_title = self.get_mapped_value('job_title')
+        if type(job_title) == list:
+            return '/'.join(job_title).title()
+
+
 
 transform = base.transform_factory(record_class=TransformedRecord,
-        transform_func=base.generic_merge_cell_transform)
+        transform_func=base.generic_merge_cell_transform())

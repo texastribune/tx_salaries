@@ -27,18 +27,22 @@ class GenericCompensationMixin(object):
     * ``DATE_PROVIDED``
 
     Expects hire_date to be given as YYYY-MM-DD format.
-    Override calculate_tenure in the transformer if this is not the case.
+    Override hire_date with @property if that is not the case.
     """
+    EMPLOYEES_HIRED_AFTER_SUBMISSION = False
     def calculate_tenure(self):
         hire_date_data = map(int, self.hire_date.split('-'))
         hire_date = date(hire_date_data[0], hire_date_data[1],
                          hire_date_data[2])
         tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
         if tenure < 0:
-            error_msg = ("An employee was hired after the data was provided.\n"
+            if not self.EMPLOYEES_HIRED_AFTER_SUBMISSION:
+                error_msg = ("An employee was hired after the data was provided.\n"
                          "Is DATE_PROVIDED correct?")
-            raise ValueError(error_msg)
-        return tenure
+                raise ValueError(error_msg)
+
+        return tenure if tenure >= 0 else 0  # prevent us from putting a negative number
+                                             # into our tenure aggregation
 
     @property
     def compensations(self):
@@ -128,11 +132,20 @@ class RaceMixin(object):
 
     Requires a ``race`` property to be available.
     """
+    TWO_OR_MORE_RACE_STRING = 'Two or More Races'
+
     @property
     def race(self):
-        race = self.get_mapped_value('race').strip()
-        if race == '':
-            race = 'Not given'
+        race = self.get_mapped_value('race')
+
+        # race is a marge cell and
+        # therefore we should return "Two or More Races"
+        if type(race) == list:
+            race = self.TWO_OR_MORE_RACE_STRING
+        else:
+            race = race.strip()
+            if race == '':
+                race = 'Not given'
         return {
             'name': race
         }

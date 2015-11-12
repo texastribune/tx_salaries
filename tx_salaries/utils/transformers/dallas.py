@@ -54,7 +54,7 @@ class TransformedRecord(
         'PUER': 'Puerto Rican',
         'SAMO': 'Samoan',
         'SPAN': 'Other Spanish/Hispanic/Latino',
-        'TWO': 'Two or More Races',
+        'TWO': mixins.RaceMixin.TWO_OR_MORE_RACE_STRING,
         'VIET': 'Vietnamese',
         'WHT': 'White',
     }
