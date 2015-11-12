@@ -73,7 +73,7 @@ TRANSFORMERS = {
     '96c50536164eeecade2194082544648d3bb4fd97': [tarrant_county.transform, ],
     'e1af1d516d482dc89008704156ed2cc4e40ea18e': [texas_am_system.transform, ],
     '3382282e79ee58627aedd4703591928b09525af5': [texas_state_university.transform, ],
-    'bc023bcf9e573ecdf8335ebafb24feec596e473f': [texas_tech_system.transform, ],
+    '4a690481630cfe64360c3914f25ca49150e5584b': [texas_tech_system.transform, ],
     'c60489252da989ab04f6a47a86265dc047dd367b': [texas_tech_university.transform, ],
     '177bf9500b4f73c649e30154c46e0c359d122a48': [
         ('UT Permian Basin', ut_permian_basin.transform),
