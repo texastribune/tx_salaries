@@ -124,7 +124,7 @@ def generic_transform(labels, source, record_class):
             data.append(record.as_dict())
         else:
             warnings.append("WARNING: RECORD INVALID; {0}".format(record.data))
-    if len(warnings) != 0 and record_class.REJECT_ALL_IF_INVALID_RECORD_EXISTS:
+    if warnings and record_class.REJECT_ALL_IF_INVALID_RECORD_EXISTS:
         raise ValueError("Aborting the transformation because invalid records exist,"
                          "and there is no override to accept invalid records."
                          "{0}".format(['\n'.join(warnings)]))
@@ -156,7 +156,7 @@ def generic_merge_cell_transform(labels, source, record_class):
         else:
             warnings.append("WARNING: RECORD INVALID; {0}".format(record.data))
         last_row = row
-    if len(warnings) != 0 and record_class.REJECT_ALL_IF_INVALID_RECORD_EXISTS:
+    if warnings and record_class.REJECT_ALL_IF_INVALID_RECORD_EXISTS:
         raise ValueError("Aborting the transformation because invalid records exist,"
                          "and there is no override to accept invalid records.\n"
                          "{0}".format(['\n'.join(warnings)]))
