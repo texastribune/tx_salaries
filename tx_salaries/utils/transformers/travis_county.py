@@ -77,7 +77,17 @@ class TransformedRecord(
 
         if employee_type == 'Stipend':
             return 'Stipend'
-            
+
+    @property
+    def compensation(self):
+        salary = self.salary
+        rate = self.rate
+
+        if salary == '0':
+            return rate
+        else:
+            return salary
+
     @property
     def person(self):
         name = self.get_name()
