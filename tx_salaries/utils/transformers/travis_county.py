@@ -63,14 +63,21 @@ class TransformedRecord(
 
     @property
     def description(self):
+        status = self.status
         employee_type = self.employee_type
 
-        if employee_type == 'FULL TIME':
-            return "Annual salary"
+        if 'Full time' in status:
+            return 'Annual salary'
 
-        if employee_type == 'PART TIME':
-            return "Part-time annual salary"
+        if 'Part' in status:
+            return 'Part-time annual salary'
 
+        if 'Hourly' in status or 'Seasonal' in status:
+            return 'Hourly rate'
+
+        if employee_type == 'Stipend':
+            return 'Stipend'
+            
     @property
     def person(self):
         name = self.get_name()
