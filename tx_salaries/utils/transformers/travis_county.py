@@ -21,12 +21,12 @@ class TransformedRecord(
         'gender': 'Gender',
         'given_race': 'Ethnic Origin',
         'salary': 'Annual Sal',
-        'rate': 'Hourly Rat'
+        'rate': 'Hourly Rat',
     }
 
     gender_map = {'Female': 'F', 'Male': 'M'}
 
-    NAME_FIELDS = ('first_name', 'last_name',)
+    NAME_FIELDS = ('first_name', 'last_name', )
 
     ORGANIZATION_NAME = 'Travis County'
 
@@ -74,9 +74,9 @@ class TransformedRecord(
         rate = self.rate
 
         if salary == '0':
-            return rate
+            return self.get_mapped_value('salary')
         else:
-            return salary
+            return self.get_mapped_value('rate')
 
     @property
     def person(self):
@@ -85,7 +85,7 @@ class TransformedRecord(
             'family_name': name.last,
             'given_name': name.first,
             'name': unicode(name),
-            'gender': self.gender_map[self.gender.strip()],
+            'gender': self.gender_map[self.gender.strip()]
         }
 
         return r
