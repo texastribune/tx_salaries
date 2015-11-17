@@ -20,7 +20,7 @@ class TransformedRecord(
         'status': 'Emp Sub-Group',
         'gender': 'Gender',
         'given_race': 'Ethnic Origin',
-        'salary': 'Annual Sal',
+        'compensation': 'Annual Sal',
         'rate': 'Hourly Rat',
     }
 
@@ -56,25 +56,28 @@ class TransformedRecord(
         status = self.status
         employee_type = self.employee_type
 
-        if 'Full time' in status:
+        if 'Full' in status:
             return 'Annual salary'
 
         if 'Part' in status:
             return 'Part-time annual salary'
 
-        if 'Hourly' in status or 'Seasonal' in status:
+        if 'Hourly' in status:
             return 'Hourly rate'
 
-        if employee_type == 'Stipend':
+        if 'Seasonal' in status:
+            return 'Hourly rate'
+
+        if 'Fee' in status:
             return 'Stipend'
 
     @property
     def compensation(self):
-        salary = self.salary
+        salary = self.get_mapped_value('compensation')
         rate = self.rate
 
         if salary == '0':
-            return self.get_mapped_value('salary')
+            return self.get_mapped_value('compensation')
         else:
             return self.get_mapped_value('rate')
 
