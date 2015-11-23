@@ -38,15 +38,25 @@ class TransformedRecord(
         'salaries/2015-10/traviscounty.xlsx')
 
     @property
+    def compensation(self):
+        salary = self.get_mapped_value('compensation')
+        wage = self.get_mapped_value('rate')
+
+        if salary == '0':
+            return wage
+        else:
+            return salary
+
+    @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.last_name.strip() != ''
 
     @property
     def compensation_type(self):
-        status = self.status
+        emptype = self.get_mapped_value('status')
 
-        if 'Full time' in status:
+        if 'Full' in emptype:
             return 'FT'
         else:
             return 'PT'
@@ -70,16 +80,6 @@ class TransformedRecord(
 
         if 'Fee' in status:
             return 'Stipend'
-
-    @property
-    def compensation(self):
-        salary = self.get_mapped_value('compensation')
-        rate = self.rate
-
-        if salary == '0':
-            return self.get_mapped_value('compensation')
-        else:
-            return self.get_mapped_value('rate')
 
     @property
     def person(self):
