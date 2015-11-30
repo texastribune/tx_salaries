@@ -19,8 +19,8 @@ class TransformedRecord(
         'compensation': 'Salary',
         'gender': 'Gender',
         'race': 'Ethnicity',
-        'employee_type': 'Employee Type',
-        'hours_worked': 'Hours Worked',
+        'status': 'Employee Type',
+        'hours': 'Hours Worked',
     }
 
     # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
@@ -28,9 +28,6 @@ class TransformedRecord(
 
     # What type of organization is this? This MUST match what we use on the site, double check against salaries.texastribune.org
     ORGANIZATION_CLASSIFICATION = 'School District'
-
-    # ???
-    compensation_type = 'FT'
 
     # How would you describe the compensation field? We try to respect how they use their system.
     description = 'Salary'
@@ -46,13 +43,28 @@ class TransformedRecord(
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.full_name.strip() != ''
+        return self.job_title.strip() != 'STADIUM WORKER'
 
     # @property
     # def hire_date(self):
     #     raw_date = self.get_mapped_value('hire_date')
     #     return '-'.join([raw_date[-4:], raw_date[:2], raw_date[3:5]])
 
+    @property
+    def compensation_type(self):
+        emp_type = self.status
+
+        if emp_type == 'Full-Time':
+            return 'FT'
+
+        if emp_type == 'Part-Time':
+            return 'PT'
+
+    @property
+    def compensation(self):
+        if not self.get_mapped_value('compensation'):
+            return 0
+        return self.get_mapped_value('compensation')
 
     @property
     def person(self):
@@ -60,6 +72,7 @@ class TransformedRecord(
         r = {
             'family_name': name.last,
             'given_name': name.first,
+            'additional_name': name.middle,
             'name': unicode(name),
             'gender': self.gender
         }
