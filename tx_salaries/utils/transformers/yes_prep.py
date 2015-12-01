@@ -39,7 +39,7 @@ class TransformedRecord(mixins.GenericCompensationMixin, mixins.GenericDepartmen
 
     NAME_FIELDS = ('first_name', 'last_name')
 
-    ORGANIZATION_NAME = 'Yes Prep Public Schools'
+    ORGANIZATION_NAME = 'YES Prep Public Schools'
 
     ORGANIZATION_CLASSIFICATION = 'School District'  # Different from school district?
 
