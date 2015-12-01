@@ -74,7 +74,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
 
 
-    ORGANIZATION_NAME = 'The University of Texas Health Science Center at Houston'
+    ORGANIZATION_NAME = 'The University of Texas Health Science Center at San Antonio'
 
     # TODO current app uses University Hospital
     ORGANIZATION_CLASSIFICATION = 'University Hospital'
@@ -101,7 +101,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     DATE_PROVIDED = date(2015, 10, 8)
 
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_health_houston/salaries/2015-10/uthsca-2015-10-8.xlsx'
+    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_health_san_antonio/salaries/2015-10/uthsca-2015-10-8.xlsx'
 
     @property
     def is_valid(self):
