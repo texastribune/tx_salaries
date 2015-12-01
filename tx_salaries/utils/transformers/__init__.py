@@ -45,6 +45,7 @@ from . import ut_san_antonio
 from . import ut_southwestern
 from . import ut_system
 from . import ut_tyler
+from . import yes_prep
 
 TRANSFORMERS = {
     'ddd655aafc883a905a0e2b3556c0e42b34f21d04': [alamo_colleges.transform, ],
@@ -97,4 +98,5 @@ TRANSFORMERS = {
     '5714aa39bed15a7d032097c2aa0be7df68507e56': [ut_southwestern.transform, ],
     'fd66132338a69d2fb76faa1d91b6f0d21ffc5aec': [ut_san_antonio.transform, ],
     '068d88f0ea10973339f5a4d57c8d806686d2df40': [ut_tyler.transform, ],
+    'd4c26a2ac454683f0fd208b5cbf1ef8a1ec05a10': [yes_prep.transform, ],
 }
