@@ -30,7 +30,7 @@ class TransformedRecord(mixins.GenericCompensationMixin, mixins.GenericDepartmen
         'P': 'PT'
     }
 
-    description = 'Annual compensation'
+    description = 'Total compensation rate'
 
     NAME_FIELDS = ('first_name', 'last_name', )
 
