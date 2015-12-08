@@ -23,13 +23,16 @@ class TransformedRecord(
         'hours': 'Hours Worked',
     }
 
-    # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
+    # The name of the organization this WILL SHOW UP ON THE SITE,
+    #  so double check it!
     ORGANIZATION_NAME = 'Dallas ISD'
 
-    # What type of organization is this? This MUST match what we use on the site, double check against salaries.texastribune.org
+    # What type of organization is this? This MUST match what we use on the
+    # site, double check against salaries.texastribune.org
     ORGANIZATION_CLASSIFICATION = 'School District'
 
-    # How would you describe the compensation field? We try to respect how they use their system.
+    # How would you describe the compensation field? We try to respect how
+    # they use their system.
     description = 'Salary'
 
     # When did you receive the data? NOT when we added it to the site.
@@ -39,7 +42,8 @@ class TransformedRecord(
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
            'dallas_isd/salaries/2015-11/dallas_isd.xlsx')
 
-    # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
+    # This is how the loader checks for valid people. Defaults to checking to
+    # see if `last_name` is empty.
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
