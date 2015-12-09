@@ -8,6 +8,7 @@ from . import cypress_fairbanks_isd
 from . import collin_college
 from . import dallas
 from . import dallas_county
+from . import dallas_isd
 from . import eanes_isd
 from . import el_paso_county
 from . import houston
@@ -28,6 +29,7 @@ from . import texas_tech_system
 from . import texas_tech_university
 from . import university_of_houston
 from . import texas_womans_university
+from . import travis_county
 from . import ut_austin
 from . import ut_arlington
 from . import ut_brownsville
@@ -57,6 +59,7 @@ TRANSFORMERS = {
     '7c9088d4ddd84422e7ccc26b986bd7d6c4c6fd45': [cypress_fairbanks_isd.transform, ],
     '1a55d6050f034d84f6551cd629e46805c8788297': [dallas.transform, ],
     'c81582dc5ef3233848c0cbe13d9047d2e5a6dbde': [dallas_county.transform, ],
+    '9cd2f59f4b4ec7b7b1fbf5b0da6571a671d22662': [dallas_isd.transform, ],
     'b3ac361fd078f04d8035cef647ac839ef3f0f353': [eanes_isd.transform, ],
     'd18ad5c9635a40de15b0ead0e8f8fe97b8ccca31': [el_paso_county.transform, ],
     'b91a9f78c4db005d73b11c228f30657ced7ed3c7': [houston.transform, ],
@@ -76,6 +79,7 @@ TRANSFORMERS = {
     'bc023bcf9e573ecdf8335ebafb24feec596e473f': [texas_tech_system.transform, ],
     'c60489252da989ab04f6a47a86265dc047dd367b': [texas_tech_university.transform, ],
     '63ca4b9cd0465cb3daaad24b070689a0c065d863': [texas_womans_university.transform, ],
+    'facd5bf54a4a075309fd32b2e1931e3a939d325e': [travis_county.transform, ],
     '177bf9500b4f73c649e30154c46e0c359d122a48': [
         ('UT Permian Basin', ut_permian_basin.transform),
         ('UT Arlington', ut_arlington.transform), ],
