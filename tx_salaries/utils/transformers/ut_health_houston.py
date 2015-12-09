@@ -4,21 +4,33 @@ from . import base
 from . import mixins
 
 
-class TransformedRecord(mixins.GenericCompensationMixin,
-        mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
-        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
+class TransformedRecord(mixins.GenericCompensationMixin, mixins.GenericDepartmentMixin,
+                        mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
+                        mixins.GenericJobTitleMixin,
+                        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+                        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
+    # They included people without compensation and have clarified they do not consider them employees
+    REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
+
     MAP = {
         'last_name': 'Last',
         'first_name': 'First Name',
-        'department': 'Dept',
+        'id_number': 'ID',
         'job_title': 'Job Title',
-        'gender': 'Sex',
+        'department': 'Dept',
         'race': 'Ethnic Grp',
+        'gender': 'Sex',
+        'compensation_type': 'Full/Part',
         'hire_date': 'Start Date',
         'compensation': 'Total Comp Rate',
-        'compensation_type': 'Full/Part',
     }
+
+    COMPENSATION_MAP = {
+        'F': 'FT',
+        'P': 'PT'
+    }
+
+    description = 'Total compensation rate'
 
     NAME_FIELDS = ('first_name', 'last_name', )
 
@@ -27,27 +39,14 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     # TODO current app uses University Hospital
     ORGANIZATION_CLASSIFICATION = 'University Hospital'
 
-    # TODO not given on spreadsheet, but they appear to give part time
-
-    @property
-    def compensation_type(self):
-        if self.get_mapped_value('compensation_type') == 'F':
-            return 'FT'
-        elif self.get_mapped_value('compensation_type') == 'P':
-            return 'PT'
-        else:
-            return ''
-
-    description = 'Annual compensation' # Should still be called annual compenstation?
-
     DATE_PROVIDED = date(2015, 8, 10)
+
+    is_valid = True
 
     URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_health_houston/salaries/2015-08/ut_health_science_center_houston.xlsx'
 
     @property
-    def is_valid(self):
-        # Adjust to return False on invalid fields.  For example:
-        return self.last_name.strip() != ''
-
+    def compensation_type(self):
+        return self.COMPENSATION_MAP[self.get_mapped_value('compensation_type')]
 
 transform = base.transform_factory(TransformedRecord)
