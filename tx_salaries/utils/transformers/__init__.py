@@ -29,6 +29,7 @@ from . import texas_tech_system
 from . import texas_tech_university
 from . import university_of_houston
 from . import texas_womans_university
+from . import travis_county
 from . import ut_austin
 from . import ut_arlington
 from . import ut_brownsville
@@ -78,6 +79,7 @@ TRANSFORMERS = {
     'bc023bcf9e573ecdf8335ebafb24feec596e473f': [texas_tech_system.transform, ],
     'c60489252da989ab04f6a47a86265dc047dd367b': [texas_tech_university.transform, ],
     '63ca4b9cd0465cb3daaad24b070689a0c065d863': [texas_womans_university.transform, ],
+    'facd5bf54a4a075309fd32b2e1931e3a939d325e': [travis_county.transform, ],
     '177bf9500b4f73c649e30154c46e0c359d122a48': [
         ('UT Permian Basin', ut_permian_basin.transform),
         ('UT Arlington', ut_arlington.transform), ],
