@@ -3,8 +3,6 @@ from . import mixins
 
 from datetime import date
 
-# --row=4
-
 
 class TransformedRecord(mixins.GenericCompensationMixin,
         mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
@@ -13,15 +11,15 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        'last_name': 'LAST NAME',
-        'first_name': 'FIRST NAME',
-        'middle_name': 'MIDDLE NAME',
-        'department': 'DEPARTMENT',
-        'job_title': 'CLASSIFICATION',
-        'hire_date': 'HIRE DATE',
-        'compensation': 'ANNUALIZED BASE PAY',
-        'gender': 'GENDER',
-        'race': 'RACE',
+        'last_name': 'Last Name',
+        'first_name': 'First Name',
+        'middle_name': 'Mid Name',
+        'department': 'Department Name',
+        'job_title': 'Title',
+        'hire_date': 'Hire Date',
+        'compensation': 'Gross Annual Salary',
+        'gender': 'Gender',
+        'race': 'Race',
     }
 
     NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
@@ -30,10 +28,10 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_CLASSIFICATION = 'City'
 
-    DATE_PROVIDED = date(2014, 7, 17)
+    DATE_PROVIDED = date(2015, 10, 20)
     # Y/M/D agency provided the data
 
-    URL = "http://raw.texastribune.org.s3.amazonaws.com/houston/salaries/2014-07/TPIA-Texas%20Tribune.xlsx"
+    URL = "http://raw.texastribune.org.s3.amazonaws.com/houston/salaries/2015-10/houston.xlsx"
 
     gender_map = {'Female': 'F', 'Male': 'M'}
 
@@ -44,6 +42,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.last_name.strip() != ''
+
 
     @property
     def person(self):

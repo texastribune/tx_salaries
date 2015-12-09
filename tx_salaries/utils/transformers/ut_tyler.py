@@ -2,96 +2,60 @@ from datetime import date
 
 from . import base
 from . import mixins
+from decimal import Decimal
 
 
-class TransformedRecord(mixins.GenericCompensationMixin,
-        mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
-        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
+class TransformedRecord(mixins.GenericCompensationMixin, mixins.GenericDepartmentMixin,
+                        mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
+                        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+                        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
     MAP = {
-        'full_name': 'NAME',
-        'department': 'SHORT-DEPT',
-        'job_title': 'JOB-TITLE',
-        'gender': 'GENDER',
-        'race': 'ETHNICITY',
-        'hire_date': 'DATE-HIRED',
-        'compensation': 'RATE',
-        'full_time': 'PERCENT',
-        'active': 'ACTIVE-GRP',
-        'appt': 'APPT',
-        'mo_hr': 'MO-HR',
-        'emp_type': 'TYPE',
+        'last_name': 'Last',
+        'first_name': 'First',
+        'job_title': 'Job Title',
+        'department': 'Dept Descr',
+        'full_time': 'FTE',
+        'compensation': 'Annual Rt',
+        'gender': 'Gender',
+        'hire_date': 'Hire Date',
+        'race': 'Ethnicity',
+        'pay_group': 'Pay Group'
     }
+
+    NAME_FIELDS = ('first_name', 'last_name', )
 
     ORGANIZATION_NAME = 'The University of Texas at Tyler'
 
     ORGANIZATION_CLASSIFICATION = 'University'
 
-    DATE_PROVIDED = date(2014, 3, 1)
-    # salaries of new hires
+    DATE_PROVIDED = date(2015, 9, 16)
 
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_tyler/salaries/2014-03/EE%20List%203-13-14.xlsx'
+    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_tyler/salaries/2015-09/ut_tyler.xls'
 
     description = 'Annual compensation'
 
-    @property
-    def is_valid(self):
-        # Adjust to return False on invalid fields.  For example:
-        return self.full_name.strip() != '' and self.hire_date.strip() != ''
 
-    def process_name(self, name):
-        split_name = name.split(',')
-        return {
-            'given_name': split_name[1].strip(),
-            'family_name': split_name[0].strip()
-        }
+    # there will be exception raised elsewhere if not valid
+    is_valid = True
 
     @property
-    def person(self):
-        names = self.process_name(self.full_name)
-        gender = self.gender
-        if gender.strip() == '':
-            gender = 'Not given'
-        data = {
-            'family_name': names['family_name'],
-            'given_name': names['given_name'],
-            'name': " ".join([names['family_name'], names['given_name']]),
-            'gender': gender,
-        }
-        return data
-
-    def process_compensation_type(self, full_time):
-        """
-
-        "If someone's percentage time says 10000 that is equivalent to 100% or Full-Time.
-        You will see some people have more than one job/appointment but equal up to 100% time.
-        Anyone under 10000 or 100% will be part-time"
-
-        """
-        if int(full_time.strip()) == 10000:
-            return 'FT'
-        else:
-            return 'PT'
+    def compensation_type(self):
+        return 'FT' if self.full_time >= 1 else 'PT'
 
     @property
-    def compensations(self):
-        compensation_type = self.process_compensation_type(self.full_time)
-        return [
-            {
-                'tx_salaries.CompensationType': {
-                    'name': compensation_type,
-                    'description': self.description,
-                },
-                'tx_salaries.Employee': {
-                    'hire_date': self.hire_date,
-                    'compensation': self.compensation,
-                    'tenure': self.calculate_tenure(),
-                },
-                'tx_salaries.EmployeeTitle': {
-                    'name': self.job_title,
-                },
-            }
-        ]
+    def description(self):
+        return {'F9M': 'Faculty pay group being paid over 9 months',
+                'M19': 'Monthly pay group for NRA (Non-resident Alien) employees',
+                'MNF': 'Monthly pay group for non-exempt employees (those who are eligible for '
+                       'overtime pay based on FLSA standards)',
+                'MON': 'Monthly pay group for exempt employees (those who are not eligible for '
+                       'overtime pay based on FLSA standards)',
+                'S19': 'Semi-monthly pay group for NRA (Non-resident Alien) employees',
+                'SMF': 'Semi-monthly pay group for non-exempt employees (those who are eligible for '
+                       'overtime pay based on FLSA standards)',
+                'SMN': 'Semi-monthly pay group for exempt employees (those who are not eligible for '
+                       'overtime pay based on FLSA standards)'
+                }[self.pay_group.strip()]
 
     @property
     def identifier(self):
@@ -100,16 +64,67 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
         "People also may have more than one job in departments"
         """
-        excluded = [self.full_time_key, self.department_key,
-                    self.compensation_key,
-                    self.hire_date_key, self.job_title_key,
-                    self.race_key, self.gender_key,
-                    self.active_key, self.emp_type_key,
-                    self.mo_hr_key, self.appt_key]
+        excluded = [self.job_title_key, self.department_key,
+                    self.full_time_key, self.compensation_key,
+                    self.hire_date_key, self.pay_group_key]
         return {
             'scheme': 'tx_salaries_hash',
             'identifier': base.create_hash_for_record(self.data,
-                    exclude=excluded)
+                                                      exclude=excluded)
         }
 
-transform = base.transform_factory(TransformedRecord)
+
+# Since there is a lot of code assuming people can't hold multiple jobs, including aggregations and views,
+# I am doing a very hacky thing. For each person with multiple jobs, we give them a job 'Multiple',
+# go with thier least recent hire date, and give them the department description "multiple departments", and call it a day
+def special_sauce_transform(labels, source, record_class):
+    sorted_data = []
+
+    for raw_record in source:
+        sorted_data.append(raw_record)
+
+    # problem inherent in the way they are giving us data that I can't code away:
+    # if a person has the same last and first and gender and ethnicity as another person, it's impossible to
+    # keep from grouping them together. Not enough info here'
+    key_indices = [labels.index(k) for k in ['Last', 'First', 'Gender', 'Ethnicity']]
+
+    def key_getter(row):
+        return [row[index] for index in key_indices]
+
+    sorted_data.sort(key=key_getter)
+
+    def get_date(date_string):
+        dt = map(int, date_string.split('-'))
+        return date(*dt)
+
+    # the wonderful and all wise CSVKit returns empty strings
+    # for a number field if the number field is 0
+    def get_decimal(string):
+        return Decimal(string) if len(string.strip()) != 0 else Decimal()
+
+    grouped_data = []
+    label_index_mapping = {key: value for value, key in enumerate(labels)}
+    previous_datum = sorted_data.pop(0)
+    previous_datum[label_index_mapping['FTE']] = get_decimal(previous_datum[label_index_mapping['FTE']])
+    previous_datum[label_index_mapping['Annual Rt']] = get_decimal(previous_datum[label_index_mapping['Annual Rt']])
+    for datum in sorted_data:
+        datum[label_index_mapping['FTE']] = get_decimal(datum[label_index_mapping['FTE']])
+        datum[label_index_mapping['Annual Rt']] = get_decimal(datum[label_index_mapping['Annual Rt']])
+        if key_getter(previous_datum) == key_getter(datum):
+            previous_datum[label_index_mapping['Job Title']] = 'Multiple'
+            previous_datum[label_index_mapping['Dept Descr']] = 'Multiple'
+            previous_datum[label_index_mapping['FTE']] += datum[label_index_mapping['FTE']]
+            previous_datum[label_index_mapping['Annual Rt']] += datum[label_index_mapping['Annual Rt']]
+
+            if get_date(previous_datum[label_index_mapping['Hire Date']]) > \
+                    get_date(datum[label_index_mapping['Hire Date']]):
+                previous_datum[label_index_mapping['Hire Date']] = datum[label_index_mapping['Hire Date']]
+
+        else:
+            grouped_data.append(previous_datum)
+            previous_datum = datum
+    grouped_data.append(previous_datum)
+    return base.generic_transform(labels, grouped_data, record_class)
+
+
+transform = base.transform_factory(TransformedRecord, transform_func=special_sauce_transform)
