@@ -3,12 +3,13 @@ from datetime import date
 from . import base
 from . import mixins
 
+
 class TransformedRecord(
-    mixins.GenericCompensationMixin,
-    mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
-    mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
-    mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-    mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
+        mixins.GenericCompensationMixin,
+        mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
+        mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
+        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
         'last_name': 'Last name',
@@ -35,7 +36,7 @@ class TransformedRecord(
     DATE_PROVIDED = date(2015, 10, 13)
 
     URL = ('http://s3.amazonaws.com/raw.texastribune.org/travis_county/'
-        'salaries/2015-10/traviscounty.xlsx')
+           'salaries/2015-10/traviscounty.xlsx')
 
     @property
     def compensation(self):
@@ -64,7 +65,6 @@ class TransformedRecord(
     @property
     def description(self):
         status = self.status
-        employee_type = self.employee_type
 
         if 'Full' in status:
             return 'Annual salary'
