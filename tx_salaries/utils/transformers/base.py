@@ -19,6 +19,8 @@ DEFAULT_DATA_TEMPLATE = {
 
 
 class BaseTransformedRecord(object):
+    REJECT_ALL_IF_INVALID_RECORD_EXISTS = True
+
     def __init__(self, data=None, **kwargs):
         self.data = data
 
@@ -62,9 +64,6 @@ class BaseTransformedRecord(object):
         return cleaver.EmployeeNameCleaver
 
     def as_dict(self):
-        # Stop early if this isn't valid
-        if not self.is_valid:
-            return
 
         # Build the structured record with the required attributes
         d = copy(DEFAULT_DATA_TEMPLATE)
@@ -115,11 +114,18 @@ def generic_transform(labels, source, record_class):
     used directly via ``transform_factory``.
     """
     data = []
+    warnings = []
     for raw_record in source:
         record = record_class(dict(zip(labels, raw_record)))
         if record.is_valid:
             data.append(record.as_dict())
-    return data
+        else:
+            warnings.append("WARNING: RECORD INVALID; {0}".format(record.data))
+    if warnings and record_class.REJECT_ALL_IF_INVALID_RECORD_EXISTS:
+        raise ValueError("Aborting the transformation because invalid records exist,"
+                         "and there is no override to accept invalid records."
+                         "{0}".format(['\n'.join(warnings)]))
+    return data, warnings
 
 
 def generic_merge_cell_transform(labels, source, record_class):
@@ -133,6 +139,7 @@ def generic_merge_cell_transform(labels, source, record_class):
     """
     data = []
     last_row = None
+    warnings = []
     for raw_row in source:
         row = dict(zip(labels, raw_row))
         if not raw_row[0].strip() and last_row:
@@ -143,8 +150,14 @@ def generic_merge_cell_transform(labels, source, record_class):
         record = record_class(row)
         if record.is_valid:
             data.append(record.as_dict())
+        else:
+            warnings.append("WARNING: RECORD INVALID; {0}".format(record.data))
         last_row = row
-    return data
+    if warnings and record_class.REJECT_ALL_IF_INVALID_RECORD_EXISTS:
+        raise ValueError("Aborting the transformation because invalid records exist,"
+                         "and there is no override to accept invalid records.\n"
+                         "{0}".format(['\n'.join(warnings)]))
+    return data, warnings
 
 
 def transform_factory(record_class, transform_func=None):
