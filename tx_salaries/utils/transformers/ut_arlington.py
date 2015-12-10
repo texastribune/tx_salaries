@@ -44,7 +44,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     description = 'Annual compensation'
 
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_arlington/salaries/2014-02/UT%20Arlington%20Salaries.xlsx'
+    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_arlington/salaries/2015-10/data.xlsx'
 
     DATE_PROVIDED = date(2015, 10, 27)
 
