@@ -17,23 +17,22 @@ class TransformedRecord(
         'job_title': 'Title',
         'hire_date': 'Hire Date',
         'status': 'Status',
+        'contract': 'Months of Contract',
         'gender': 'Gender',
         'given_race': 'Race',
         'compensation': 'Salary',
     }
 
-    gender_map = {'Female': 'F', 'Male': 'M'}
-
     NAME_FIELDS = ('first_name', 'last_name', )
 
-    ORGANIZATION_NAME = 'Travis County'
+    ORGANIZATION_NAME = 'Tarrant County College'
 
-    ORGANIZATION_CLASSIFICATION = 'County'
+    ORGANIZATION_CLASSIFICATION = 'Community College'
 
-    DATE_PROVIDED = date(2015, 10, 13)
+    DATE_PROVIDED = date(2015, 11, 13)
 
-    URL = ('http://s3.amazonaws.com/raw.texastribune.org/travis_county/'
-        'salaries/2015-10/traviscounty.xlsx')
+    URL = ('http://s3.amazonaws.com/raw.texastribune.org/tarrant_county_college/'
+        'salaries/2015-11/tarrantcountycollege.xlsx')
 
     @property
     def compensation(self):
