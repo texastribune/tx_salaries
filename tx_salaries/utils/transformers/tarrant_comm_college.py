@@ -35,16 +35,6 @@ class TransformedRecord(
         'salaries/2015-11/tarrantcountycollege.xlsx')
 
     @property
-    def compensation(self):
-        salary = self.get_mapped_value('compensation')
-        wage = self.get_mapped_value('rate')
-
-        if salary == '0':
-            return wage
-        else:
-            return salary
-
-    @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.last_name.strip() != ''
@@ -53,7 +43,7 @@ class TransformedRecord(
     def compensation_type(self):
         emptype = self.get_mapped_value('status')
 
-        if 'Full' in emptype:
+        if emptype == 'Full Time' or emptype == 'Temporary Full Time':
             return 'FT'
         else:
             return 'PT'
@@ -61,22 +51,14 @@ class TransformedRecord(
     @property
     def description(self):
         status = self.status
-        employee_type = self.employee_type
+        contract = self.contract
 
-        if 'Full' in status:
-            return 'Annual salary'
-
-        if 'Part' in status:
-            return 'Part-time annual salary'
-
-        if 'Hourly' in status:
+        if status == 'Part Time':
             return 'Hourly rate'
-
-        if 'Seasonal' in status:
-            return 'Hourly rate'
-
-        if 'Fee' in status:
-            return 'Stipend'
+        elif status == '60% Full Time':
+            return 'Part time salary'
+        else:
+            return contract + '-month salary'
 
     @property
     def person(self):
@@ -85,7 +67,7 @@ class TransformedRecord(
             'family_name': name.last,
             'given_name': name.first,
             'name': unicode(name),
-            'gender': self.gender_map[self.gender.strip()]
+            'gender': self.gender.strip()
         }
 
         return r
