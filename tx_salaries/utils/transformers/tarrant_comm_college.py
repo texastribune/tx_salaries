@@ -58,7 +58,7 @@ class TransformedRecord(
         elif status == '60% Full Time':
             return 'Part time salary'
         else:
-            return contract + '-month salary'
+            return '{0:g}'.format(contract) + '-month salary'
 
     @property
     def person(self):
