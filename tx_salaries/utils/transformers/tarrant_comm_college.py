@@ -51,7 +51,7 @@ class TransformedRecord(
     @property
     def description(self):
         status = self.status
-        contract = self.contract
+        contract = float(self.contract)
 
         if status == 'Part Time':
             return 'Hourly rate'
