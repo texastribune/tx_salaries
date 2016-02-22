@@ -22,6 +22,7 @@ from . import potter_county
 from . import san_antonio
 from . import rockwall_isd
 from . import state_of_texas
+from . import tarrant_comm_college
 from . import tarrant_county
 from . import texas_am_system
 from . import texas_state_university
@@ -74,6 +75,7 @@ TRANSFORMERS = {
     '5034d589091e79d58ee3c51766bd6ab05f08d3a5': [rockwall_isd.transform, ],
     '690fc3890e8f893a7b1634de2df958846ad12a1b': [state_of_texas.transform, ],
     '96c50536164eeecade2194082544648d3bb4fd97': [tarrant_county.transform, ],
+    '5f34613a2026006655ae15c0e31e8ed4f5ef29fa': [tarrant_comm_college.transform, ],
     'e1af1d516d482dc89008704156ed2cc4e40ea18e': [texas_am_system.transform, ],
     '3382282e79ee58627aedd4703591928b09525af5': [texas_state_university.transform, ],
     'bc023bcf9e573ecdf8335ebafb24feec596e473f': [texas_tech_system.transform, ],
