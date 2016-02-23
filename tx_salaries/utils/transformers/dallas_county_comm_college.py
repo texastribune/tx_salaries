@@ -11,30 +11,30 @@ class TransformedRecord(
     mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        'last_name': 'NAME LAST',
-        'first_name': 'NAME FIRST',
-        'middle_name': 'NAME MIDDLE',
-        'suffix_name': 'NAME SUFFIX',
-        'department': 'DEPARTMENT',
-        'job_title': 'TITLE',
-        'hire_date': 'CONTINUOUS EMPLOYMENT DATE',
-        'employee_type': 'EMPLOYMENT TYPE',
-        'gender': 'GENDER',
-        'given_race': 'RACE',
-        'compensation': 'SALARY (FY ALLOCATION)',
+        'last_name': 'Last Name ',
+        'first_name': 'First Name ',
+        'middle_name': 'Middle Name ',
+        'department': 'Department',
+        'job_title': 'Title',
+        'hire_date': 'Latest Hire Date',
+        'gender': 'Gender',
+        'given_race': 'Ethnicity/Race',
+        'employee_type': 'Emp Type',
+        'compensation': 'Annual Salary',
+        'rate': 'Hrly Rate',
     }
 
-    gender_map = {u'FEMALE': u'F', u'MALE': u'M', u'': u'Unknown'}
+    gender_map = {u'Female': u'F', u'Male': u'M'}
 
     NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
 
-    ORGANIZATION_NAME = 'University of Texas at Austin'
+    ORGANIZATION_NAME = 'Dallas County Community College District'
 
-    ORGANIZATION_CLASSIFICATION = 'University'
+    ORGANIZATION_CLASSIFICATION = 'Community College'
 
-    DATE_PROVIDED = date(2015, 6, 29)
+    DATE_PROVIDED = date(2016, 2, 17)
 
-    URL = 'http://s3.amazonaws.com/raw.texastribune.org/ut_austin/salaries/2015-06/ut_austin.xlsx'
+    URL = 'http://s3.amazonaws.com/raw.texastribune.org/dallas_county_community_college_district/salaries/2016-02/dcccd.xlsx'
 
     @property
     def is_valid(self):
