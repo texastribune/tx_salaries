@@ -36,20 +36,19 @@ class TransformedRecord(
 
     URL = 'http://s3.amazonaws.com/raw.texastribune.org/dallas_county_community_college_district/salaries/2016-02/dcccd.xlsx'
 
+    # There are some adjuncts who don't have a salary or wage
+    REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
+
     @property
     def is_valid(self):
-        if self.compensation.strip() == 0 and self.rate.strip() == '':
-            print 'hi'
-            return False
-        else:
-            return True
+        return self.job_title.strip() != 'Pt Faculty, Non-Credit'
 
     @property
     def compensation(self):
         salary = self.get_mapped_value('compensation')
         wage = self.get_mapped_value('rate')
 
-        if salary == 0:
+        if salary == '0':
             return wage
         else:
             return salary
@@ -75,7 +74,7 @@ class TransformedRecord(
         salaried = self.get_mapped_value('compensation')
         hourly = self.get_mapped_value('rate')
 
-        if salaried == 0:
+        if salaried == '0':
             return "Hourly rate"
         else:
             return "Annual Salary"
