@@ -38,18 +38,21 @@ class TransformedRecord(
 
     @property
     def is_valid(self):
-        # Adjust to return False on invalid fields.  For example:
-        return self.last_name.strip() != ''
+        if self.compensation.strip() == 0 and self.rate.strip() == '':
+            print 'hi'
+            return False
+        else:
+            return True
 
     @property
-    def hire_date(self):
-        hire_date = self.get_mapped_value('hire_date')
-        if hire_date.strip() == "":
-            return ""
-        year = hire_date[0:4]
-        month = hire_date[4:6]
-        day = hire_date[6:8]
-        return "-".join([year, month, day])
+    def compensation(self):
+        salary = self.get_mapped_value('compensation')
+        wage = self.get_mapped_value('rate')
+
+        if salary == 0:
+            return wage
+        else:
+            return salary
 
     @property
     def gender(self):
@@ -60,23 +63,22 @@ class TransformedRecord(
 
     @property
     def compensation_type(self):
-        employee_type = self.employee_type
+        employee_type = self.employee_type.strip()
 
-        if employee_type == 'FULL TIME':
+        if employee_type == 'Full-Time':
             return 'FT'
-
-        if employee_type == 'PART TIME':
+        else:
             return 'PT'
 
     @property
     def description(self):
-        employee_type = self.employee_type
+        salaried = self.get_mapped_value('compensation')
+        hourly = self.get_mapped_value('rate')
 
-        if employee_type == 'FULL TIME':
-            return "Fiscal year allocation"
-
-        if employee_type == 'PART TIME':
-            return "Part-time compensation"
+        if salaried == 0:
+            return "Hourly rate"
+        else:
+            return "Annual Salary"
 
     @property
     def person(self):
@@ -86,7 +88,7 @@ class TransformedRecord(
             'given_name': name.first,
             'additional_name': name.middle,
             'name': unicode(name),
-            'gender': self.gender,
+            'gender': self.gender_map[self.get_mapped_value('gender')],
         }
 
         return r
@@ -95,17 +97,7 @@ class TransformedRecord(
     def race(self):
         race = self.given_race.strip()
         if race == '':
-            race = 'UNKNOWN'
-        return {'name': race}
-
-
-    def calculate_tenure(self):
-        hire_date_data = map(int, self.hire_date.split('-'))
-        hire_date = date(hire_date_data[0], hire_date_data[1],
-                         hire_date_data[2])
-        tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
-        if tenure < 0:
-            tenure = 0
-        return tenure
+            race = 'Unknown'
+        return {'name': race }
 
 transform = base.transform_factory(TransformedRecord)
