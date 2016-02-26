@@ -35,22 +35,24 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     URL = 'http://raw.texastribune.org.s3.amazonaws.com/beaumont_isd/salaries/2016-02/beaumontisd.xlsx'
 
+    REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
+    #Contract and Part-time employees just list their salary as 'hourly' or 'contract'
+
     @property
     def is_valid(self):
-        # Adjust to return False on invalid fields.  For example:
-        return self.last_name.strip() != ''
+        return self.employee_type.strip() == 'Full Time'
+
 
     @property
-    def hire_date(self):
-        return self.get_mapped_value('hire_date').split('T')[0]
+    def person(self):
+        name = self.get_name()
+        r = {
+            'family_name': name.last,
+            'given_name': name.first,
+            'name': unicode(name),
+            'gender': self.gender,
+        }
 
-    def get_raw_name(self):
-        middle_name_field = self.middle_name.strip()
-
-        if middle_name_field == '' or middle_name_field == '(null)':
-            self.NAME_FIELDS = ('first_name', 'last_name', )
-
-        name_fields = [getattr(self, a).strip() for a in self.NAME_FIELDS]
-        return u' '.join(name_fields)
+        return r
 
 transform = base.transform_factory(TransformedRecord)
