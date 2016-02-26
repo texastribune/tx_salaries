@@ -120,7 +120,7 @@ def generic_transform(labels, source, record_class):
         if record.is_valid:
             data.append(record.as_dict())
         else:
-            warnings.append("WARNING: RECORD INVALID; {0}".format(record.data))
+            warnings
     if warnings and record_class.REJECT_ALL_IF_INVALID_RECORD_EXISTS:
         raise ValueError("Aborting the transformation because invalid records exist,"
                          "and there is no override to accept invalid records."

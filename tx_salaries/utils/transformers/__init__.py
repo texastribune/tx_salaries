@@ -24,6 +24,7 @@ from . import state_of_texas
 from . import tarrant_county
 from . import texas_am_system
 from . import texas_state_university
+from . import texas_tech_health_el_paso
 from . import texas_tech_system
 from . import texas_tech_university
 from . import university_of_houston
@@ -73,6 +74,7 @@ TRANSFORMERS = {
     '96c50536164eeecade2194082544648d3bb4fd97': [tarrant_county.transform, ],
     'e1af1d516d482dc89008704156ed2cc4e40ea18e': [texas_am_system.transform, ],
     '3382282e79ee58627aedd4703591928b09525af5': [texas_state_university.transform, ],
+    'a984f5e506b93d5637a2150b227b9dfd1239bd7e': [texas_tech_health_el_paso.transform , ],
     'bc023bcf9e573ecdf8335ebafb24feec596e473f': [texas_tech_system.transform, ],
     'c60489252da989ab04f6a47a86265dc047dd367b': [texas_tech_university.transform, ],
     '63ca4b9cd0465cb3daaad24b070689a0c065d863': [texas_womans_university.transform, ],
