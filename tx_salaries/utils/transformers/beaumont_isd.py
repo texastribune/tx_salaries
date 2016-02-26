@@ -3,9 +3,6 @@ from . import mixins
 
 from datetime import date
 
-# add if necessary: --sheet="Request data" --row=3
-
-
 class TransformedRecord(mixins.GenericCompensationMixin,
         mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
         mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
@@ -13,18 +10,18 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        'last_name': 'PER_LAST_NAME',
-        'first_name': 'PER_FIRST_NAME',
-        'middle_name': 'PER_MIDDLE_NAME',
-        'department': 'ORG_NAME',
-        'job_title': 'ROLE_NAME',
-        'hire_date': 'EMP_HIRE_DT',
-        'compensation': 'EMP_ASGN_PAY_HIST_A_NRML_PAY',
-        'gender': 'PER_GENDER',
-        'race': 'PRIMARY_ETHNICITY_CODE',
+        'last_name': 'LNAME',
+        'first_name': 'FNAME',
+        'department': 'DEPT',
+        'job_title': 'TITLE',
+        'hire_date': 'HIREDATE',
+        'compensation': 'BUDGETED_SALARY',
+        'gender': 'SEX',
+        'race': 'Race',
+        'employee_type': 'Status'
     }
 
-    NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
+    NAME_FIELDS = ('first_name', 'last_name', )
 
     ORGANIZATION_NAME = 'Beaumont ISD'
 
@@ -32,12 +29,11 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     compensation_type = 'FT'
 
-    description = 'Annual salary'
+    description = 'Budgeted salary'
 
-    DATE_PROVIDED = date(2014, 7, 15)
-    # Y/M/D agency provided the data
+    DATE_PROVIDED = date(2016, 2, 26)
 
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/beaumont_isd/salaries/2014-07/FOIA%2014175.xlsx'
+    URL = 'http://raw.texastribune.org.s3.amazonaws.com/beaumont_isd/salaries/2016-02/beaumontisd.xlsx'
 
     @property
     def is_valid(self):
