@@ -7,6 +7,7 @@ from . import brownsville_isd
 from . import cypress_fairbanks_isd
 from . import collin_college
 from . import dallas
+from . import dallas_county_comm_college
 from . import dallas_county
 from . import dallas_isd
 from . import eanes_isd
@@ -54,11 +55,12 @@ TRANSFORMERS = {
     'f0d7f1733d2e76dc76f2aaea9ad7f6babf824975': [allen_isd.transform, ],
     '2a51198f9949fc5d13a90f048b3a9eb7a8c1c0de': [austin_isd.transform, ],
     '3c71e58afb5d003074a2b7a196133ca28b4e0e3d': [austin.transform, ],
-    'fc0eb7927ee4d39dab7602f01ab771eb49eb7512': [beaumont_isd.transform, ],
+    '8d342e1f6a7c33328ecd6890bcd7bf7c6d8be5a7': [beaumont_isd.transform, ],
     '6e4bb90321c62a34296cad61c3800b1dd308257e': [brownsville_isd.transform, ],
     '39bcb735ae0a6d3b9bddb839337680abf76be1fd': [collin_college.transform, ],
     '7c9088d4ddd84422e7ccc26b986bd7d6c4c6fd45': [cypress_fairbanks_isd.transform, ],
     '1a55d6050f034d84f6551cd629e46805c8788297': [dallas.transform, ],
+    '695426d2122576c140691958c145818d31f95c89': [dallas_county_comm_college.transform, ],
     'c81582dc5ef3233848c0cbe13d9047d2e5a6dbde': [dallas_county.transform, ],
     '9cd2f59f4b4ec7b7b1fbf5b0da6571a671d22662': [dallas_isd.transform, ],
     'b3ac361fd078f04d8035cef647ac839ef3f0f353': [eanes_isd.transform, ],
