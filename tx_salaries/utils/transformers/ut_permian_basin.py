@@ -16,17 +16,17 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'department': 'Dept',
         'job_title': 'Job Title',
         'hire_date': 'Start Date',
-        'compensation': ' Annual Rt ',
+        'compensation': 'Annual Rt',
         'gender': 'Sex',
-        'race': 'Race',
-        'employee_type':  'Full/Part',
+        'given_race': 'Race',
+        'employee_type': 'Full/Part',
     }
 
     ORGANIZATION_NAME = 'University of Texas of the Permian Basin'
 
-    ORGANIZATION_CLASSIFICATION = 'Universtiy'
+    NAME_FIELDS = ('first_name', 'last_name', )
 
-    description = 'Annual rate'
+    ORGANIZATION_CLASSIFICATION = 'Universtiy'
 
     DATE_PROVIDED = date(2016, 2, 29)
 
@@ -36,7 +36,25 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.full_name.strip() != ''
+        return self.last_name.strip() != ''
+
+    @property
+    def compensation_type(self):
+        emptype = self.get_mapped_value('employee_type')
+
+        if 'Full' in emptype:
+            return 'FT'
+        else:
+            return 'PT'
+
+    @property
+    def description(self):
+        emptype = self.get_mapped_value('employee_type')
+
+        if 'Full' in emptype:
+            return 'Annual rate'
+        else:
+            return 'Part-time annual rate'
 
     @property
     def person(self):
@@ -46,15 +64,17 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             'given_name': name.first,
             'additional_name': name.middle,
             'name': unicode(name),
-            'gender': self.gender_map[self.gender.strip()]
+            'gender': self.gender.strip()
         }
 
         return r
 
-    def get_raw_name(self):
-        split_name = self.full_name.split(', ')
-
-        return u' '.join([split_name[1], split_name[0]])
+    @property
+    def race(self):
+        race = self.given_race.strip()
+        if race == '':
+            race = 'Not given'
+        return {'name': race}
 
 
 transform = base.transform_factory(TransformedRecord)
