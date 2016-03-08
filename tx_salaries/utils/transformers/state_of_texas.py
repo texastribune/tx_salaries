@@ -16,7 +16,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     MAP = {
         'last_name': 'LAST NAME',
         'first_name': 'FIRST NAME',
-        'department': ' AGENCY NAME',
+        'department': 'AGENCY NAME',
         'job_title': 'CLASS TITLE',
         'gender': 'GENDER',
         'race': 'ETHNICITY',
@@ -29,7 +29,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     NAME_FIELDS = ('first_name', 'last_name', )
 
-    gender_map = {'FEMALE': 'F', 'MALE': 'M'}
+    gender_map = {'FEMALE': 'FEMALE', 'MALE': 'MALE'}
 
     # State of Texas uses these employment status codes:
     description_map = {
@@ -49,9 +49,9 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_CLASSIFICATION = 'State'
 
-    DATE_PROVIDED = date(2014, 1, 23)
+    DATE_PROVIDED = date(2016, 2, 29)
 
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/state_of_texas/salaries/2014-04/TEXAS%20TRIBUNE%20JANUARY%202014_State%20Agencies%20only.xlsx'
+    URL = 'http://raw.texastribune.org.s3.amazonaws.com/state_of_texas/salaries/2016-02/USPS_SPRS_ASOFJAN312016.xlsx'
 
     @property
     def is_valid(self):

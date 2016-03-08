@@ -73,7 +73,7 @@ TRANSFORMERS = {
     '0e027f3d0038d81f570cbda2aeedf3dd1f720881': [potter_county.transform, ],
     'f53125485535c4619b16838160dc4bd41875389f': [san_antonio.transform, ],
     '5034d589091e79d58ee3c51766bd6ab05f08d3a5': [rockwall_isd.transform, ],
-    '690fc3890e8f893a7b1634de2df958846ad12a1b': [state_of_texas.transform, ],
+    '60f6cef782e44830c94d719a9e9e460f31723e07': [state_of_texas.transform, ],
     '96c50536164eeecade2194082544648d3bb4fd97': [tarrant_county.transform, ],
     '5f34613a2026006655ae15c0e31e8ed4f5ef29fa': [tarrant_comm_college.transform, ],
     'e1af1d516d482dc89008704156ed2cc4e40ea18e': [texas_am_system.transform, ],
