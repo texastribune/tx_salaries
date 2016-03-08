@@ -47,7 +47,7 @@ class TransformedRecord(
     }
     status_map = {'F': 'FT', 'P': 'PT'}
 
-    ORGANIZATION_NAME = 'State of Texas'
+    ORGANIZATION_NAME = 'State Comptroller Payroll'
 
     ORGANIZATION_CLASSIFICATION = 'State'
 
