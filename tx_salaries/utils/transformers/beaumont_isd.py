@@ -3,10 +3,12 @@ from . import mixins
 
 from datetime import date
 
-class TransformedRecord(mixins.GenericCompensationMixin,
-        mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
-        mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
-        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+
+class TransformedRecord(
+    mixins.GenericCompensationMixin,
+    mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
+    mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
+    mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
@@ -33,15 +35,16 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     DATE_PROVIDED = date(2016, 2, 26)
 
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/beaumont_isd/salaries/2016-02/beaumontisd.xlsx'
+    URL = ('http://raw.texastribune.org.s3.amazonaws.com/beaumont_isd/'
+           'salaries/2016-02/beaumontisd.xlsx')
 
     REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
-    #Contract and Part-time employees just list their salary as 'hourly' or 'contract'
+    # Contract and Part-time employees just list their salary as 'hourly' or
+    # 'contract'
 
     @property
     def is_valid(self):
         return self.employee_type.strip() == 'Full Time'
-
 
     @property
     def person(self):
