@@ -25,8 +25,6 @@ class TransformedRecord(
 
     ORGANIZATION_NAME = 'University of Texas of the Permian Basin'
 
-    NAME_FIELDS = ('first_name', 'last_name', )
-
     ORGANIZATION_CLASSIFICATION = 'Universtiy'
 
     DATE_PROVIDED = date(2016, 2, 29)
@@ -59,16 +57,24 @@ class TransformedRecord(
 
     @property
     def person(self):
-        name = self.get_name()
+        formatted_name = self.get_name()
+
         r = {
-            'family_name': name.last,
-            'given_name': name.first,
-            'additional_name': name.middle,
-            'name': unicode(name),
+            'family_name': formatted_name['last_name'],
+            'given_name': formatted_name['first_name'],
+            'name': " ".join([n for n in formatted_name.values()]),
             'gender': self.gender.strip()
         }
 
         return r
+
+    def get_name(self):
+        last_name = self.get_mapped_value('last_name')
+        first_name = self.get_mapped_value('first_name').title()
+        return {
+            'first_name': first_name,
+            'last_name': last_name
+        }
 
     @property
     def race(self):
