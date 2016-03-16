@@ -29,6 +29,7 @@ from . import texas_am_system
 from . import texas_state_university
 from . import texas_tech_system
 from . import texas_tech_university
+from . import texas_tech_university_hsc
 from . import university_of_houston
 from . import texas_womans_university
 from . import travis_county
@@ -82,6 +83,7 @@ TRANSFORMERS = {
     '3382282e79ee58627aedd4703591928b09525af5': [texas_state_university.transform, ],
     'bc023bcf9e573ecdf8335ebafb24feec596e473f': [texas_tech_system.transform, ],
     'c60489252da989ab04f6a47a86265dc047dd367b': [texas_tech_university.transform, ],
+    'e5d21da8c6170d349d922f9e9bb29c4a2aada14f': [texas_tech_university_hsc.transform, ],
     '63ca4b9cd0465cb3daaad24b070689a0c065d863': [texas_womans_university.transform, ],
     'facd5bf54a4a075309fd32b2e1931e3a939d325e': [travis_county.transform, ],
     '177bf9500b4f73c649e30154c46e0c359d122a48': [
