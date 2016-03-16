@@ -14,66 +14,47 @@ class TransformedRecord(
         'full_name': 'Employee Name',
         'department': 'Department',
         'job_title': 'Job Title',
-        'hire_date': 'CONTINUOUS EMPLOYMENT DATE',
+        'hire_date': '',
         'employee_type': 'Full or Part Time',
         'gender': 'Gender',
         'given_race': 'Race',
         'compensation': 'Salary',
     }
 
-    gender_map = {u'FEMALE': u'F', u'MALE': u'M', u'': u'Unknown'}
+    gender_map = {u'Female': u'F', u'Male': u'M'}
 
-    NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
-
-    ORGANIZATION_NAME = 'University of Texas at Austin'
+    ORGANIZATION_NAME = 'Texas Tech University Health Sciences Center'
 
     ORGANIZATION_CLASSIFICATION = 'University'
 
-    DATE_PROVIDED = date(2015, 6, 29)
+    DATE_PROVIDED = date()
 
-    URL = 'http://s3.amazonaws.com/raw.texastribune.org/ut_austin/salaries/2015-06/ut_austin.xlsx'
+    URL = ''
 
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.last_name.strip() != ''
-
-    @property
-    def hire_date(self):
-        hire_date = self.get_mapped_value('hire_date')
-        if hire_date.strip() == "":
-            return ""
-        year = hire_date[0:4]
-        month = hire_date[4:6]
-        day = hire_date[6:8]
-        return "-".join([year, month, day])
-
-    @property
-    def gender(self):
-        sex = self.gender_map[self.get_mapped_value('gender')]
-        if sex.strip() == "":
-            return ""
-        return sex.strip()
+        return self.full_name.strip() != ''
 
     @property
     def compensation_type(self):
         employee_type = self.employee_type
 
-        if employee_type == 'FULL TIME':
+        if employee_type == 'F':
             return 'FT'
 
-        if employee_type == 'PART TIME':
+        if employee_type == 'P':
             return 'PT'
 
     @property
     def description(self):
         employee_type = self.employee_type
 
-        if employee_type == 'FULL TIME':
-            return "Fiscal year allocation"
+        if employee_type == 'F':
+            return "Salary"
 
-        if employee_type == 'PART TIME':
-            return "Part-time compensation"
+        if employee_type == 'P':
+            return "Part-time salary"
 
     @property
     def person(self):
@@ -83,26 +64,23 @@ class TransformedRecord(
             'given_name': name.first,
             'additional_name': name.middle,
             'name': unicode(name),
-            'gender': self.gender,
+            'gender': self.gender_map[self.get_mapped_value('gender')],
         }
 
         return r
 
-    @property
-    def race(self):
-        race = self.given_race.strip()
-        if race == '':
-            race = 'UNKNOWN'
-        return {'name': race}
+    def get_raw_name(self):
+        split_name = self.full_name.split(', ')
+        last_name = split_name[0]
+        split_firstname = split_name[1].split(' ')
+        first_name = split_firstname[0]
+        if len(split_firstname) == 2 and len(split_firstname[1]) == 1:
+            middle_name = split_firstname[1]
+        else:
+            first_name = split_name[1]
+            middle_name = ''
 
+        return u' '.join([first_name, middle_name, last_name])
 
-    def calculate_tenure(self):
-        hire_date_data = map(int, self.hire_date.split('-'))
-        hire_date = date(hire_date_data[0], hire_date_data[1],
-                         hire_date_data[2])
-        tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
-        if tenure < 0:
-            tenure = 0
-        return tenure
 
 transform = base.transform_factory(TransformedRecord)
