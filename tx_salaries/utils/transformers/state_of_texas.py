@@ -45,11 +45,8 @@ class TransformedRecord(
     }
     status_map = {'F': 'FT', 'P': 'PT'}
 
-<<<<<<< HEAD
     gender_map = {'FEMALE': 'F', 'MALE': 'M'}
 
-=======
->>>>>>> da944897e9496c5ed36fea14b48204fab7566ff9
     ORGANIZATION_NAME = 'State Comptroller Payroll'
 
     ORGANIZATION_CLASSIFICATION = 'State'
@@ -66,21 +63,12 @@ class TransformedRecord(
 
     @property
     def person(self):
-<<<<<<< HEAD
         name = self.get_name()
         r = {
             'family_name': name.last,
             'given_name': name.first,
             'name': unicode(name),
             'gender': self.gender_map[self.gender.strip()]
-=======
-        data = {
-            'family_name': self.get_cleaved_first_or_last(
-                self.last_name.strip()),
-            'given_name': self.get_cleaved_first_or_last(
-                self.first_name.strip()),
-            'name': self.get_name(),
->>>>>>> da944897e9496c5ed36fea14b48204fab7566ff9
         }
 
         return r
