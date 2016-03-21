@@ -84,9 +84,7 @@ TRANSFORMERS = {
     'c60489252da989ab04f6a47a86265dc047dd367b': [texas_tech_university.transform, ],
     '63ca4b9cd0465cb3daaad24b070689a0c065d863': [texas_womans_university.transform, ],
     'facd5bf54a4a075309fd32b2e1931e3a939d325e': [travis_county.transform, ],
-    '177bf9500b4f73c649e30154c46e0c359d122a48': [
-        ('UT Permian Basin', ut_permian_basin.transform),
-        ('UT Arlington', ut_arlington.transform), ],
+    '177bf9500b4f73c649e30154c46e0c359d122a48': [ut_arlington.transform, ],
     'dd1cd3cde7c95e8b5155c252b3baf9f72dad7856': [university_of_houston.transform, ],
     '2115235d43a6f292c7a37e26e12cd0e77a683a1a': [ut_austin.transform, ],
     'a1cb75442f33c2f0152296838771087192643869': [ut_brownsville.transform, ],
@@ -99,6 +97,7 @@ TRANSFORMERS = {
     'a70e63dd99026dd7ca0d9c5cd6a17fea15f261a7': [ut_md_anderson.transform, ],
     '258ae8c47dc5b5bd842fb82569b1be7ba8c1bd7d': [ut_medical_branch.transform, ],
     'bf2d8d6cad54567327b44050c507096885f925b7': [ut_pan_american.transform, ],
+    'dc125c8ca1bdfbe9888abefcb2806064d5b6b55d': [ut_permian_basin.transform, ],
     '3eede716c96db3c302eaa2b9b3af6e176daf7727': [ut_san_antonio.transform, ],
     'de0167927d7162fb025b72c76a1fc157f081c00b': [ut_tyler.transform, ],
     'fe980380568d4efbc398522dfd71a3e872ea33ac': [ut_system.transform, ],
