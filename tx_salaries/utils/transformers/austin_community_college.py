@@ -26,7 +26,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     ORGANIZATION_CLASSIFICATION = 'Community College'
 
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-          'ut_dallas/salaries/2015-05/ut_dallas.xls')
+           'austin_community_college/salaries/2016-02/'
+           'austin_community_college.xlsx')
 
     race_map = {
          'NHS': 'Non-Hispanic/Latino',
@@ -43,7 +44,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     # How would you describe the compensation field? We try to respect how they use their system.
     description = 'Annual Rate'
 
-    DATE_PROVIDED = date(2015, 5, 27)
+    DATE_PROVIDED = date(2016, 2, 26)
 
     @property
     def is_valid(self):
