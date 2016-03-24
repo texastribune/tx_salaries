@@ -6,11 +6,13 @@ from datetime import date
 
 # http://raw.texastribune.org.s3.amazonaws.com/ut_dallas/salaries/2014-02/FOIA%20Request%20-%20Tribune.xlsx
 
-class TransformedRecord(mixins.GenericCompensationMixin,
-        mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
-        mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
-        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+class TransformedRecord(
+    mixins.GenericCompensationMixin,
+    mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
+    mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
+    mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
+
     MAP = {
         'full_name': 'Name',
         'department': 'Dept Desc',
@@ -30,18 +32,19 @@ class TransformedRecord(mixins.GenericCompensationMixin,
            'austin_community_college.xlsx')
 
     race_map = {
-         'NHS': 'Non-Hispanic/Latino',
-         'WH': 'White',
-         'AN': 'American/Alaska Native',
-         'AS': 'Asian',
-         'BL': 'Black or African American',
-         'HP': 'Hawaiian/Pacific Islander',
-         'HIS': 'Hispanic'
+        'NHS': 'Non-Hispanic/Latino',
+        'WH': 'White',
+        'AN': 'American/Alaska Native',
+        'AS': 'Asian',
+        'BL': 'Black or African American',
+        'HP': 'Hawaiian/Pacific Islander',
+        'HIS': 'Hispanic'
     }
 
     compensation_type = 'FT'
 
-    # How would you describe the compensation field? We try to respect how they use their system.
+    # How would you describe the compensation field? We try to respect how
+    # they use their system.
     description = 'Annual Rate'
 
     DATE_PROVIDED = date(2016, 2, 26)
