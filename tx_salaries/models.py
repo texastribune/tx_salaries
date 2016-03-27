@@ -2,10 +2,10 @@ from datetime import datetime
 
 from django.db import models
 from django.utils.text import slugify
-from jsonfield import JSONField
 from tx_people import fields
 from tx_people.models import Membership, Organization, Post
 from tx_people import mixins
+from django.contrib.postgres.fields import JSONField
 
 from . import managers
 
