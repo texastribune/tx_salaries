@@ -36,7 +36,9 @@ class TransformedRecord(mixins.GenericCompensationMixin,
          'AS': 'Asian',
          'BL': 'Black or African American',
          'HP': 'Hawaiian/Pacific Islander',
-         'HIS': 'Hispanic'
+         'HIS': 'Hispanic',
+         '2 or more': 'Two or more races',
+         'Unknown': 'Unknown'
     }
 
     compensation_type = 'FT'
@@ -50,11 +52,6 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.full_name.strip() != ''
-
-    @property
-    def compensation(self):
-        raw = self.get_mapped_value('compensation')
-        return raw.strip(' $').replace(',', '')
 
     @property
     def race(self):
