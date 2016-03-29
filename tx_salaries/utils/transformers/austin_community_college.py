@@ -1,6 +1,8 @@
 from . import base
 from . import mixins
 
+from .. import cleaver
+
 from datetime import date
 
 
@@ -84,17 +86,8 @@ class TransformedRecord(
 
         return r
 
-    def get_raw_name(self):
-        split_name = self.full_name.split(',')
-        last_name = split_name[0]
-        split_firstname = split_name[1].split(' ')
-        first_name = split_firstname[0]
-        if len(split_firstname) == 2 and len(split_firstname[1]) == 1:
-            middle_name = split_firstname[1]
-        else:
-            first_name = split_name[1]
-            middle_name = ''
-
-        return u' '.join([first_name, middle_name, last_name])
+    def get_name(self):
+        return cleaver.EmployeeNameCleaver(
+            self.get_mapped_value('full_name')).parse()
 
 transform = base.transform_factory(TransformedRecord)
