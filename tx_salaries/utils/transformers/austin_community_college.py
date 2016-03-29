@@ -3,8 +3,6 @@ from . import mixins
 
 from datetime import date
 
-# http://raw.texastribune.org.s3.amazonaws.com/ut_dallas/salaries/2014-02/FOIA%20Request%20-%20Tribune.xlsx
-
 
 class TransformedRecord(
     mixins.GenericCompensationMixin,
@@ -50,6 +48,11 @@ class TransformedRecord(
     description = 'Annual Rate'
 
     DATE_PROVIDED = date(2016, 2, 26)
+
+    def print_compensation(self):
+        compensation = self.compensation
+        print compensation
+
 
     @property
     def is_valid(self):
