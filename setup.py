@@ -36,11 +36,10 @@ setup(
     package_data={'tx_salaries': data_files},
     install_requires=[
         'csvkit==0.9.1',
-        'django-jsonfield>=0.9.19',
         'name_cleaver==0.6.0',
         'requests==2.5.1',
         'psycopg2>=2.6.1',
-        'tx_people>=0.3.0',
+        'tx_people>=2.0.0',
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',

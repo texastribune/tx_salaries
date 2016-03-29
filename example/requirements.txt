@@ -1,5 +1,4 @@
 django-appconf==1.0.1
-django-jsonfield==0.9.19
 dj-database-url==0.4.0
 dj-settings-helpers==1.0.0
 mock>=1.0.1

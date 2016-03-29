@@ -95,11 +95,11 @@ class Employee(mixins.TimeTrackingMixin, mixins.ReducedDateStartAndEndMixin,
     position = models.ForeignKey(Membership)
     title = models.ForeignKey(EmployeeTitle, related_name='employees', null=True)
     hire_date = fields.ReducedDateField()
-    tenure = models.DecimalField(null=True, blank=True, decimal_places=4,
+    tenure = models.DecimalField(null=True, blank=True, decimal_places=2,
                                  max_digits=12)
     slug = models.SlugField(max_length=255, null=True, blank=True, default=None)
     compensation = models.DecimalField(
-        decimal_places=4, max_digits=12, db_index=True)
+        decimal_places=2, max_digits=12, db_index=True)
     compensation_type = models.ForeignKey(CompensationType)
     updated = models.DateTimeField(auto_now=True)
 
@@ -122,7 +122,7 @@ def create_stats_mixin(prefix):
         return {
             'null': True,
             'blank': True,
-            'decimal_places': 4,
+            'decimal_places': 2,
             'max_digits': 12
         }
 
@@ -135,10 +135,10 @@ def create_stats_mixin(prefix):
         median_paid = models.DecimalField(**generate_kwargs('median'))
         lowest_paid = models.DecimalField(**generate_kwargs('lowest'))
         total_number = models.PositiveIntegerField(default=0)
-        races = JSONField()
-        female = JSONField()
-        male = JSONField()
-        time_employed = JSONField()
+        races = JSONField(null=True)
+        female = JSONField(null=True)
+        male = JSONField(null=True)
+        time_employed = JSONField(null=True)
         date_provided = models.DateField(null=True, blank=True)
         slug = models.SlugField(max_length=255, null=True, blank=True,
                                 default=None)
