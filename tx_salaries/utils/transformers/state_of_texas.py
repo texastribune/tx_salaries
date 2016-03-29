@@ -99,15 +99,17 @@ class TransformedRecord(
     def post(self):
         return {'label': self.process_job_title()}
 
-    # @property
-    # def hire_date(self):
-    #     raw_date = self.get_mapped_value('hire_date')
-    #     print raw_date
-    #     print '-'.join([raw_date[-4:], raw_date[:2], raw_date[3:5]])
-    #     return '-'.join([raw_date[-4:], raw_date[:2], raw_date[3:5]])
+    @property
+    def hire_date(self):
+        raw_hire_date = self.get_mapped_value('hire_date')
+        parsed_hire_date = map(int, raw_hire_date.split('/'))
+
+        return '-'.join([
+            str(i) for i in
+            [parsed_hire_date[2], parsed_hire_date[0], parsed_hire_date[1]]
+        ])
 
     def calculate_tenure(self):
-        # hire_date = self.get_mapped_value('hire_date')
         hire_date_data = map(int, self.hire_date.split('-'))
         hire_date = date(hire_date_data[0], hire_date_data[1],
                          hire_date_data[2])
