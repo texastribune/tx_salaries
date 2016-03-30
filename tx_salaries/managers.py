@@ -13,10 +13,10 @@ class DenormalizeManagerMixin(object):
         total_in_cohort = cohort.count()
         # Overall distribution
         stats.distribution = self.get_distribution(cohort, total_in_cohort, cohort)
-        stats.highest_paid = (cohort.order_by('-compensation')
+        stats.highest_paid = float(cohort.order_by('-compensation')
                                     .values_list('compensation', flat=True)[0])
         stats.median_paid = self.get_median(cohort)
-        stats.lowest_paid = (cohort.order_by('compensation')
+        stats.lowest_paid = float(cohort.order_by('compensation')
                                    .values_list('compensation', flat=True)[0])
         stats.races = self.get_races(cohort, total_in_cohort)
         stats.female = self.generate_stats(cohort.filter(
@@ -52,7 +52,7 @@ class DenormalizeManagerMixin(object):
             median_paid = (cohort.order_by('-compensation')
                                  .values_list('compensation',
                                               flat=True)[(total_number - 1) / 2])
-        return median_paid
+        return float(median_paid)
 
     def generate_stats(self, cohort, total_in_cohort, get_slices=False,
                        parent_cohort=False):
@@ -63,11 +63,12 @@ class DenormalizeManagerMixin(object):
         """
         total_number = cohort.count()
         if total_number > 0:
+            median = self.get_median(cohort)
             data = {
-                'highest_paid': (cohort.order_by('-compensation')
+                'highest_paid': float(cohort.order_by('-compensation')
                                        .values_list('compensation', flat=True)[0]),
-                'median_paid': self.get_median(cohort),
-                'lowest_paid': (cohort.order_by('compensation')
+                'median_paid': float(median) if median else None,
+                'lowest_paid': float(cohort.order_by('compensation')
                                       .values_list('compensation', flat=True)[0]),
                 'total_number': total_number,
                 'ratio': round((float(total_number) / float(total_in_cohort)) * 100, 1)
@@ -129,13 +130,14 @@ class DenormalizeManagerMixin(object):
         # Set bounds of buckets using all employees so gender breakdowns are comparable
         salaries = parent_cohort_full_time.aggregate(max=models.Max('compensation'),
                                                      min=models.Min('compensation'))
+
         start = salaries['min']
-        if start < 1200:
+        if start is None or start < 1200:
             start = 0
         else:
             start = int(math.floor(float(salaries['min'])/1200.0)) * 1200
         end = salaries['max']
-        if end < 1200:
+        if end is None or end < 1200:
             end = 1200
         else:
             end = int(math.ceil(float(salaries['max'])/1200.0)) * 1200
@@ -143,8 +145,8 @@ class DenormalizeManagerMixin(object):
         return_none = {
             'step': 0,
             'slices': [{
-                'start': salaries['min'],
-                'end': salaries['max'],
+                'start': float(salaries['min']) if salaries['min'] else None,
+                'end': float(salaries['max']) if salaries['max'] else None,
                 'count': cohort.count(),
                 'ratio': round((float(cohort_full_time.count()) / float(total_in_cohort)) * 100, 1)
             }]

@@ -1,9 +1,14 @@
+from django.db import transaction
+
 from tx_people import models as tx_people
 
 from .. import models
 
+RACE_STORE = {}
+COMP_TYPE_STORE = {}
+TITLE_STORE = {}
 
-def save(data):
+def save(data, source_department):
     """
     Unpack and save each of the items in a structured record from a transformer
 
@@ -16,10 +21,11 @@ def save(data):
     identifier, id_created = tx_people.Identifier.objects.get_or_create(
         **data['tx_people.Identifier'])
 
-    link, link_created = tx_people.Link.objects.get_or_create(
-        **data['tx_people.Links'])
-
-    race, _ = tx_people.Race.objects.get_or_create(**data['tx_people.Race'])
+    if data['tx_people.Race']['name'] in RACE_STORE:
+        race = RACE_STORE[data['tx_people.Race']['name']]
+    else:
+        race, _ = tx_people.Race.objects.get_or_create(**data['tx_people.Race'])
+        RACE_STORE[race.name] = race
 
     if id_created:
         person = tx_people.Person.objects.create(**data['tx_people.Person'])
@@ -33,9 +39,6 @@ def save(data):
     #
     # TODO: How should we/can we deal with recursive children?
     children = data['tx_people.Organization'].pop('children', [])
-    source_department, _ = tx_people.Organization.objects.get_or_create(
-        **data['tx_people.Organization'])
-    source_department.links.add(link)
     save_for_stats['organizations'].add(source_department)
     for child in children:
         department, _ = tx_people.Organization.objects.get_or_create(
@@ -43,8 +46,9 @@ def save(data):
         save_for_stats['organizations'].add(department)
 
     # TODO: Remove post entirely
-    post, _ = tx_people.Post.objects.get_or_create(organization=department,
-                                                   **data['tx_people.Post'])
+    post, _ = tx_people.Post.objects.get_or_create(
+        organization=department, **data['tx_people.Post'])
+
     save_for_stats['positions'].add(post)
 
     membership, _ = tx_people.Membership.objects.get_or_create(
@@ -52,11 +56,21 @@ def save(data):
         **data['tx_people.Membership'])
 
     for compensation in data['compensations']:
-        compensation_type, _ = models.CompensationType.objects.get_or_create(
-            **compensation['tx_salaries.CompensationType'])
-        title, _ = models.EmployeeTitle.objects.get_or_create(
-            **compensation['tx_salaries.EmployeeTitle'])
-        models.Employee.objects.get_or_create(
+        if compensation['tx_salaries.CompensationType']['name'] in COMP_TYPE_STORE:
+            compensation_type = COMP_TYPE_STORE[compensation['tx_salaries.CompensationType']['name']]
+        else:
+            compensation_type, _ = models.CompensationType.objects.get_or_create(
+                **compensation['tx_salaries.CompensationType'])
+            COMP_TYPE_STORE[compensation['tx_salaries.CompensationType']['name']] = compensation_type
+
+        if compensation['tx_salaries.EmployeeTitle']['name'] in TITLE_STORE:
+            title = TITLE_STORE[compensation['tx_salaries.EmployeeTitle']['name']]
+        else:
+            title, _ = models.EmployeeTitle.objects.get_or_create(
+                **compensation['tx_salaries.EmployeeTitle'])
+            TITLE_STORE[compensation['tx_salaries.EmployeeTitle']['name']] = title
+
+        emp, _ = models.Employee.objects.get_or_create(
             position=membership, compensation_type=compensation_type,
             title=title, **compensation['tx_salaries.Employee'])
 
