@@ -64,3 +64,9 @@ Add this function:
             tenure = 0
         return tenure
 ```
+
+ERROR: `ImportError: No module named django_extensions`
+
+What it means: You need to update your requirements.
+
+RUN: `pip install -r requirements/local.txt`
