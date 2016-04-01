@@ -97,7 +97,7 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'example.urls'
+# ROOT_URLCONF = 'example.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'example.wsgi.application'
@@ -123,7 +123,6 @@ INSTALLED_APPS = (
 
     # Third-party dependencies
     'tx_people',
-    'south',  # Required for migrations
 
     # Custom application being tested
     'tx_salaries',
