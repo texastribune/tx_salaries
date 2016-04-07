@@ -2,6 +2,7 @@ from . import base
 from . import mixins
 
 from datetime import date
+from .. import cleaver
 
 
 class TransformedRecord(mixins.GenericCompensationMixin,
@@ -12,12 +13,13 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     MAP = {
         'full_name': 'Full Name',
-        'department': 'Position Department Desc',
+        'department': 'Building Code Desc',
         'job_title': 'Position Group Desc',
         'hire_date': 'Hire Date',
         'compensation': 'Position Contract Amt',
         'gender': 'Gender',
         'race': 'Race Desc',
+        'employee_type': 'Position Job Type Desc',
     }
 
     ORGANIZATION_NAME = 'Allen ISD'
@@ -28,13 +30,12 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     description = 'Position contract amount'
 
-    DATE_PROVIDED = date(2014, 12, 15)
+    DATE_PROVIDED = date(2016, 4, 6)
 
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/allen_isd'
-           '/salaries/2014-12/TexasTribuneDec2014.xls')
+    URL = ('https://raw.texastribune.org.s3.amazonaws.com/'
+           'allen_isd/salaries/2016-04/allen-isd.xlsx')
 
     gender_map = {'Female': 'F', 'Male': 'M'}
-
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
@@ -50,6 +51,17 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         return self.get_mapped_value('compensation').replace(',', '')
 
     @property
+    def compensation_type(self):
+        employee_type = self.employee_type
+
+        if employee_type.endswith('P'):
+            return 'PT'
+        elif employee_type == '':
+            return 'FT'
+        else:
+            return 'FT'
+
+    @property
     def person(self):
         name = self.get_name()
         r = {
@@ -62,18 +74,9 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
         return r
 
-    def get_raw_name(self):
-        split_name = self.full_name.split(', ')
-        last_name = split_name[0]
-        split_firstname = split_name[1].split(' ')
-        first_name = split_firstname[0]
-        if len(split_firstname) == 2 and len(split_firstname[1]) == 1:
-            middle_name = split_firstname[1]
-        else:
-            first_name = split_name[1]
-            middle_name = ''
-
-        return u' '.join([first_name, middle_name, last_name])
+    def get_name(self):
+        return cleaver.EmployeeNameCleaver(
+            self.get_mapped_value('full_name')).parse()
 
 
 transform = base.transform_factory(TransformedRecord)
