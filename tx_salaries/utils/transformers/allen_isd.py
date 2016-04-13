@@ -36,6 +36,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
            'allen_isd/salaries/2016-04/allen-isd.xlsx')
 
     gender_map = {'Female': 'F', 'Male': 'M'}
+
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
