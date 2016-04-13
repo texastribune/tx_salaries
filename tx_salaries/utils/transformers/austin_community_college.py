@@ -44,6 +44,8 @@ class TransformedRecord(
          'Unknown': 'Unknown'
     }
 
+    REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
+
     @property
     def compensation_type(self):
         emptype = self.get_mapped_value('FTPT')
