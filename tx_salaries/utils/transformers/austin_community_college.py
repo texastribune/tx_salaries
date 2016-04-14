@@ -1,6 +1,8 @@
 from . import base
 from . import mixins
 
+from .. import cleaver
+
 from datetime import date
 
 
@@ -12,13 +14,14 @@ class TransformedRecord(
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        'full_name': 'Name',
+        'full_name': 'Ppwg Name',
         'department': 'Dept Desc',
         'job_title': ' Pos Title',
         'hire_date': 'Hire date',
         'nationality': 'Ethnicity/Race',
         'gender': 'Gender',
-        'compensation': 'FY 2015 Gross Pay',
+        'FTPT': 'FT/PT ',
+        'compensation': 'Gross Pay',
     }
 
     ORGANIZATION_NAME = 'Austin Community College'
@@ -26,7 +29,7 @@ class TransformedRecord(
     ORGANIZATION_CLASSIFICATION = 'Community College'
 
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'austin_community_college/salaries/2016-02/'
+           'austin_community_college/salaries/2016-04/'
            'austin_community_college.xlsx')
 
     race_map = {
@@ -41,18 +44,26 @@ class TransformedRecord(
          'Unknown': 'Unknown'
     }
 
-    compensation_type = 'FT'
+    REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
+
+    @property
+    def compensation_type(self):
+        emptype = self.get_mapped_value('FTPT')
+
+        if emptype == 'Full Time':
+            return 'FT'
+        else:
+            return 'PT'
 
     # How would you describe the compensation field? We try to respect how
     # they use their system.
-    description = 'Annual Rate'
+    description = 'Gross Pay'
 
-    DATE_PROVIDED = date(2016, 2, 26)
+    DATE_PROVIDED = date(2016, 4, 04)
 
     def print_compensation(self):
         compensation = self.compensation
         print compensation
-
 
     @property
     def is_valid(self):
@@ -84,17 +95,8 @@ class TransformedRecord(
 
         return r
 
-    def get_raw_name(self):
-        split_name = self.full_name.split(',')
-        last_name = split_name[0]
-        split_firstname = split_name[1].split(' ')
-        first_name = split_firstname[0]
-        if len(split_firstname) == 2 and len(split_firstname[1]) == 1:
-            middle_name = split_firstname[1]
-        else:
-            first_name = split_name[1]
-            middle_name = ''
-
-        return u' '.join([first_name, middle_name, last_name])
+    def get_name(self):
+        return cleaver.EmployeeNameCleaver(
+            self.get_mapped_value('full_name')).parse()
 
 transform = base.transform_factory(TransformedRecord)
