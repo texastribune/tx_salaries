@@ -12,7 +12,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     MAP = {
         'full_name': 'Full Name',
-        'department': 'Building Code Desc',
+        'department': 'Position Department Desc',
         'job_title': 'Position Group Desc',
         'hire_date': 'Hire Date',
         'compensation': 'Position Contract Amt',
