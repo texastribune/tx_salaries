@@ -16,6 +16,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'job_title': 'TITLE',
         'hire_date': 'HIREDATE',
         'compensation': 'BUDGETED_SALARY',
+        'hourly_rate': 'Hourly Rate',
         'gender': 'SEX',
         'race': 'Race',
         'employee_type': 'Status'
@@ -27,21 +28,51 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_CLASSIFICATION = 'School District'
 
-    compensation_type = 'FT'
+    DATE_PROVIDED = date(2016, 4, 25)
 
-    description = 'Budgeted salary'
-
-    DATE_PROVIDED = date(2016, 2, 26)
-
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/beaumont_isd/salaries/2016-02/beaumontisd.xlsx'
+    URL = 'http://raw.texastribune.org.s3.amazonaws.com/beaumont_isd/salaries/2016-04/beaumont_isd.xlsx'
 
     REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
-    #Contract and Part-time employees just list their salary as 'hourly' or 'contract'
+    #One contract employee is listed, salary is just 'contract'
 
     @property
     def is_valid(self):
-        return self.employee_type.strip() == 'Full Time'
+        return self.employee_type.strip() != 'Contract'
 
+    @property
+    def compensation_type(self):
+        employee_type = self.employee_type
+
+        if employee_type == 'Full Time':
+            return 'FT'
+
+        if employee_type == 'Part Time':
+            return 'PT'
+
+        return 'FT'
+
+    @property
+    def description(self):
+        employee_type = self.employee_type
+
+        if employee_type == 'Full Time':
+            return "Budgeted Salary"
+
+        if employee_type == 'Part Time':
+            return "Part-time hourly rate"
+
+        return "Budgeted Salary"
+
+    @property
+    def compensation(self):
+        salary = self.get_mapped_value('compensation')
+        wage = self.get_mapped_value('hourly_rate')
+        employee_type = self.employee_type
+
+        if employee_type == 'Part Time':
+            return wage
+        else:
+            return salary
 
     @property
     def person(self):
