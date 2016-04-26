@@ -32,7 +32,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     DATE_PROVIDED = date(2016, 4, 6)
 
-    URL = ('https://raw.texastribune.org.s3.amazonaws.com/'
+    URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
            'allen_isd/salaries/2016-04/allen-isd.xlsx')
 
     gender_map = {'Female': 'F', 'Male': 'M'}
