@@ -14,7 +14,7 @@ class TransformedRecord(
         'full_name': 'Employee Name',
         'department': 'Department',
         'job_title': 'Job Title',
-        'hire_date': '',
+        'hire_date': 'Date of Hire',
         'employee_type': 'Full or Part Time',
         'gender': 'Gender',
         'given_race': 'Race',
@@ -27,9 +27,10 @@ class TransformedRecord(
 
     ORGANIZATION_CLASSIFICATION = 'University'
 
-    DATE_PROVIDED = date()
+    DATE_PROVIDED = date(2016, 03, 24)
 
-    URL = ''
+    URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
+           'texas_tech_health_science/salaries/2016-03/ttuhsc.xlsx')
 
     @property
     def is_valid(self):
