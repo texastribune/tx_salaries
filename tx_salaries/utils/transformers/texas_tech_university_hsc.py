@@ -58,6 +58,12 @@ class TransformedRecord(
             return "Part-time salary"
 
     @property
+    def race(self):
+        return {
+            'name': self.get_mapped_value('given_race').strip()
+        }
+
+    @property
     def person(self):
         name = self.get_name()
         r = {
