@@ -1,6 +1,8 @@
 from . import alamo_colleges
 from . import allen_isd
+from . import austin_community_college
 from . import austin_isd
+from . import austin_community_college
 from . import austin
 from . import beaumont_isd
 from . import brownsville_isd
@@ -53,7 +55,9 @@ from . import ut_tyler
 TRANSFORMERS = {
     'ddd655aafc883a905a0e2b3556c0e42b34f21d04': [alamo_colleges.transform, ],
     'f0d7f1733d2e76dc76f2aaea9ad7f6babf824975': [allen_isd.transform, ],
+    '0e125e98fc20d0e9f93f92c2ad44c749e57aa34e': [austin_community_college.transform, ],
     '2a51198f9949fc5d13a90f048b3a9eb7a8c1c0de': [austin_isd.transform, ],
+    'ee4ad65260cc250e6a52b9728d45efa871fead0b': [austin_community_college.transform, ],
     '3c71e58afb5d003074a2b7a196133ca28b4e0e3d': [austin.transform, ],
     '129db1bc7003a42783d41a3b0d9cf0db77e1c76b': [beaumont_isd.transform, ],
     '6e4bb90321c62a34296cad61c3800b1dd308257e': [brownsville_isd.transform, ],
