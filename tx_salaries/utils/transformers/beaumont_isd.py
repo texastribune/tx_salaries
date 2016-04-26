@@ -34,9 +34,6 @@ class TransformedRecord(
 
     URL = 'http://raw.texastribune.org.s3.amazonaws.com/beaumont_isd/salaries/2016-04/beaumont_isd.xlsx'
 
-    REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
-    #One contract employee is listed, salary is just 'contract'
-
     @property
     def is_valid(self):
         return self.employee_type.strip() != 'Contract'
