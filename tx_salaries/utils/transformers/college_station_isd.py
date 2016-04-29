@@ -18,8 +18,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'hire_date': 'Hire Date',
         'compensation': 'Annual Salary',
         'gender': 'Sex',
-        'race': 'Race',
-        'ethnicity': 'Hispanic',
+        'given_race': 'Race',
+        'hispanic': 'Hispanic',
         'employee_type': 'Full Time/Part Time',
     }
 
@@ -30,7 +30,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
          'W': 'White'
     }
 
-    ethnicity_map = {'N': 'Non-Hispanic', 'H': 'Hispanic'}
+    hispanic_map = {'N': 'Non-Hispanic', 'H': 'Hispanic'}
 
     ORGANIZATION_NAME = 'College Station ISD'
 
@@ -45,11 +45,6 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.full_name.strip() != ''
-
-    @property
-    def hire_date(self):
-        raw_date = self.get_mapped_value('hire_date')
-        return '-'.join([raw_date[-4:], raw_date[:2], raw_date[3:5]])
 
     @property
     def compensation_type(self):
@@ -71,13 +66,13 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     @property
     def race(self):
-        race = self.get_mapped_value('race').strip()
-        hispanic = self.get_mapped_value('ethnicity').strip()
+        given_race = self.race_map[self.given_race.strip()]
+        ethnicity = self.hispanic_map[self.hispanic.strip()]
 
-        if race == '':
-            race = 'Not given'
+        if given_race == '':
+            given_race = 'Not given'
         return {
-            'name': race + ', ' + hispanic
+            'name': given_race + ', ' + ethnicity
         }
 
     @property
