@@ -89,5 +89,31 @@ class TransformedRecord(
 
         return u' '.join([first_name, middle_name, last_name])
 
+    @property
+    def organization(self):
+        return {
+            'name': self.ORGANIZATION_NAME,
+            'classification': self.ORGANIZATION_CLASSIFICATION,
+            'children': self.department_as_child,
+        }
+
+    @property
+    def department_as_child(self):
+        fullDept = self.department
+
+        if ' Ama ' in fullDept or fullDept.endswith(' Ama'):
+            fullDept = fullDept.replace(' Ama', ' Amarillo')
+        if ' Lbk ' in fullDept or fullDept.endswith(' Lbk'):
+            fullDept = fullDept.replace(' Lbk', ' Lubbock')
+        if ' Elp ' in fullDept or fullDept.endswith(' Elp'):
+            fullDept = fullDept.replace(' Elp', ' El Paso')
+        if ' Ode ' in fullDept or fullDept.endswith(' Ode'):
+            fullDept = fullDept.replace(' Ode', ' Odessa')
+        if ' Abi ' in fullDept or fullDept.endswith(' Abi'):
+            fullDept = fullDept.replace(' Abi', ' Abilene')
+        if ' Dal ' in fullDept or fullDept.endswith(' Dal'):
+            fullDept = fullDept.replace(' Dal', ' Dallas')
+
+        return [{'name': unicode(fullDept), }, ]
 
 transform = base.transform_factory(TransformedRecord)
