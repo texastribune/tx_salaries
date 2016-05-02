@@ -53,11 +53,14 @@ class TransformedRecord(
     @property
     def description(self):
         emptype = self.get_mapped_value('employee_type')
+        title = self.get_mapped_value('job_title')
 
         if emptype == 'P':
-            return 'Part-time gross annual salary'
+            return 'Part-time 2015 gross annual salary'
+        elif title == 'President':
+            return 'Budgeted salary'
         else:
-            return 'Gross annual salary'
+            return '2015 gross annual salary'
 
     @property
     def person(self):
