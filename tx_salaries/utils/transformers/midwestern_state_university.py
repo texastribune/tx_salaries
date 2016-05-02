@@ -36,10 +36,13 @@ class TransformedRecord(
            'midwestern_state_university/salaries/2016-03/'
            'midwestern.xlsx')
 
+    # There are some people listed as Other status, because they retired in 2015, which the data represents
+    REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
+
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.last_name.strip() != ''
+        return self.employee_type.strip() != 'O'
 
     @property
     def compensation_type(self):
