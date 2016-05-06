@@ -1,5 +1,6 @@
 from . import base
 from . import mixins
+import string
 
 from datetime import date
 
@@ -59,6 +60,16 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             return float(self.compensation) * 12
         else:
             return self.compensation
+
+    @property
+    def job_title(self):
+        job_title = self.get_mapped_value('job_title')
+        return string.capwords(job_title)
+
+    @property
+    def department(self):
+        department_name = self.get_mapped_value('department')
+        return string.capwords(department_name)
 
     @property
     def compensations(self):
