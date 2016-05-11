@@ -27,18 +27,20 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_CLASSIFICATION = 'County'
 
-    DATE_PROVIDED = date(2014, 6, 2)
+    DATE_PROVIDED = date(2016, 4, 7)
 
-    URL = "http://raw.texastribune.org.s3.amazonaws.com/dallas_county/salaries/2014-06/tx%20tribune%205_2014.xls"
+    URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
+           'dallas_county/salaries/2016-04/dallas-county.xls')
 
     basis_map = {
         'EXEMPT': '',
         'NON-EXEMPT': 'hourly'
     }
     category_map = {
-        'FR': 'Full Time',
-        'PT': 'Part Time Seasonal',
-        'PR': 'Part Time Regular'
+        'FR': 'Full Time Regular',
+        'PT': 'Part Time Temporary',
+        'PR': 'Part Time Regular',
+        'PB': 'Part Time with Benefits'
     }
 
     @property
@@ -63,7 +65,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         # TODO: ADJUST HOUR PAY
         compensation_description = self.process_compensation_description()
         compensation = self.process_compensation()
-        compensation_type = 'FT' if compensation_description == 'Full Time' else 'PT'
+        compensation_type = 'FT' if compensation_description == 'Full Time Regular' else 'PT'
         return [
             {
                 'tx_salaries.CompensationType': {
