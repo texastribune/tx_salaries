@@ -34,7 +34,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     basis_map = {
         'EXEMPT': '',
-        'NON-EXEMPT': 'hourly'
+        'NON-EXEMPT': 'Hourly'
     }
     category_map = {
         'FR': 'Full Time Regular',
