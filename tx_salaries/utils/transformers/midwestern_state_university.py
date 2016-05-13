@@ -2,6 +2,7 @@ from . import base
 from . import mixins
 
 from datetime import date
+from .. import cleaver
 
 
 class TransformedRecord(
@@ -12,28 +13,24 @@ class TransformedRecord(
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        'last_name': 'LASTNAME',
-        'first_name': 'FIRSTNAME',
-        'middle_name': 'MIDDLE',
+        'full_name': 'FNAME',
         'department': 'DEPT',
         'job_title': 'TITLE',
         'hire_date': 'HIREDATE',
         'compensation': 'GROSS',
-        'employee_type': 'EMPLSTATUS',
+        'employee_type': 'FULL_PART',
         'gender': 'GENDER',
         'race': 'ETHNICITY',
     }
-
-    NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
 
     ORGANIZATION_NAME = 'Midwestern State University'
 
     ORGANIZATION_CLASSIFICATION = 'University'
 
-    DATE_PROVIDED = date(2016, 3, 24)
+    DATE_PROVIDED = date(2016, 5, 2)
 
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'midwestern_state_university/salaries/2016-03/'
+           'midwestern_state_university/salaries/2016-05/'
            'midwestern.xlsx')
 
     # There are some people listed as Other status, because they retired in 2015, which the data represents
@@ -60,10 +57,12 @@ class TransformedRecord(
 
         if emptype == 'P':
             return 'Part-time 2015 gross annual salary'
-        elif title == 'President':
-            return 'Budgeted salary'
-        else:
-            return '2015 gross annual salary'
+
+        if emptype == 'F':
+            if title == 'President':
+                return 'Budgeted annual salary'
+            else:
+                return '2015 gross annual salary'
 
     @property
     def person(self):
@@ -77,5 +76,9 @@ class TransformedRecord(
         }
 
         return r
+
+    def get_name(self):
+        return cleaver.EmployeeNameCleaver(
+            self.get_mapped_value('full_name')).parse()
 
 transform = base.transform_factory(TransformedRecord)
