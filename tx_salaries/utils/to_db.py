@@ -5,7 +5,6 @@ from tx_people import models as tx_people
 from .. import models
 
 RACE_STORE = {}
-COMP_TYPE_STORE = {}
 TITLE_STORE = {}
 
 def save(data, source_department):
@@ -56,12 +55,8 @@ def save(data, source_department):
         **data['tx_people.Membership'])
 
     for compensation in data['compensations']:
-        if compensation['tx_salaries.CompensationType']['name'] in COMP_TYPE_STORE:
-            compensation_type = COMP_TYPE_STORE[compensation['tx_salaries.CompensationType']['name']]
-        else:
-            compensation_type, _ = models.CompensationType.objects.get_or_create(
-                **compensation['tx_salaries.CompensationType'])
-            COMP_TYPE_STORE[compensation['tx_salaries.CompensationType']['name']] = compensation_type
+        compensation_type, _ = models.CompensationType.objects.get_or_create(
+            **compensation['tx_salaries.CompensationType'])
 
         if compensation['tx_salaries.EmployeeTitle']['name'] in TITLE_STORE:
             title = TITLE_STORE[compensation['tx_salaries.EmployeeTitle']['name']]
