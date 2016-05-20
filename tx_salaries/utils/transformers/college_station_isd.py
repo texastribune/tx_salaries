@@ -14,7 +14,9 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     MAP = {
         'full_name': 'Full Name Last-First-Middle',
         'department': 'Department Title',
-        'job_title': 'Job Type',
+        'job_title': 'Titles',
+        'job_type': 'Job Type',
+        'secondary_job_type': 'Employee Type',
         'hire_date': 'Hire Date',
         'compensation': 'Annual Salary',
         'gender': 'Sex',
@@ -36,15 +38,56 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_CLASSIFICATION = 'School District'
 
-    DATE_PROVIDED = date(2016, 4, 29)
+    DATE_PROVIDED = date(2016, 5, 9)
 
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'college_station_isd/salaries/2016-04/collegestationISD.xlsx')
+           'college_station_isd/salaries/2016-05/collegestation-isd.xlsx')
 
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.full_name.strip() != ''
+
+    @property
+    def post(self):
+        if self.job_title != '':
+            title = self.job_title
+        else:
+            if self.job_type != '':
+                title = self.job_type
+            else:
+                title = self.secondary_job_type.title()
+
+        return {
+            'label': title,
+        }
+
+    @property
+    def compensations(self):
+        if self.job_title != '':
+            title = self.job_title
+        else:
+            if self.job_type != '':
+                title = self.job_type
+            else:
+                title = self.secondary_job_type.title()
+
+        return [
+            {
+                'tx_salaries.CompensationType': {
+                    'name': self.compensation_type,
+                    'description': self.description
+                },
+                'tx_salaries.EmployeeTitle': {
+                    'name': title,
+                },
+                'tx_salaries.Employee': {
+                    'hire_date': self.hire_date,
+                    'compensation': self.compensation,
+                    'tenure': self.calculate_tenure()
+                },
+            }
+        ]
 
     @property
     def compensation_type(self):
