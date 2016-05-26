@@ -101,6 +101,23 @@ class TransformedRecord(
     def department_as_child(self):
         fullDept = self.department
 
+        #department specifications
+        if ' SON ' in fullDept or fullDept.startswith('SON '):
+            fullDept = fullDept.replace('SON ', 'School of Nursing ')
+        if ' SOM ' in fullDept or fullDept.startswith('SOM '):
+            fullDept = fullDept.replace('SOM ', 'School of Medicine ')
+        if ' SOP ' in fullDept or fullDept.startswith('SOP '):
+            fullDept = fullDept.replace('SOP ', 'School of Pharmacy ')
+        if 'GGHSON' in fullDept:
+            fullDept = fullDept.replace('GGHSON', 'Gayle Greve Hunt School of Nursing')
+        if 'MPIP' in fullDept:
+            fullDept = fullDept.replace('MPIP', 'Medical Practice Income Plan')
+        if 'GME' in fullDept:
+            fullDept = fullDept.replace('GME', 'Graduate Medical Education')
+        if 'LARC' in fullDept:
+            fullDept = fullDept.replace('LARC', 'Laboratory Animal Resource Center')
+
+        #location specifications
         if ' Ama ' in fullDept or fullDept.endswith(' Ama'):
             fullDept = fullDept.replace(' Ama', ' Amarillo')
         if ' Lbk ' in fullDept or fullDept.endswith(' Lbk'):
