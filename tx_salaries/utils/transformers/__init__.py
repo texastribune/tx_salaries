@@ -34,6 +34,7 @@ from . import texas_tech_university
 from . import university_of_houston
 from . import texas_womans_university
 from . import travis_county
+from . import university_of_north_texas_system
 from . import ut_austin
 from . import ut_arlington
 from . import ut_brownsville
@@ -89,6 +90,7 @@ TRANSFORMERS = {
     'facd5bf54a4a075309fd32b2e1931e3a939d325e': [travis_county.transform, ],
     '177bf9500b4f73c649e30154c46e0c359d122a48': [ut_arlington.transform, ],
     'dd1cd3cde7c95e8b5155c252b3baf9f72dad7856': [university_of_houston.transform, ],
+    '30c0ee0b76df0b8ae4007901f38af1e959acd889': [university_of_north_texas_system.transform, ],
     '2115235d43a6f292c7a37e26e12cd0e77a683a1a': [ut_austin.transform, ],
     'a1cb75442f33c2f0152296838771087192643869': [ut_brownsville.transform, ],
     '1124210f0bdca6e3713c422117cd721e38bff3cb': [ut_dallas.transform, ],
