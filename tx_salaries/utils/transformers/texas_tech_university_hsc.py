@@ -4,8 +4,7 @@ from . import base
 from . import mixins
 
 class TransformedRecord(
-    mixins.GenericCompensationMixin,
-    mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
+    mixins.GenericCompensationMixin, mixins.GenericIdentifierMixin,
     mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
     mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
     mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
@@ -102,20 +101,38 @@ class TransformedRecord(
         fullDept = self.department
 
         #department specifications
-        if ' SON ' in fullDept or fullDept.startswith('SON '):
-            fullDept = fullDept.replace('SON ', 'School of Nursing ')
-        if ' SOM ' in fullDept or fullDept.startswith('SOM '):
-            fullDept = fullDept.replace('SOM ', 'School of Medicine ')
-        if ' SOP ' in fullDept or fullDept.startswith('SOP '):
-            fullDept = fullDept.replace('SOP ', 'School of Pharmacy ')
-        if 'GGHSON' in fullDept:
-            fullDept = fullDept.replace('GGHSON', 'Gayle Greve Hunt School of Nursing')
+        if 'SON' in fullDept:
+            fullDept = fullDept.replace('SON', 'School of Nursing')
+        if 'SOM' in fullDept:
+            fullDept = fullDept.replace('SOM', 'School of Medicine')
+        if 'SOP' in fullDept:
+            fullDept = fullDept.replace('SOP', 'School of Pharmacy')
+        if 'GGH' in fullDept:
+            fullDept = fullDept.replace('GGH', 'Gayle Greve Hunt ')
         if 'MPIP' in fullDept:
             fullDept = fullDept.replace('MPIP', 'Medical Practice Income Plan')
         if 'GME' in fullDept:
             fullDept = fullDept.replace('GME', 'Graduate Medical Education')
         if 'LARC' in fullDept:
             fullDept = fullDept.replace('LARC', 'Laboratory Animal Resource Center')
+        if 'RMF' in fullDept:
+            fullDept = fullDept.replace('RMF', 'John Montford Unit')
+        if 'CBB' in fullDept:
+            fullDept = fullDept.replace('CBB', 'Cell Biology and Biochemistry')
+        if 'ATACS' in fullDept:
+            fullDept = fullDept.replace('ATACS', 'Advanced Teaching and Assessment Clinical Simulation')
+        if 'SSRFA' in fullDept:
+            fullDept = fullDept.replace('SSRFA', 'Student Services and Financial Aid')
+        if 'ITSC PC' in fullDept:
+            fullDept = fullDept.replace('ITSC PC', 'Information Technology Services Personal Computer')
+        if 'TTP' in fullDept:
+            fullDept = fullDept.replace('TTP', 'Texas Tech Physicians')
+        if 'CME' in fullDept:
+            fullDept = fullDept.replace('CME', 'Continuing Medical Education')
+        if 'SIM' in fullDept:
+            fullDept = fullDept.replace('SIM', 'Simulation Center')
+        if 'OIRE' in fullDept:
+            fullDept = fullDept.replace('OIRE', 'Office of Institutional Research')
 
         #location specifications
         if ' Ama ' in fullDept or fullDept.endswith(' Ama'):
