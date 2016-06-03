@@ -65,9 +65,14 @@ class TransformedRecord(
         return self.full_name.strip() != ''
 
     @property
+    def organization_name(self):
+        return self.organization_name_map[self.get_mapped_value(
+            'organization_name').strip()]
+
+    @property
     def organization(self):
         return {
-            'name': self.organization_name_map[self.organization_name.strip()],
+            'name': self.organization_name,
             'children': self.department_as_child,
             'classification': self.ORGANIZATION_CLASSIFICATION,
         }

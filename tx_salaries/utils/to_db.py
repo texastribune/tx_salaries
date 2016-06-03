@@ -1,5 +1,3 @@
-from django.db import transaction
-
 from tx_people import models as tx_people
 
 from .. import models
@@ -7,7 +5,8 @@ from .. import models
 RACE_STORE = {}
 TITLE_STORE = {}
 
-def save(data, source_department):
+
+def save(data):
     """
     Unpack and save each of the items in a structured record from a transformer
 
@@ -20,10 +19,14 @@ def save(data, source_department):
     identifier, id_created = tx_people.Identifier.objects.get_or_create(
         **data['tx_people.Identifier'])
 
+    link, link_created = tx_people.Link.objects.get_or_create(
+        **data['tx_people.Links'])
+
     if data['tx_people.Race']['name'] in RACE_STORE:
         race = RACE_STORE[data['tx_people.Race']['name']]
     else:
-        race, _ = tx_people.Race.objects.get_or_create(**data['tx_people.Race'])
+        race, _ = tx_people.Race.objects.get_or_create(
+            **data['tx_people.Race'])
         RACE_STORE[race.name] = race
 
     if id_created:
@@ -38,6 +41,9 @@ def save(data, source_department):
     #
     # TODO: How should we/can we deal with recursive children?
     children = data['tx_people.Organization'].pop('children', [])
+    source_department, _ = tx_people.Organization.objects.get_or_create(
+        **data['tx_people.Organization'])
+    source_department.links.add(link)
     save_for_stats['organizations'].add(source_department)
     for child in children:
         department, _ = tx_people.Organization.objects.get_or_create(
@@ -59,11 +65,13 @@ def save(data, source_department):
             **compensation['tx_salaries.CompensationType'])
 
         if compensation['tx_salaries.EmployeeTitle']['name'] in TITLE_STORE:
-            title = TITLE_STORE[compensation['tx_salaries.EmployeeTitle']['name']]
+            title = TITLE_STORE[
+                compensation['tx_salaries.EmployeeTitle']['name']]
         else:
             title, _ = models.EmployeeTitle.objects.get_or_create(
                 **compensation['tx_salaries.EmployeeTitle'])
-            TITLE_STORE[compensation['tx_salaries.EmployeeTitle']['name']] = title
+            TITLE_STORE[compensation[
+                'tx_salaries.EmployeeTitle']['name']] = title
 
         emp, _ = models.Employee.objects.get_or_create(
             position=membership, compensation_type=compensation_type,
