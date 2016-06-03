@@ -15,10 +15,11 @@ class TransformedRecord(
         'full_name': 'Name',
         'department': 'Department',
         'job_title': 'Job Title',
-        'hire_date': 'Hire Date',
+        'hire_date': 'Start Date',
         'compensation': 'Annual Salary',
         'gender': 'Gender',
-        'nationality': 'Race',
+        'nationality': 'Ethnic Grp',
+        'employee_type': 'Full/Part',
     }
 
     # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
@@ -34,11 +35,11 @@ class TransformedRecord(
     description = 'Annual salary'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2015, 5, 26)
+    DATE_PROVIDED = date(2016, 5, 26)
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/ut_md_anderson'
-           '/salaries/2015-05/PIA%20-%20Texas%20Tribune%20-%202015.05.xlsx')
+           '/salaries/2016-05/PIA%20-%20Texas%20Tribune%20-%202016.05.xlsx')
 
     # How do they track gender? We need to map what they use to `F` and `M`.
     gender_map = {'F': 'F', 'M': 'M'}
@@ -65,6 +66,16 @@ class TransformedRecord(
         return {
             'name': self.race_map[self.nationality.strip()]
         }
+
+    @property
+    def compensation_type(self):
+        employee_type = self.employee_type
+
+        if employee_type == 'F':
+            return 'FT'
+
+        if employee_type == 'P':
+            return 'PT'
 
     @property
     def person(self):
