@@ -4,9 +4,10 @@ from . import mixins
 from datetime import date
 
 
-class TransformedRecord(mixins.GenericCompensationMixin,
-        mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
-        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+class TransformedRecord(
+    mixins.GenericCompensationMixin,
+    mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
+    mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
@@ -30,7 +31,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     # Y/M/D agency provided the data
 
     # TODO
-    URL = "http://raw.texastribune.org.s3.amazonaws.com/katy_isd/salaries/2016-05/PIR%2015524-30-E%20%20Employee%20list.xlsx"
+    URL = ("http://raw.texastribune.org.s3.amazonaws.com/katy_isd/salaries"
+           "/2016-05/PIR%2015524-30-E%20%20Employee%20list.xlsx")
 
     description = 'Annual compensation'
 
@@ -47,8 +49,11 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         ethnicities = []
         for choice in self.ethnicity_choices:
             if self.data[choice] == "Y":
-                ethnicities.append(choice)
-        ethnicity = " ".join(ethnicities)
+                if choice == 'Hispanic Ethnicity':
+                    ethnicities.append('Hispanic')
+                else:
+                    ethnicities.append(choice)
+        ethnicity = ", ".join(ethnicities)
         if ethnicity == '':
             ethnicity = 'Not given'
         return {
