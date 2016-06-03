@@ -3,58 +3,86 @@ from . import mixins
 
 from datetime import date
 
-# add if necessary: --sheet="Request data" --row=3
 
-
-class TransformedRecord(mixins.GenericCompensationMixin,
-        mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
-        mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
-        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+class TransformedRecord(
+    mixins.GenericCompensationMixin,
+    mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
+    mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
+    mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        'last_name': 'PER_LAST_NAME',
-        'first_name': 'PER_FIRST_NAME',
-        'middle_name': 'PER_MIDDLE_NAME',
-        'department': 'ORG_NAME',
-        'job_title': 'ROLE_NAME',
-        'hire_date': 'EMP_HIRE_DT',
-        'compensation': 'EMP_ASGN_PAY_HIST_A_NRML_PAY',
-        'gender': 'PER_GENDER',
-        'race': 'PRIMARY_ETHNICITY_CODE',
+        'last_name': 'LNAME',
+        'first_name': 'FNAME',
+        'department': 'DEPT',
+        'job_title': 'TITLE',
+        'hire_date': 'HIREDATE',
+        'compensation': 'BUDGETED_SALARY',
+        'hourly_rate': 'Hourly Rate',
+        'gender': 'SEX',
+        'race': 'Race',
+        'employee_type': 'Status'
     }
 
-    NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
+    NAME_FIELDS = ('first_name', 'last_name', )
 
     ORGANIZATION_NAME = 'Beaumont ISD'
 
     ORGANIZATION_CLASSIFICATION = 'School District'
 
-    compensation_type = 'FT'
+    DATE_PROVIDED = date(2016, 4, 25)
 
-    description = 'Annual salary'
-
-    DATE_PROVIDED = date(2014, 7, 15)
-    # Y/M/D agency provided the data
-
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/beaumont_isd/salaries/2014-07/FOIA%2014175.xlsx'
+    URL = 'http://raw.texastribune.org.s3.amazonaws.com/beaumont_isd/salaries/2016-04/beaumont_isd.xlsx'
 
     @property
     def is_valid(self):
-        # Adjust to return False on invalid fields.  For example:
-        return self.last_name.strip() != ''
+        return self.employee_type.strip() != 'Contract'
 
     @property
-    def hire_date(self):
-        return self.get_mapped_value('hire_date').split('T')[0]
+    def compensation_type(self):
+        employee_type = self.employee_type
 
-    def get_raw_name(self):
-        middle_name_field = self.middle_name.strip()
+        if employee_type == 'Full Time':
+            return 'FT'
 
-        if middle_name_field == '' or middle_name_field == '(null)':
-            self.NAME_FIELDS = ('first_name', 'last_name', )
+        if employee_type == 'Part Time':
+            return 'PT'
 
-        name_fields = [getattr(self, a).strip() for a in self.NAME_FIELDS]
-        return u' '.join(name_fields)
+        return 'FT'
+
+    @property
+    def description(self):
+        employee_type = self.employee_type
+
+        if employee_type == 'Full Time':
+            return "Budgeted Salary"
+
+        if employee_type == 'Part Time':
+            return "Part-time hourly rate"
+
+        return "Budgeted Salary"
+
+    @property
+    def compensation(self):
+        salary = self.get_mapped_value('compensation')
+        wage = self.get_mapped_value('hourly_rate')
+        employee_type = self.employee_type
+
+        if employee_type == 'Part Time':
+            return wage
+        else:
+            return salary
+
+    @property
+    def person(self):
+        name = self.get_name()
+        r = {
+            'family_name': name.last,
+            'given_name': name.first,
+            'name': unicode(name),
+            'gender': self.gender,
+        }
+
+        return r
 
 transform = base.transform_factory(TransformedRecord)
