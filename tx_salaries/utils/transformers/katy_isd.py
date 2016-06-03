@@ -16,6 +16,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'job_title': 'Job Title',
         'hire_date': 'Hire Date',
         'compensation': 'Salary',
+        'employee_type': 'Part Time Full Time',
         'gender': 'Gender',
     }
 
@@ -25,13 +26,12 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_CLASSIFICATION = 'School District'
 
-    DATE_PROVIDED = date(2014, 7, 1)
+    DATE_PROVIDED = date(2016, 5, 26)
     # Y/M/D agency provided the data
 
     # TODO
-    URL = "http://raw.texastribune.org.s3.amazonaws.com/katy_isd/salaries/2014-07/PIR%2013582-30E.xlsx"
+    URL = "http://raw.texastribune.org.s3.amazonaws.com/katy_isd/salaries/2016-05/PIR%2015524-30-E%20%20Employee%20list.xlsx"
 
-    compensation_type = 'FT'
     description = 'Annual compensation'
 
     ethnicity_choices = ['American Indian', 'Asian', 'Black', 'White',
@@ -54,6 +54,16 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         return {
             'name': ethnicity.strip()
         }
+
+    @property
+    def compensation_type(self):
+        employee_type = self.employee_type
+
+        if employee_type == 'Full Time':
+            return 'FT'
+
+        if employee_type == 'Part Time':
+            return 'PT'
 
     def calculate_tenure(self):
         hire_date_data = map(int, self.hire_date.split('/'))
