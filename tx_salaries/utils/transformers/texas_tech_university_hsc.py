@@ -58,8 +58,13 @@ class TransformedRecord(
 
     @property
     def race(self):
+        listed_race = self.get_mapped_value('given_race').strip()
+
+        if 'Puerto Rican' in listed_race:
+            listed_race = 'Puerto Rican'
+
         return {
-            'name': self.get_mapped_value('given_race').strip()
+            'name': listed_race
         }
 
     @property
