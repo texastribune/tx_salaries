@@ -19,7 +19,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'employee_type': 'Full / Part Time',
         'hire_date': 'Hire Date',
         'compensation': 'Annual Salary',
-        #'gender': 'Sex',
+        'gender': 'Sex',
         'white': 'White',
         'black': 'Black or African American',
         'asian': 'Asian',
@@ -29,69 +29,21 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'employee_type': 'Full Time/Part Time',
     }
 
-    race_map = {
-         'A': 'Asian',
-         'B': 'Black',
-         'I': 'American Indian/Alaskan',
-         'W': 'White'
-    }
+    hispanic_map = {'Yes': 'Hispanic', '': 'Non-Hispanic'}
 
-    hispanic_map = {'N': 'Non-Hispanic', 'H': 'Hispanic'}
-
-    ORGANIZATION_NAME = 'College Station ISD'
+    ORGANIZATION_NAME = 'Bryan ISD'
 
     ORGANIZATION_CLASSIFICATION = 'School District'
 
-    DATE_PROVIDED = date(2016, 5, 9)
+    DATE_PROVIDED = date(2016, 6, 9)
 
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'college_station_isd/salaries/2016-05/collegestation-isd.xlsx')
+           'bryan_isd/salaries/2016-06/bryan-isd.xlsx')
 
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.full_name.strip() != ''
-
-    @property
-    def post(self):
-        if self.job_title != '':
-            title = self.job_title
-        else:
-            if self.job_type != '':
-                title = self.job_type
-            else:
-                title = self.secondary_job_type.title()
-
-        return {
-            'label': title,
-        }
-
-    @property
-    def compensations(self):
-        if self.job_title != '':
-            title = self.job_title
-        else:
-            if self.job_type != '':
-                title = self.job_type
-            else:
-                title = self.secondary_job_type.title()
-
-        return [
-            {
-                'tx_salaries.CompensationType': {
-                    'name': self.compensation_type,
-                    'description': self.description
-                },
-                'tx_salaries.EmployeeTitle': {
-                    'name': title,
-                },
-                'tx_salaries.Employee': {
-                    'hire_date': self.hire_date,
-                    'compensation': self.compensation,
-                    'tenure': self.calculate_tenure()
-                },
-            }
-        ]
+        return self.last_name.strip() != ''
 
     @property
     def compensation_type(self):
@@ -113,14 +65,27 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     @property
     def race(self):
-        given_race = self.race_map[self.given_race.strip()]
+        races = [self.white,self.black,self.asian,self.native,self.hawaiian]
+        raceNames = ['White','Black or African American','Asian',
+        'American Indian or Alaskan Native','Hawaiian / Pacific Islander']
         ethnicity = self.hispanic_map[self.hispanic.strip()]
 
-        if given_race == '':
-            given_race = 'Not given'
-        return {
-            'name': given_race + ', ' + ethnicity
-        }
+        i = 0
+        raceList = []
+
+        for indivRace in races:
+            if indivRace == u'X':
+                raceList.append(self.raceNames[i].strip())
+            i += 1
+
+        if len(raceList) > 1:
+            return {
+                'name': 'Two or more races, ' + ethnicity
+            }
+        else:
+            return {
+                'name': raceList[0] + ', ' + ethnicity
+            }
 
     @property
     def person(self):
