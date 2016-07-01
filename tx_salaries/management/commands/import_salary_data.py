@@ -9,7 +9,6 @@ from ... import models
 
 import requests
 
-from tx_people import models as tx_people
 
 def out(s):
     sys.stdout.write(s)
@@ -106,21 +105,8 @@ class Command(BaseCommand):
                           'date_provided': records[0]['date_provided']}
         records_remaining = len(records)
 
-        link, _ = tx_people.Link.objects.get_or_create(
-            **records[0]['tx_people.Links'])
-
-        temp_org = {
-            key: records[0]['tx_people.Organization'][key]
-            for key in ('name', 'classification',)
-        }
-
-        source_department, _ = tx_people.Organization.objects.get_or_create(
-            **temp_org)
-
-        source_department.links.add(link)
-
         for record in records:
-            save_for_stats = to_db.save(record, source_department)
+            save_for_stats = to_db.save(record)
 
             to_denormalize['organizations'].update(
                 save_for_stats['organizations'])
