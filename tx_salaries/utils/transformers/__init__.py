@@ -6,6 +6,7 @@ from . import austin_community_college
 from . import austin
 from . import beaumont_isd
 from . import brownsville_isd
+from . import bryan_isd
 from . import cypress_fairbanks_isd
 from . import college_station_isd
 from . import collin_college
@@ -32,6 +33,7 @@ from . import texas_am_system
 from . import texas_state_university
 from . import texas_tech_system
 from . import texas_tech_university
+from . import texas_tech_university_hsc
 from . import university_of_houston
 from . import texas_womans_university
 from . import travis_county
@@ -62,6 +64,7 @@ TRANSFORMERS = {
     '3c71e58afb5d003074a2b7a196133ca28b4e0e3d': [austin.transform, ],
     '129db1bc7003a42783d41a3b0d9cf0db77e1c76b': [beaumont_isd.transform, ],
     '6e4bb90321c62a34296cad61c3800b1dd308257e': [brownsville_isd.transform, ],
+    '2ec7de74cf3768a517adfbe035b1c6436f353649': [bryan_isd.transform, ],
     'bbeaab35571afadf074586ef3d75f739a4dfe471': [college_station_isd.transform, ],
     '39bcb735ae0a6d3b9bddb839337680abf76be1fd': [collin_college.transform, ],
     '7c9088d4ddd84422e7ccc26b986bd7d6c4c6fd45': [cypress_fairbanks_isd.transform, ],
@@ -88,6 +91,7 @@ TRANSFORMERS = {
     '3382282e79ee58627aedd4703591928b09525af5': [texas_state_university.transform, ],
     'bc023bcf9e573ecdf8335ebafb24feec596e473f': [texas_tech_system.transform, ],
     'c60489252da989ab04f6a47a86265dc047dd367b': [texas_tech_university.transform, ],
+    '6ed63202860363b3add42ec5418c00c73efe96ac': [texas_tech_university_hsc.transform, ],
     '63ca4b9cd0465cb3daaad24b070689a0c065d863': [texas_womans_university.transform, ],
     'facd5bf54a4a075309fd32b2e1931e3a939d325e': [travis_county.transform, ],
     '177bf9500b4f73c649e30154c46e0c359d122a48': [ut_arlington.transform, ],
