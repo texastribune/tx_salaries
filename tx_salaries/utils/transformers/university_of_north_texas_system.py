@@ -48,12 +48,12 @@ class TransformedRecord(
     description = 'Total salary'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2016, 5, 26)
+    DATE_PROVIDED = date(2016, 6, 21)
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
            'university_north_texas_system/salaries/'
-           '2016-05/unt_system.xlsx')
+           '2016-06/unt_system.xlsx')
 
     # How do they track gender? We need to map what they use to `F` and `M`.
     gender_map = {'F': 'F', 'M': 'M'}
@@ -89,7 +89,7 @@ class TransformedRecord(
     def compensation_type(self):
         status = self.get_mapped_value('status')
 
-        if status == 'F':
+        if status == 1:
             return 'FT'
 
         return 'PT'
