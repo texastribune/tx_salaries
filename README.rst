@@ -41,6 +41,18 @@ Data is imported using the ``import_salary_data`` management command.  You can r
 Data is imported using `csvkit`_, so it can import from any spreadsheet format
 that csvkit's `in2csv`_ understands.
 
+Setup for Salaries: Updated 4/1/16
+""""""""""""""""""""""""""""""""""
++ Pull `master` for both `salaries.texastribune.org` and `tx_salaries`
++ Get rid of your old virtual environment for salaries. Run `rmvirtualenv <name of virtual env>`.
++ Make a new virtual environment. `mkvirtualenv <name of virtual env>`
++ Install the requirements. `pip install -r requirements/local.txt`
++ Install your local `tx_salaries` into this. `pip install -e ../tx_salaries`
++ If you're using the local postgres database (which I recommend!), then you need to set that up. First set the DATABASE_URL. `export DATABASE_URL=postgres://localhost/salaries`
++ Then pull down the backup. `make local/db-fetch`
++ And load it. `make local/db-restore`
+
+Now, you should be good to work on `tx_salaries` like normal! If you have any transformers already in progress, you'll need to merge `master` of `tx_salaries` into it. Don't forget!
 
 Start the salaries.texastribune.org server
 """"""""""""""""""""""""""""""""""""""""""
