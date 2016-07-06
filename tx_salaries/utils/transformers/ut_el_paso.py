@@ -15,15 +15,20 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'department': 'Department',
         'job_title': 'Title',
         'hire_date': 'Start Date',
-        'race': 'Race',
+        'nationality': 'Race',
         'gender': 'Sex',
         'compensation': 'Annual Rt',
-        'compensation_type': 'Full/Part'
+        'status': 'Full/Part'
     }
 
-    COMPENSATION_MAP = {
-        'F': 'FT',
-        'P': 'PT'
+    RACE_MAP = {
+        'White': 'White',
+        'Asian': 'Asian',
+        'Hisp/Ltno': 'Hispanic/Latino',
+        'AmIndAlsk': 'American Indian/Alaska Native',
+        'Blk/AfrAm': 'Black/African American',
+        'NotSpec': 'Not Specified',
+        'HwnPacIsln': 'Native Hawaiian/Other Pacific Islander'
     }
 
     ORGANIZATION_NAME = 'University of Texas at El Paso'
@@ -31,8 +36,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     ORGANIZATION_CLASSIFICATION = 'University'
 
     # TODO not given on spreadsheet, 40 earn < 4000
-    compensation_type = 'FT'
-    description = 'Annual compensation'
+    # compensation_type = 'FT'
+    description = 'Annual rate'
 
     DATE_PROVIDED = date(2016, 6, 21)
 
@@ -59,7 +64,18 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     @property
     def compensation_type(self):
-        return self.COMPENSATION_MAP[self.get_mapped_value('compensation_type')]
+        emptype = self.get_mapped_value('status')
+
+        if emptype == 'F':
+            return 'FT'
+        else:
+            return 'PT'
+
+    @property
+    def race(self):
+        return {
+            'name': self.RACE_MAP[self.nationality.strip()]
+        }
 
     # def calculate_tenure(self, hire_date):
     #     try:
