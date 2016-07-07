@@ -1,133 +1,98 @@
-from datetime import date
-
 from . import base
 from . import mixins
 
-from .. import cleaver
-
-# http://raw.texastribune.org.s3.amazonaws.com/ut_arlington/salaries/2014-02/UT%20Arlington%20Salaries.xlsx
+from datetime import date
 
 
-class TransformedRecord(mixins.GenericCompensationMixin,
+class TransformedRecord(
+        mixins.GenericCompensationMixin,
         mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
         mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
+
     MAP = {
-        'last_name': 'NAME LAST',
-        'first_name': 'NAME FIRST',
-        'middle_name': 'NAME MIDDLE',
-        'name_suffix': 'NAME SUFFIX',
-        'department': 'DEPARTMENT TITLE',
-        'job_title': 'JOB TITLE',
-        'race': 'ETHNICITY',
-        'gender': 'GENDER',
-        'hire_date': 'CONTINUOUS EMPLOYMENT DATE',
-        'compensation': 'FY ALLOCATIONS',
+        'first_name': 'First Name',
+        'last_name': 'Last Name',
+        'department': 'Department',
+        'job_title': 'Job Title',
+        'hire_date': 'Hire Date',
+        'compensation': 'Annual Rt',
+        'gender': 'Gender',
+        'nationality': 'Ethnic Group',
+        'employee_type': 'Pay Type',
     }
 
-    NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
+    NAME_FIELDS = ('first_name', 'last_name', )
 
-    gender_map = {'FEMALE': 'F', 'MALE': 'M'}
+    race_map = {
+        'AMIND': 'American Indian',
+        'WHITE': 'White',
+        'HISPA': 'Hispanic',
+        'ASIAN': 'Asian',
+        '2+RACE': 'Mixed race',
+        'PACIF': 'Pacific Islander',
+        'BLACK': 'Black',
+        'NSPEC': 'Not specified',
+        '': 'Not given',
+    }
 
-    ORGANIZATION_NAME = 'University of Texas at Arlington'
+    # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
+    ORGANIZATION_NAME = 'The University of Texas at Arlington'
 
+    # What type of organization is this? This MUST match what we use on the site, double check against salaries.texastribune.org
     ORGANIZATION_CLASSIFICATION = 'University'
 
-    # TODO not given on spreadsheet, but they appear to give part time. 14 people earn < 4000
-    compensation_type = 'FT'
-    description = 'Annual compensation'
+    # How would you describe the compensation field? We try to respect how they use their system.
+    description = 'Annual salary'
 
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_arlington/salaries/2014-02/UT%20Arlington%20Salaries.xlsx'
+    # When did you receive the data? NOT when we added it to the site.
+    DATE_PROVIDED = date(2016, 6, 30)
 
-    DATE_PROVIDED = date(2014, 2, 13)
+    # The URL to find the raw data in our S3 bucket.
+    URL = ('http://raw.texastribune.org.s3.amazonaws.com/ut_arlington/salaries/2016-06/Release,%20UTA_HR_TX_TRIBUNE_FINAL.xls')
 
-    cleaver.DepartmentName.MAP = (cleaver.DepartmentName.MAP +
-                                 ((cleaver.regex_i(r'vp '), 'Vice President '), ) +
-                                 ((cleaver.regex_i(r'^It '), 'IT '), ) +
-                                 ((cleaver.regex_i(r'^Uta'), 'UTA'), ) +
-                                 ((cleaver.regex_i(r'Tmac'), 'TMAC'), ) +
-                                 ((cleaver.regex_i(r'^Ada '), 'ADA'), ) +
-                                 ((cleaver.regex_i(r'Orce - Ceshci'), 'ORCE - CESHCHI'), ))
+    # How do they track gender? We need to map what they use to `F` and `M`.
+    gender_map = {'F': 'F', 'M': 'M'}
 
-    @property
-    def get_raw_name(self):
-        # TODO include suffix
-        if self.middle_name.strip() == '':
-            self.NAME_FIELDS = ('first_name', 'last_name')
-        name_fields = [getattr(self, a).strip() for a in self.NAME_FIELDS]
-        return u' '.join(name_fields)
+    REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
 
+
+    # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
     @property
     def is_valid(self):
-        # Adjust to return False on invalid fields.  For example:
-        return self.last_name.strip() != '' and self.hire_date.strip() != ''
+        return len(self.compensation.strip()) > 1
+
+    @property
+    def race(self):
+        return {
+            'name': self.race_map[self.nationality.strip()]
+        }
+
+    @property
+    def compensation_type(self):
+        employee_type = self.employee_type
+
+        if employee_type == 'Annual Salary':
+            return 'Annual Salary'
+
+        if employee_type == '9 Month Salary':
+            return '9 Month Salary'
+
+        if employee_type == '12 Month Salary':
+            return '12 Month Salary'
 
     @property
     def person(self):
-        data = {
-            'family_name': self.last_name.strip(),
-            'given_name': self.first_name.strip(),
-            'name': self.get_raw_name,
+        name = self.get_name()
+        r = {
+            'family_name': name.last,
+            'given_name': name.first,
+            'additional_name': name.middle,
+            'name': unicode(name),
+            'gender': self.gender_map[self.gender.strip()]
         }
-        try:
-            data.update({
-                'gender': self.gender_map[self.gender.strip()]
-            })
-            return data
-        except KeyError:
-            return data
 
-    def process_hire_date(self, hire_date):
-        # TODO five people don't have hire dates given
-        year = hire_date[0:4]
-        month = hire_date[4:6]
-        day = hire_date[6:8]
-        return "-".join([year, month, day])
-
-    def calculate_tenure(self, hire_date):
-        try:
-            hire_date_data = map(int, hire_date.split('-'))
-        except:
-            return None
-        hire_date = date(hire_date_data[0], hire_date_data[1],
-                         hire_date_data[2])
-        tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
-        if tenure < 0:
-            error_msg = ("An employee was hired after the data was provided.\n"
-                         "Is DATE_PROVIDED correct?")
-            raise ValueError(error_msg)
-        return tenure
-
-    @property
-    def compensations(self):
-        hire_date = self.process_hire_date(self.hire_date)
-        return [
-            {
-                'tx_salaries.CompensationType': {
-                    'name': self.compensation_type,
-                    'description': self.description
-                },
-                'tx_salaries.Employee': {
-                    'hire_date': hire_date,
-                    'compensation': self.compensation,
-                    'tenure': self.calculate_tenure(hire_date),
-                },
-                'tx_salaries.EmployeeTitle': {
-                    'name': unicode(cleaver.DepartmentNameCleaver(self.job_title)
-                                           .parse())
-                },
-            }
-        ]
-
-    @property
-    def post(self):
-        return {'label': (unicode(cleaver.DepartmentNameCleaver(self.job_title)
-                                         .parse()))}
-
-    @property
-    def department_as_child(self):
-        return [{'name': unicode(cleaver.DepartmentNameCleaver(self.department)
-                                        .parse()), }, ]
+        return r
 
 transform = base.transform_factory(TransformedRecord)
