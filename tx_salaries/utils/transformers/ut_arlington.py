@@ -18,6 +18,7 @@ class TransformedRecord(
         'job_title': 'Job Title',
         'hire_date': 'Hire Date',
         'compensation': 'Annual Rt',
+        'status': 'FTE',
         'gender': 'Gender',
         'nationality': 'Ethnic Group',
         'employee_type': 'Pay Type',
@@ -61,7 +62,8 @@ class TransformedRecord(
     # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
     @property
     def is_valid(self):
-        return len(self.compensation.strip()) > 1
+        # Adjust to return False on invalid fields.  For example:
+        return self.full_name.strip() != ''
 
     @property
     def race(self):
@@ -71,6 +73,15 @@ class TransformedRecord(
 
     @property
     def compensation_type(self):
+        status = self.get_mapped_value('status')
+
+        if status == 1:
+            return 'FT'
+
+        return 'PT'
+
+    @property
+    def description(self):
         employee_type = self.employee_type
 
         if employee_type == 'Annual Salary':
