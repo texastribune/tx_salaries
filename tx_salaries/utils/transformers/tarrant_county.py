@@ -31,8 +31,6 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     description = 'Annual rate'
 
-    # TODO: Change to 6/17 after validating why handful of employees
-    # hired date is after that date
     DATE_PROVIDED = date(2016, 06, 23)
 
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/tarrant_county/salaries/2016-06/2016-06-17%20Texas%20Tribune.xls')
