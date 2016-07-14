@@ -94,7 +94,7 @@ class TransformedRecord(
     def compensation_type(self):
         status = self.get_mapped_value('status')
 
-        if status == 1:
+        if float(status) >= 1:
             return 'FT'
 
         return 'PT'
