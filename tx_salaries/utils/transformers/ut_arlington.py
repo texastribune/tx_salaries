@@ -63,7 +63,7 @@ class TransformedRecord(
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.full_name.strip() != ''
+        return self.last_name.strip() != ''
 
     @property
     def race(self):
@@ -75,7 +75,7 @@ class TransformedRecord(
     def compensation_type(self):
         status = self.get_mapped_value('status')
 
-        if status == 1:
+        if float(status) >= 1:
             return 'FT'
 
         return 'PT'
