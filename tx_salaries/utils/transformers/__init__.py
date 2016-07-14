@@ -5,6 +5,7 @@ from . import austin_isd
 from . import austin_community_college
 from . import austin
 from . import beaumont_isd
+from . import bexar_county
 from . import brownsville_isd
 from . import bryan_isd
 from . import cypress_fairbanks_isd
@@ -62,6 +63,7 @@ TRANSFORMERS = {
     '2a51198f9949fc5d13a90f048b3a9eb7a8c1c0de': [austin_isd.transform, ],
     '3c71e58afb5d003074a2b7a196133ca28b4e0e3d': [austin.transform, ],
     '129db1bc7003a42783d41a3b0d9cf0db77e1c76b': [beaumont_isd.transform, ],
+    '215681115c43dc1e1e6f9e14d824c96e31b6144a': [bexar_county.transform, ],
     '6e4bb90321c62a34296cad61c3800b1dd308257e': [brownsville_isd.transform, ],
     '2ec7de74cf3768a517adfbe035b1c6436f353649': [bryan_isd.transform, ],
     'bbeaab35571afadf074586ef3d75f739a4dfe471': [college_station_isd.transform, ],
