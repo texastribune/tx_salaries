@@ -32,9 +32,9 @@ class TransformedRecord(
     # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
     # ORGANIZATION_NAME = 'The University of North Texas '
     organization_name_map = {
-        'DAL': 'University of North Texas at Dallas',
-        'HSC': 'University of North Texas Health Science Center',
-        'SYS': 'University of North Texas System',
+        'DAL': 'UNT Dallas',
+        'HSC': 'UNT Health Science Center',
+        'SYS': 'UNT System Administration',
         'UNT': 'University of North Texas'
     }
 
@@ -99,8 +99,17 @@ class TransformedRecord(
 
         return 'PT'
 
-    def get_name(self):
-        return cleaver.EmployeeNameCleaver(
-            self.get_mapped_value('full_name')).parse()
+    def get_raw_name(self):
+            split_name = self.full_name.split(',')
+            last_name = split_name[0]
+            split_firstname = split_name[1].split(' ')
+            first_name = split_firstname[0]
+            if len(split_firstname) == 2 and len(split_firstname[1]) == 1:
+                middle_name = split_firstname[1]
+            else:
+                first_name = split_name[1]
+                middle_name = ''
+
+            return u' '.join([first_name, middle_name, last_name])
 
 transform = base.transform_factory(TransformedRecord)
