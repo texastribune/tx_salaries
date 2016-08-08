@@ -22,7 +22,7 @@ class TransformedRecord(
         'gender': 'GENDER',
         'race': 'ETHNICITY',
         'status': 'FULL/PART TIME',
-        'organization_name': 'COMPANY'
+        'organization_name': 'COMPANY',
     }
 
     # The order of the name fields to build a full name.
@@ -32,14 +32,14 @@ class TransformedRecord(
     # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
     # ORGANIZATION_NAME = 'The University of North Texas '
     organization_name_map = {
-        'DAL': 'UNT Dallas',
-        'HSC': 'UNT Health Science Center',
-        'SYS': 'UNT System Administration',
-        'UNT': 'University of North Texas'
+        'DAL': 'University of North Texas at Dallas',
+        'HSC': 'University of North Texas Health Science Center',
+        'SYS': 'University of North Texas System',
+        'UNT': 'University of North Texas',
     }
 
     # What type of organization is this? This MUST match what we use on the site, double check against salaries.texastribune.org
-    ORGANIZATION_CLASSIFICATION = 'University'
+    # ORGANIZATION_CLASSIFICATION = 'University'
 
     # ???
     compensation_type = 'FT'
@@ -71,10 +71,14 @@ class TransformedRecord(
 
     @property
     def organization(self):
+        classification = ('University Hospital'
+                          if self.organization_name ==
+                          'University of North Texas Health Science Center'
+                          else 'University')
         return {
             'name': self.organization_name,
             'children': self.department_as_child,
-            'classification': self.ORGANIZATION_CLASSIFICATION,
+            'classification': classification
         }
 
     @property
@@ -85,7 +89,7 @@ class TransformedRecord(
             'given_name': name.first,
             # 'additional_name': name.middle,
             'name': unicode(name),
-            'gender': self.gender_map[self.gender.strip()]
+            'gender': self.gender_map[self.gender.strip()],
         }
 
         return r

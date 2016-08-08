@@ -11,13 +11,16 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        'full_name': 'Name',
+        'full_name': 'Employee Name',
         'department': 'Department',
         'job_title': 'Title',
         'hire_date': 'Hire Date',
-        'compensation': 'Ann. Rate of Pay',
+        'compensation': 'Salary',
         'gender': 'Gender',
-        'race': 'Race',
+        'race': 'Ethnicity',
+        'employee_type': 'Employment Status',
+        'salary_basis': 'Salary Basis',
+
     }
 
     ORGANIZATION_NAME = 'Tarrant County'
@@ -28,10 +31,9 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     description = 'Annual rate'
 
-    DATE_PROVIDED = date(2014, 12, 15)
+    DATE_PROVIDED = date(2016, 06, 23)
 
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/tarrant_county'
-           '/salaries/2014-12/2014-12-08%20Texas%20Tribune.xls')
+    URL = ('http://raw.texastribune.org.s3.amazonaws.com/tarrant_county/salaries/2016-06/2016-06-17%20Texas%20Tribune.xls')
 
     gender_map = {'Female': 'F', 'Male': 'M'}
 
@@ -39,6 +41,23 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.full_name.strip() != ''
+
+    @property
+    def compensation_type(self):
+        employee_type = self.employee_type
+
+        if employee_type == 'Full-time':
+            return 'FT'
+
+        if employee_type == 'Temporary/part-time':
+            return 'PT'
+
+    @property
+    def description(self):
+        if self.salary_basis == 'Annual':
+            return 'Annual Compensation'
+        elif self.salary_basis == 'Hourly':
+            return 'Hourly Pay'
 
     @property
     def person(self):

@@ -12,86 +12,49 @@ class TransformedRecord(
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        'first_name': 'First Name',
-        'last_name': 'Last Name',
+        'full_name': 'Employee Name',
         'department': 'Department',
-        'job_title': 'Job Title',
+        'job_title': 'Position Title',
         'hire_date': 'Hire Date',
-        'compensation': 'Annual Rt',
-        'status': 'FTE',
+        'compensation': 'Annual Salary',
         'gender': 'Gender',
-        'nationality': 'Ethnic Group',
-        'employee_type': 'Pay Type',
-    }
-
-    NAME_FIELDS = ('first_name', 'last_name', )
-
-    race_map = {
-        'AMIND': 'American Indian',
-        'WHITE': 'White',
-        'HISPA': 'Hispanic',
-        'ASIAN': 'Asian',
-        '2+RACE': 'Mixed race',
-        'PACIF': 'Pacific Islander',
-        'BLACK': 'Black',
-        'NSPEC': 'Not specified',
-        '': 'Not given',
+        'race': 'Ethnicity',
+        'employee_type': 'Fulltime/Part-Time',
     }
 
     # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
-    ORGANIZATION_NAME = 'The University of Texas at Arlington'
+    ORGANIZATION_NAME = 'Bexar County'
 
     # What type of organization is this? This MUST match what we use on the site, double check against salaries.texastribune.org
-    ORGANIZATION_CLASSIFICATION = 'University'
+    ORGANIZATION_CLASSIFICATION = 'County'
 
     # How would you describe the compensation field? We try to respect how they use their system.
     description = 'Annual salary'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2016, 6, 30)
+    DATE_PROVIDED = date(2016, 6, 8)
 
     # The URL to find the raw data in our S3 bucket.
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/ut_arlington/salaries/2016-06/Release,%20UTA_HR_TX_TRIBUNE_FINAL.xls')
+    URL = ('http://raw.texastribune.org.s3.amazonaws.com/bexar_county/salaries/2016-06/ORR%20460%20response.xlsx')
 
     # How do they track gender? We need to map what they use to `F` and `M`.
-    gender_map = {'F': 'F', 'M': 'M'}
-
-    REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
-
+    gender_map = {'Female': 'F', 'Male': 'M'}
 
     # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.last_name.strip() != ''
-
-    @property
-    def race(self):
-        return {
-            'name': self.race_map[self.nationality.strip()]
-        }
+        return self.full_name.strip() != ''
 
     @property
     def compensation_type(self):
-        status = self.get_mapped_value('status')
-
-        if float(status) >= 1:
-            return 'FT'
-
-        return 'PT'
-
-    @property
-    def description(self):
         employee_type = self.employee_type
 
-        if employee_type == 'Annual Salary':
-            return 'Annual Salary'
+        if employee_type == 'Fulltime':
+            return 'FT'
 
-        if employee_type == '9 Month Salary':
-            return '9 Month Salary'
-
-        if employee_type == '12 Month Salary':
-            return '12 Month Salary'
+        if employee_type == 'Part-Time':
+            return 'PT'
 
     @property
     def person(self):
@@ -105,5 +68,18 @@ class TransformedRecord(
         }
 
         return r
+
+    def get_raw_name(self):
+        split_name = self.full_name.split(',')
+        last_name = split_name[0]
+        split_firstname = split_name[1].split(' ')
+        first_name = split_firstname[0]
+        if len(split_firstname) == 2 and len(split_firstname[1]) == 1:
+            middle_name = split_firstname[1]
+        else:
+            first_name = split_name[1]
+            middle_name = ''
+
+        return u' '.join([first_name, middle_name, last_name])
 
 transform = base.transform_factory(TransformedRecord)
