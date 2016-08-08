@@ -45,7 +45,7 @@ class TransformedRecord(
     compensation_type = 'FT'
 
     # How would you describe the compensation field? We try to respect how they use their system.
-    description = 'Total salary'
+    description = 'Total yearly salary'
 
     # When did you receive the data? NOT when we added it to the site.
     DATE_PROVIDED = date(2016, 6, 21)
@@ -98,6 +98,14 @@ class TransformedRecord(
             return 'FT'
 
         return 'PT'
+
+    @property
+    def description(self):
+        status = self.get_mapped_value('status')
+        if float(status) <= 1:
+            return 'Total yearly salary, part-time'
+        else:
+            return 'Total yearly salary'
 
     def get_raw_name(self):
             split_name = self.full_name.split(',')
