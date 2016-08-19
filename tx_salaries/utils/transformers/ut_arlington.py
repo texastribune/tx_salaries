@@ -39,7 +39,7 @@ class TransformedRecord(
     }
 
     # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
-    ORGANIZATION_NAME = 'The University of Texas at Arlington'
+    ORGANIZATION_NAME = 'University of Texas at Arlington'
 
     # What type of organization is this? This MUST match what we use on the site, double check against salaries.texastribune.org
     ORGANIZATION_CLASSIFICATION = 'University'
