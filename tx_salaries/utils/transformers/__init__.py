@@ -52,6 +52,7 @@ from . import ut_md_anderson
 from . import ut_medical_branch
 from . import ut_pan_american
 from . import ut_permian_basin
+from . import ut_rgv
 from . import ut_san_antonio
 from . import ut_southwestern
 from . import ut_system
@@ -112,6 +113,7 @@ TRANSFORMERS = {
     'bf2d8d6cad54567327b44050c507096885f925b7': [ut_pan_american.transform, ],
     'dc125c8ca1bdfbe9888abefcb2806064d5b6b55d': [ut_permian_basin.transform, ],
     '3eede716c96db3c302eaa2b9b3af6e176daf7727': [ut_san_antonio.transform, ],
+    '825bb8db7dc92a1a91dbdc1df9132c7f2f438048': [ut_rgv.transform, ],
     'de0167927d7162fb025b72c76a1fc157f081c00b': [ut_tyler.transform, ],
     'fe980380568d4efbc398522dfd71a3e872ea33ac': [ut_system.transform, ],
     '5714aa39bed15a7d032097c2aa0be7df68507e56': [ut_southwestern.transform, ],
