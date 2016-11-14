@@ -14,24 +14,35 @@ class TransformedRecord(
 
     # They included people without compensation and have
     # clarified they do not consider them employees
-    REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
+    # REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
 
     MAP = {
         'last_name': 'Last',
         'first_name': 'First Name',
         'id_number': 'ID',
         'job_title': 'Job Title',
-        'department': 'Dept',
-        'race': 'Ethnic Grp',
-        'gender': 'Sex',
-        'compensation_type': 'Full/Part',
-        'hire_date': 'Start Date',
-        'compensation': 'Total Comp Rate',
+        'department': 'Department',
+        'race': 'Ethnicity',
+        'gender': 'Gender',
+        'compensation_type': 'Employment Status',
+        'hire_date': 'Original Hire Date',
+        'compensation': 'Total Base Comp',
     }
 
     COMPENSATION_MAP = {
         'F': 'FT',
         'P': 'PT'
+    }
+
+    RACE_MAP = {
+        'WHITE': 'White',
+        'ASIAN': 'Asian',
+        'HISPA': 'Hispanic',
+        'NSPEC': 'Not specified',
+        'BLACK': 'Black',
+        'TWO OR MORE': 'Two or more races',
+        'AMIND': 'American Indian',
+        'PACIF': 'Pacific Islander',
     }
 
     description = 'Total compensation rate'
@@ -44,9 +55,12 @@ class TransformedRecord(
     # TODO current app uses University Hospital
     ORGANIZATION_CLASSIFICATION = 'University Hospital'
 
-    DATE_PROVIDED = date(2015, 8, 10)
+    DATE_PROVIDED = date(2016, 10, 14)
 
-    is_valid = True
+    @property
+    def is_valid(self):
+        # Adjust to return False on invalid fields.  For example:
+        return self.last_name.strip() != ''
 
     URL = (
         'https://s3.amazonaws.com/raw.texastribune.org/ut_health_houston/'
@@ -56,5 +70,29 @@ class TransformedRecord(
     def compensation_type(self):
         return self.COMPENSATION_MAP[
             self.get_mapped_value('compensation_type')]
+
+    @property
+    def race(self):
+        raw_race = self.get_mapped_value('race')
+
+        if raw_race == '':
+            converted_race = 'Not specified'
+        else:
+            converted_race = self.RACE_MAP[raw_race]
+
+        return {
+            'name': converted_race
+        }
+
+    @property
+    def description(self):
+        compensation_type = self.compensation_type
+
+        if compensation_type == 'FT':
+            return 'Base compensation rate'
+
+        if compensation_type == 'PT':
+            return 'Part-time base compensation rate'
+
 
 transform = base.transform_factory(TransformedRecord)
