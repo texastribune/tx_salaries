@@ -4,12 +4,16 @@ from . import base
 from . import mixins
 
 
-class TransformedRecord(mixins.GenericCompensationMixin, mixins.GenericDepartmentMixin,
-                        mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
-                        mixins.GenericJobTitleMixin,
-                        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-                        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
-    # They included people without compensation and have clarified they do not consider them employees
+class TransformedRecord(
+    mixins.GenericCompensationMixin,
+    mixins.GenericDepartmentMixin,
+    mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
+    mixins.GenericJobTitleMixin,
+    mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
+
+    # They included people without compensation and have
+    # clarified they do not consider them employees
     REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
 
     MAP = {
@@ -34,7 +38,8 @@ class TransformedRecord(mixins.GenericCompensationMixin, mixins.GenericDepartmen
 
     NAME_FIELDS = ('first_name', 'last_name', )
 
-    ORGANIZATION_NAME = 'The University of Texas Health Science Center at Houston'
+    ORGANIZATION_NAME = (
+        'The University of Texas Health Science Center at Houston')
 
     # TODO current app uses University Hospital
     ORGANIZATION_CLASSIFICATION = 'University Hospital'
@@ -43,10 +48,13 @@ class TransformedRecord(mixins.GenericCompensationMixin, mixins.GenericDepartmen
 
     is_valid = True
 
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_health_houston/salaries/2015-08/ut_health_science_center_houston.xlsx'
+    URL = (
+        'https://s3.amazonaws.com/raw.texastribune.org/ut_health_houston/'
+        'salaries/2016-10/ut-health-science-houston-10-14-16.xlsx')
 
     @property
     def compensation_type(self):
-        return self.COMPENSATION_MAP[self.get_mapped_value('compensation_type')]
+        return self.COMPENSATION_MAP[
+            self.get_mapped_value('compensation_type')]
 
 transform = base.transform_factory(TransformedRecord)
