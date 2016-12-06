@@ -22,8 +22,19 @@ class TransformedRecord(
         'hire_date': 'Last Start',
         'compensation': 'Annual Rt',
         'gender': 'Sex',
-        'race': 'Ethnic Grp',
+        'nationality': 'Ethnic Grp',
         'employee_type': 'Full/Part Time'
+    }
+
+    RACE_MAP = {
+        'WHITE': 'White',
+        'BLACK': 'Black/African American',
+        'HISPA': 'Hispanic/Latino',
+        'ASIAN': 'Asian',
+        'NSPEC': 'Not specified',
+        'PACIF': 'Native Hawaiian/Other Pacific Islander',
+        'AMIND': 'American Indian/Alaska Native',
+        '2ORMORE': 'Two or more races'
     }
 
     # The order of the name fields to build a full name.
@@ -57,6 +68,12 @@ class TransformedRecord(
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.first_name.strip() != ''
+
+    @property
+    def race(self):
+        return {
+            'name': self.RACE_MAP[self.nationality.strip()]
+        }
 
     @property
     def compensation(self):
