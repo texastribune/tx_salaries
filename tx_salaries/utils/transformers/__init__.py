@@ -17,6 +17,7 @@ from . import dallas_county
 from . import dallas_isd
 from . import eanes_isd
 from . import el_paso_county
+from . import fort_worth
 from . import houston
 from . import houston_community_college
 from . import katy_isd
@@ -76,6 +77,7 @@ TRANSFORMERS = {
     '9cd2f59f4b4ec7b7b1fbf5b0da6571a671d22662': [dallas_isd.transform, ],
     'b3ac361fd078f04d8035cef647ac839ef3f0f353': [eanes_isd.transform, ],
     'd18ad5c9635a40de15b0ead0e8f8fe97b8ccca31': [el_paso_county.transform, ],
+    '578a8bb56581d0cae8154b26286abc93f2bf093a': [fort_worth.transform, ],
     'b91a9f78c4db005d73b11c228f30657ced7ed3c7': [houston.transform, ],
     'a4f1152500a1c25df0705463266f75a9b15f6b5a': [houston_community_college.transform, ],
     '63756f881651e50857ed321b897b34a6440b47c6': [katy_isd.transform, ],
