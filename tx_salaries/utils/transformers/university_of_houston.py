@@ -2,7 +2,6 @@ from . import base
 from . import mixins
 
 from datetime import date
-from .. import cleaver
 
 
 class TransformedRecord(
@@ -12,17 +11,22 @@ class TransformedRecord(
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
+    REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
+
     MAP = {
-        'full_name': 'Name',
-        'department': 'Dept Name',
+        'last_name': 'Last',
+        'first_name': 'First Name',
+        'department': 'Dept',
         'job_title': 'Job Title',
-        'hire_date': 'Hire Date',
+        'hire_date': 'Start Date',
         'compensation': 'Annual Rt',
         'employee_type': 'Full/Part',
         'gender': 'Sex',
         'nationality': 'Ethnic Grp',
-        'campus': 'Campus',
+        'campus': 'Unit',
     }
+
+    NAME_FIELDS = ('first_name', 'last_name', )
 
     # The name of the organization this WILL SHOW UP ON THE SITE,
     # so double check it!
@@ -37,34 +41,21 @@ class TransformedRecord(
 
     description = 'Annual salary'
 
-    race_map = {
-        'AMIND': 'American Indian/Alaska Native',
-        'WHITE': 'White',
-        'HISPA': 'Hispanic/Latino',
-        'ASIAN': 'Asian',
-        '2+RACE': 'Mixed race',
-        'PACIF': 'Native Hawaiian/Other Pacific Islander',
-        'BLACK': 'Black/African American',
-        'NSPEC': 'Not Specified',
-        'NHISP': 'White',
-        '': 'Not given',
-    }
-
     campus_map = {
-        'HR730': 'University of Houston',
-        'HR759': 'University of Houston-Clear Lake',
-        'HR765': 'University of Houston-Victoria',
-        'HR783': 'University of Houston System',
-        'HR784': 'University of Houston-Downtown',
+        'UH': 'University of Houston',
+        'UH Clear Lake': 'University of Houston-Clear Lake',
+        'UH Victoria': 'University of Houston-Victoria',
+        'UH System': 'University of Houston System',
+        'UH Downtown': 'University of Houston-Downtown',
     }
 
     # How do they track gender? We need to map what they use to `F` and `M`.
     gender_map = {'F': 'F', 'M': 'M'}
 
-    DATE_PROVIDED = date(2015, 9, 16)
+    DATE_PROVIDED = date(2016, 12, 1)
     # Y/M/D agency provided the data
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/university_houston/'
-           'salaries/2015-09/Texas%20Tribune%2020150908.xlsx')
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
+           'university_houston/salaries/2016-12/uh.xls')
 
     @property
     def organization(self):
@@ -77,54 +68,40 @@ class TransformedRecord(
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.full_name.strip() != ''
+        has_first_name = True if self.first_name else False
+        has_last_name = True if self.last_name else False
+        has_hire_date = True if self.hire_date else False
+        has_salary = True if self.compensation else False
+
+        return (
+            has_first_name and has_last_name and has_hire_date and has_salary)
 
     @property
     def compensation_type(self):
         employee_type = self.employee_type
 
-        if employee_type == 'Full-Time':
+        if employee_type == 'F':
             return 'FT'
 
-        if employee_type == 'Part-Time':
+        if employee_type == 'P':
             return 'PT'
 
     @property
     def description(self):
         employee_type = self.employee_type
 
-        if employee_type == 'Full-Time':
+        if employee_type == 'F':
             return "Annual salary"
 
-        if employee_type == 'Part-Time':
+        if employee_type == 'P':
             return "Part-time annual salary"
 
     @property
     def race(self):
+        race = self.nationality.strip()
+
         return {
-            'name': self.race_map[self.nationality.strip()]
+            'name': race if race else 'Unknown'
         }
-
-    def calculate_tenure(self):
-        hire_date_data = map(int, self.hire_date.split('-'))
-        hire_date = date(hire_date_data[0], hire_date_data[1],
-                         hire_date_data[2])
-        tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
-        if tenure < 0:
-            tenure = 0
-        return tenure
-
-    def get_raw_name(self):
-        split_name = self.full_name.split(',')
-        last_name = split_name[0]
-        split_firstname = split_name[1].split(' ')
-        first_name = split_firstname[0]
-        if len(split_firstname) == 2 and len(split_firstname[1]) == 1:
-            middle_name = split_firstname[1]
-        else:
-            first_name = split_name[1]
-            middle_name = ''
-
-        return u' '.join([first_name, middle_name, last_name])
 
 transform = base.transform_factory(TransformedRecord)
