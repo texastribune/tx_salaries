@@ -101,7 +101,7 @@ class TransformedRecord(
         race = self.nationality.strip()
 
         return {
-            'name': race if race else ''
+            'name': race if race else 'Unknown'
         }
 
 transform = base.transform_factory(TransformedRecord)
