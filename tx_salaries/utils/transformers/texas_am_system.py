@@ -30,7 +30,7 @@ class TransformedRecord(
 
     ORGANIZATION_CLASSIFICATION = 'University'
 
-    DATE_PROVIDED = date(2016, 12, 01)
+    DATE_PROVIDED = date(2016, 12, 1)
 
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
            'texas_a%26m_university_system/salaries/2016-12/'
