@@ -30,11 +30,11 @@ class TransformedRecord(
 
     ORGANIZATION_CLASSIFICATION = 'University'
 
-    DATE_PROVIDED = date(2015, 9, 9)
+    DATE_PROVIDED = date(2016, 12, 1)
 
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'texas_a%26m_university_system/salaries/2015-09/'
-           'tamu_2015-09-09.xlsx')
+           'texas_a%26m_university_system/salaries/2016-12/'
+           'am2016.csv')
 
     race_map = {
         '1': 'White (Not Hispanic or Latino)',
