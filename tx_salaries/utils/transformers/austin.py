@@ -15,14 +15,13 @@ class TransformedRecord(
         'last_name': 'Last',
         'first_name': 'First',
         'middle_name': 'MI',
-        # 'full_name': '', if needed
-        # 'suffix': '', if needed
         'department': 'Department Name',
         'job_title': 'Title',
         'hire_date': 'Date of Employment',
         'compensation': 'Annual Salary',
         'gender': 'Gender',
-        'race': 'Ethnicity',
+        'race': 'Race',
+        'employment_type': 'Status'
     }
 
     # The order of the name fields to build a full name.
@@ -35,22 +34,16 @@ class TransformedRecord(
     # What type of organization is this? This MUST match what we use on the site, double check against salaries.texastribune.org
     ORGANIZATION_CLASSIFICATION = 'City'
 
-    # ???
-    compensation_type = 'FT'
-
     # How would you describe the compensation field? We try to respect how they use their system.
     description = 'Annual salary'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2015, 4, 13)
+    DATE_PROVIDED = date(2017, 1, 27)
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'austin/salaries/2015-04/'
-           'cityofaustin0415.xls')
-
-    # How do they track gender? We need to map what they use to `F` and `M`.
-    #gender_map = {'Female': 'F', 'Male': 'M'}
+           'austin/salaries/2017-01/'
+           'cityofaustin.xlsx')
 
     @property
     def compensation(self):
@@ -58,11 +51,36 @@ class TransformedRecord(
             return 0
         return self.get_mapped_value('compensation')
 
+    @property
+    def compensation_type(self):
+        status = self.get_mapped_value('employment_type')
+
+        if status == 'Full Time':
+            return 'FT'
+        elif status == 'Part Time':
+            return 'PT'
+
+    @property
+    def description(self):
+        status = self.get_mapped_value('employment_type')
+
+        if status == 'Full Time':
+            return 'Annual salary'
+        elif status == 'Part Time':
+            return 'Part-time annual salary'
+
     # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.last_name.strip() != ''
+
+    @property
+    def race(self):
+        given_race = self.get_mapped_value('race')
+        if given_race == '':
+            given_race = 'Unknown/Not Specified'
+        return {'name': given_race}
 
     @property
     def person(self):
