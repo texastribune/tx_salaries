@@ -87,7 +87,7 @@ TRANSFORMERS = {
     '2252263014de05fa4efd240e0a3716c484495a93': [pasadena_isd.transform, ],
     '0e027f3d0038d81f570cbda2aeedf3dd1f720881': [potter_county.transform, ],
     'f53125485535c4619b16838160dc4bd41875389f': [san_antonio.transform, ],
-    '5034d589091e79d58ee3c51766bd6ab05f08d3a5': [rockwall_isd.transform, ],
+    '2412f56c1cbced970ab823b9603a082778a0b3b1': [rockwall_isd.transform, ],
     '60f6cef782e44830c94d719a9e9e460f31723e07': [state_of_texas.transform, ],
     '2aaf4d7f6687edfb719e84bd4a370c49425399b7': [tarrant_county.transform, ],
     '5f34613a2026006655ae15c0e31e8ed4f5ef29fa': [tarrant_comm_college.transform, ],

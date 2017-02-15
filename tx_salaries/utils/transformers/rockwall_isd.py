@@ -14,16 +14,14 @@ class TransformedRecord(
     MAP = {
         'last_name': 'Last Name',
         'first_name': 'First Name',
-        # 'middle_name': '', if needed
-        # 'full_name': '', if needed
-        # 'suffix': '', if needed
-        'department': 'Dept',
+        'department': 'Department-Campus',
         'job_title': 'Title',
-        'second_title': 'Title2',
         'hire_date': 'Hire Date',
-        'compensation': 'Position Contract Amt',
+        'hispanic_ethnicity': 'Hispanic Ethnicity',
+        'compensation': 'Gross annual salary',
         'gender': 'Gender',
-        'race': 'Race Desc',
+        'ethnicity': 'Federal Race',
+        'employee_type': 'Full Time/Part Time Status',
     }
 
     # The order of the name fields to build a full name.
@@ -43,7 +41,7 @@ class TransformedRecord(
     description = 'Annual salary'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2015, 5, 20)
+    DATE_PROVIDED = date(2017, 2, 13)
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
@@ -65,13 +63,6 @@ class TransformedRecord(
         return '-'.join([raw_date[-4:], raw_date[:2], raw_date[3:5]])
 
     @property
-    def job_title(self):
-        raw_title = self.get_mapped_value('job_title')
-        second_title = self.get_mapped_value('second_title')
-        return ' '.join([raw_title, second_title])
-
-
-    @property
     def person(self):
         name = self.get_name()
         r = {
@@ -83,5 +74,34 @@ class TransformedRecord(
         }
 
         return r
+
+    @property
+    def race(self):
+        fed_race = self.get_mapped_value('ethnicity')
+        hispanic_ethnicity = self.get_mapped_value('hispanic_ethnicity')
+        if hispanic_ethnicity == 'Y':
+            return {'name': 'Hispanic ' + fed_race}
+        elif hispanic_ethnicity == 'N':
+            return {'name': 'Non-Hispanic ' + fed_race}
+
+    @property
+    def compensation_type(self):
+        employee_type = self.employee_type
+
+        if employee_type == 'Full Time':
+            return 'FT'
+        else:
+            return 'PT'
+
+    @property
+    def description(self):
+        employee_type = self.employee_type
+
+        if employee_type == 'Full Time':
+            return 'Gross annual salary'
+
+        if employee_type != 'Full Time':
+            return 'Part-time annual salary'
+
 
 transform = base.transform_factory(TransformedRecord)
