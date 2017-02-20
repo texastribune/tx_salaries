@@ -13,13 +13,14 @@ class TransformedRecord(
 
     MAP = {
         'full_name': 'Name - Full',
-        'department': 'Process Level (Departmet)',
+        'department': 'Process Level Desc',
         'job_title': 'Job Code Description',
-        'hire_date': 'Adjusted Hire Date',
+        'hire_date': 'Hire Date',
         'compensation': 'Rate of Pay',
         'hours': 'Annual Hours',
         'gender': 'Gender',
         'nationality': 'Ethnicity',
+        'employment_type': 'Status'
     }
 
     # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
@@ -29,7 +30,7 @@ class TransformedRecord(
     ORGANIZATION_CLASSIFICATION = 'City'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2015, 4, 29)
+    DATE_PROVIDED = date(2017, 2, 7)
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
@@ -61,35 +62,46 @@ class TransformedRecord(
 
     @property
     def compensation_type(self):
-        hours = self.hours
+        status = self.employment_type
 
-        if not hours:
+        if any(['Full-time' in status, 'Leave' in status]):
             return 'FT'
 
-        if int(hours) < 2000:
+        if any(['Part-time' in status, 'Intern' in status, 'Seasonal' in status, 'Temporary' in status]):
             return 'PT'
-
-        return 'FT'
 
     @property
     def description(self):
-        hours = self.hours
+        status = self.employment_type
 
-        if not hours:
-            return "Full-time salary"
+        if any(['Full-time' in status, 'Absence with Pay' in status]):
+            return "Full-time annual salary"
 
-        if int(hours) < 2000:
-            return "Part-time salary"
+        if 'Part-time' in status:
+            return "Part-time annual salary"
 
-        return "Full-time salary"
+        if 'Military' in status:
+            return 'Full-time annual salary (on non-paid military leave)'
+
+        if any(['Intern' in status, 'Seasonal' in status, 'Temporary' in status]):
+            return 'Hourly rate'
 
     @property
     def compensation(self):
         comp = Decimal(self.get_mapped_value('compensation'))
+        status = self.employment_type
 
-        if comp < 1000:
-            return comp * int(self.hours)
-        return self.get_mapped_value('compensation')
+        # only want hourly rates for these guys
+        if any(['Intern' in status, 'Seasonal' in status, 'Temporary' in status]):
+            return comp
+
+        # here we want annual rates, so if they're over $100 its an annual rate
+        # if its below we caluclate with annual hours
+        if any(['Full-time' in status, 'Leave' in status, 'Part-time' in status]):
+            if comp < 100:
+                return comp * int(self.hours)
+            else:
+                return comp
 
     # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
     @property
