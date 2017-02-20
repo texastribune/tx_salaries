@@ -45,7 +45,7 @@ class TransformedRecord(
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'rockwall_isd/salaries/2015-05/'
+           'rockwall_isd/salaries/2017-02/'
            'rockwall_isd.xls')
 
     # How do they track gender? We need to map what they use to `F` and `M`.
@@ -90,7 +90,9 @@ class TransformedRecord(
 
         if employee_type == 'Full Time':
             return 'FT'
-        else:
+        elif employee_type == 'Part Time':
+            return 'PT'
+        elif employee_type == '00 - Do Not Report':
             return 'PT'
 
     @property
