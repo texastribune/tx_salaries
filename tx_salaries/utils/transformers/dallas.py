@@ -98,7 +98,7 @@ class TransformedRecord(
         # here we want annual rates, so if they're over $100 its an annual rate
         # if its below we caluclate with annual hours
         if any(['Full-time' in status, 'Leave' in status, 'Part-time' in status]):
-            if comp < 100:
+            if comp < 101:
                 return comp * int(self.hours)
             else:
                 return comp
