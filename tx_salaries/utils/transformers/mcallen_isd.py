@@ -19,6 +19,7 @@ class TransformedRecord(
         'compensation': 'Contract Salary',
         'gender': 'Gender',
         'race': 'RACE',
+        'status': 'Type'
     }
 
     # The name of the organization this WILL SHOW UP ON THE SITE,
@@ -33,8 +34,86 @@ class TransformedRecord(
     # they use their system.
     description = 'Salary'
 
+    ORGANIZATION_MAP = {
+        '001': "MCALLEN HIGH SCHOOL",
+        '002': 'MEMORIAL HIGH SCHOOL',
+        '005': 'INSTRUCTION AND GUIDANCE CENTER',
+        '006': 'NIKKI ROWE HIGH SCHOOL',
+        '007': 'OPTIONS IN EDUCATION/LAMAR ACADEMY',
+        '011': 'EARLY COLLEGE HIGH SCHOOL',
+        '042': 'TRAVIS MIDDLE SCHOOL',
+        '043': 'LINCOLN MIDDLE SCHOOL',
+        '045': 'BROWN MIDDLE SCHOOL',
+        '046': 'MORRIS MIDDLE SCHOOL',
+        '047': 'CATHEY MIDDLE SCHOOL',
+        '048': 'FOSSUM MIDDLE SCHOOL',
+        '101': 'ALVAREZ ELEMENTARY SCHOOL',
+        '103': 'BONHAM ELEMENTARY SCHOOL',
+        '106': 'HOUSTON ELEMENTARY SCHOOL',
+        '107': 'JACKSON ELEMENTARY SCHOOL',
+        '108': 'NAVARRO ELEMENTARY SCHOOL',
+        '111': 'MILAM ELEMENTARY SCHOOL',
+        '112': 'WILSON ELEMENTARY SCHOOL',
+        '114': 'FIELDS ELEMENTARY SCHOOL',
+        '116': 'SEGUIN ELEMENTARY SCHOOL',
+        '119': 'ESCANDON ELEMENTARY SCHOOL',
+        '120': 'RAYBURN ELEMENTARY SCHOOL',
+        '121': 'ROOSEVELT ELEMENTARY SCHOOL',
+        '122': 'GARZA ELEMENTARY SCHOOL',
+        '123': 'MCAULIFFE ELEMENTARY SCHOOL',
+        '124': 'GONZALEZ ELEMENTARY SCHOOL',
+        '126': 'CASTANEDA ELEMENTARY SCHOOL',
+        '127': 'SANCHEZ ELEMENTARY SCHOOL',
+        '128': 'PEREZ ELEMENTARY SCHOOL',
+        '129': 'HENDRICKS ELEMENTARY SCHOOL',
+        '130': 'THIGPEN/ZAVALA ELEMENTARY SCHOOL',
+        '699': 'SUMMER SCHOOL',
+        '701': 'SUPERINTENDENT\'S OFFICE',
+        '702': 'BOARD OF TRUSTEES',
+        '703': 'DEPARTMENT OF TAX ASSESSOR/COLLECTOR',
+        '713': 'GRANT DEVELOPMENT AND COMPLIANCE',
+        '714': 'DEPARTMENT OF COMMUNITY INFORMATION',
+        '716': 'DEPARTMENT OF INSTRUCTIONAL MATERIALS & STUDENT RECORDS',
+        '727': 'DEPARTMENT OF HUMAN RESOURCES',
+        '728': 'DEPARTMENT OF EMPLOYEE BENEFITS',
+        '729': 'DEPARTMENT OF PURCHASING',
+        '730': 'DIVISION OF BUSINESS SERVICES',
+        '731': 'ASSISTANT SUPERINTENDENT FOR DISTRICT OPERATIONS',
+        '732': 'DEPARTMENT OF INTERNAL AUDIT',
+        '733': 'ASSISTANT SUPERINTENDENT FOR BUSINESS OPERATIONS',
+        '751': 'FISCAL AGENT SHARED SERVICES ARRANGEMENTS',
+        '800': 'WAREHOUSE/FIXED ASSETS',
+        '801': 'POLICE DEPARTMENT',
+        '802': 'DIVISION OF INSTRUCTION',
+        '803': 'DEPARTMENT OF STUDENT SUPPORT SERVICES',
+        '804': 'DEPARTMENT OF ATHLETICS',
+        '805': 'DEPARTMENT OF FINE ARTS',
+        '807': 'DEPARTMENT OF TECHNOLOGY',
+        '808': 'FACILITIES MAINTENANCE & OPERATIONS',
+        '809': 'DEPARTMENT OF TRANSPORTATION',
+        '810': 'DEPARTMENT OF FOOD SERVICE',
+        '811': 'DEPARTMENT OF INSTRUCTIONAL TECHNOLOGY',
+        '812': 'DEPARTMENT OF MEDIA SERVICES',
+        '813': 'DEPARTMENT OF LIBRARY SERVICES',
+        '814': 'DEPARTMENT OF SPECIAL EDUCATION SERVICES',
+        '815': 'DEPARTMENT OF HEALTH SERVICES',
+        '816': 'WELLNESS PROGRAM',
+        '817': 'DEPARTMENT OF SPECIAL SERVICES',
+        '819': 'DEPARTMENT OF RESEARCH AND POLICY',
+        '998': 'UNALLOCATED',
+        '999': 'SUBSTITUTE'
+    }
+
+    RACE_MAP = {
+        '1': 'American Indian/Alaska Native',
+        '2': 'Asian',
+        '3': 'Black or African American',
+        '4': 'Native Hawaiian or Other Pacific Islander',
+        '5': 'White'
+    }
+
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2016, 9, 9)
+    DATE_PROVIDED = date(2017, 2, 20)
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
@@ -56,10 +135,19 @@ class TransformedRecord(
     def compensation_type(self):
         emp_type = self.status
 
-        if emp_type == 'Full-Time':
+        if emp_type == 'E':
             return 'FT'
 
-        if emp_type == 'Part-Time':
+        if emp_type == 'SU':
+            return 'PT'
+
+        if emp_type == 'PTRT':
+            return 'PT'
+
+        if emp_type == 'RTTH':
+            return 'FT'
+
+        if emp_type == 'SURT':
             return 'PT'
 
     @property
