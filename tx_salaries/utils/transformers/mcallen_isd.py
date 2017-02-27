@@ -1,7 +1,7 @@
 from . import base
 from . import mixins
 
-from datetime import date
+from datetime import date, datetime
 
 
 class TransformedRecord(
@@ -13,12 +13,12 @@ class TransformedRecord(
 
     MAP = {
         'full_name': 'Name',
-        'department': 'Department',
+        'department_code': 'Department',
         'job_title': 'POSITION DESC',
         'hire_date': 'Most Recent Hire Date',
-        'compensation': 'Contract Salary',
+        'contract_salary': 'Contract Salary',
         'gender': 'Gender',
-        'race': 'RACE',
+        'ethnicity': 'RACE',
         'status': 'Type'
     }
 
@@ -34,7 +34,7 @@ class TransformedRecord(
     # they use their system.
     description = 'Salary'
 
-    ORGANIZATION_MAP = {
+    DEPARTMENT_MAP = {
         '001': "MCALLEN HIGH SCHOOL",
         '002': 'MEMORIAL HIGH SCHOOL',
         '005': 'INSTRUCTION AND GUIDANCE CENTER',
@@ -104,7 +104,7 @@ class TransformedRecord(
         '999': 'SUBSTITUTE'
     }
 
-    RACE_MAP = {
+    race_map = {
         '1': 'American Indian/Alaska Native',
         '2': 'Asian',
         '3': 'Black or African American',
@@ -124,37 +124,51 @@ class TransformedRecord(
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.job_title.strip() != 'STADIUM WORKER'
+        return self.job_title != "PART-TIME STADIUM GAME WORKER"
 
-    # @property
-    # def hire_date(self):
-    #     raw_date = self.get_mapped_value('hire_date')
-    #     return '-'.join([raw_date[-4:], raw_date[:2], raw_date[3:5]])
+    @property
+    def department(self):
+        departmentCode = self.DEPARTMENT_MAP[self.department_code.strip()[:3]]
+        print departmentCode
+        return departmentCode
+
+    @property
+    def race(self):
+        return {
+            'name': self.race_map[self.ethnicity.strip()]
+        }
 
     @property
     def compensation_type(self):
         emp_type = self.status
-
+        # full-time employee
         if emp_type == 'E':
             return 'FT'
-
-        if emp_type == 'SU':
+        elif emp_type == 'SU':
+            # substutites
             return 'PT'
-
-        if emp_type == 'PTRT':
+        elif emp_type == 'PT':
             return 'PT'
-
-        if emp_type == 'RTTH':
+        elif emp_type == 'PTRT':
+            # part time retured teacher - retired teacher who was rehired
+            # as a part-time employee
+            return 'PT'
+        elif emp_type == 'RTRH':
+            # retired reacher who was rehired full-time
             return 'FT'
-
-        if emp_type == 'SURT':
+        elif emp_type == 'SURT':
+            # substitute teacher who is also a retired teacher
             return 'PT'
 
     @property
     def compensation(self):
-        if not self.get_mapped_value('compensation'):
-            return 0
-        return self.get_mapped_value('compensation')
+        raw_compensation = self.contract_salary
+        return float(raw_compensation)
+
+    @property
+    def hire_date(self):
+        raw_date = self.get_mapped_value('hire_date')
+        return datetime.strptime(raw_date, '%m/%d/%Y')
 
     @property
     def person(self):
