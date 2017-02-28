@@ -16,10 +16,11 @@ class TransformedRecord(
         'department_code': 'Department',
         'job_title': 'POSITION DESC',
         'hire_date': 'Most Recent Hire Date',
-        'contract_salary': 'Contract Salary',
+        'compensation': 'Contract Salary',
         'gender': 'Gender',
         'ethnicity': 'RACE',
-        'status': 'Type'
+        'status': 'Type',
+        'unique': 'ID'
     }
 
     # The name of the organization this WILL SHOW UP ON THE SITE,
@@ -35,7 +36,7 @@ class TransformedRecord(
     description = 'Salary'
 
     DEPARTMENT_MAP = {
-        '001': "MCALLEN HIGH SCHOOL",
+        '001': 'MCALLEN HIGH SCHOOL',
         '002': 'MEMORIAL HIGH SCHOOL',
         '005': 'INSTRUCTION AND GUIDANCE CENTER',
         '006': 'NIKKI ROWE HIGH SCHOOL',
@@ -43,8 +44,9 @@ class TransformedRecord(
         '011': 'EARLY COLLEGE HIGH SCHOOL',
         '042': 'TRAVIS MIDDLE SCHOOL',
         '043': 'LINCOLN MIDDLE SCHOOL',
-        '045': 'BROWN MIDDLE SCHOOL',
-        '046': 'MORRIS MIDDLE SCHOOL',
+        '044': 'BROWN MIDDLE SCHOOL',
+        '045': 'MORRIS MIDDLE SCHOOL',
+        '046': 'DE LEON MIDDLE SCHOOL',
         '047': 'CATHEY MIDDLE SCHOOL',
         '048': 'FOSSUM MIDDLE SCHOOL',
         '101': 'ALVAREZ ELEMENTARY SCHOOL',
@@ -101,7 +103,10 @@ class TransformedRecord(
         '817': 'DEPARTMENT OF SPECIAL SERVICES',
         '819': 'DEPARTMENT OF RESEARCH AND POLICY',
         '998': 'UNALLOCATED',
-        '999': 'SUBSTITUTE'
+        '999': 'SUBSTITUTE',
+        '180': '',
+        '100': '',
+        '104': ''
     }
 
     race_map = {
@@ -116,31 +121,43 @@ class TransformedRecord(
     DATE_PROVIDED = date(2017, 2, 20)
 
     # The URL to find the raw data in our S3 bucket.
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'dallas_isd/salaries/2015-11/dallas_isd.xlsx')
+    URL = ('http://s3.amazonaws.com/raw.texastribune.org/'
+           'mcallen_isd/salaries/2017-02/mcallen_isd.xlsx')
 
     # This is how the loader checks for valid people. Defaults to checking to
     # see if `last_name` is empty.
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.job_title != "PART-TIME STADIUM GAME WORKER"
+        # return self.get_mapped_value('full_name').strip() != ''
+        return self.get_mapped_value("compensation") != 0
+
+    def process_compensation(self):
+        raw_compensation = self.get_mapped_value("compensation")
+        return float(raw_compensation)
+
+    # @property
+    # def identifier(self):
+    #     return {
+    #         'scheme': 'tx_salaries_hash',
+    #         'identifier': base.create_hash_for_record(self.data,
+    #                 exclude=[self.compensation_key, ])
+    #     }
 
     @property
     def department(self):
-        departmentCode = self.DEPARTMENT_MAP[self.department_code.strip()[:3]]
-        print departmentCode
+        departmentCode = self.DEPARTMENT_MAP[self.get_mapped_value("department_code").strip()[:3]]
         return departmentCode
 
     @property
     def race(self):
         return {
-            'name': self.race_map[self.ethnicity.strip()]
+            'name': self.race_map[self.get_mapped_value("ethnicity").strip()]
         }
 
     @property
     def compensation_type(self):
-        emp_type = self.status
+        emp_type = self.get_mapped_value("status")
         # full-time employee
         if emp_type == 'E':
             return 'FT'
@@ -161,14 +178,14 @@ class TransformedRecord(
             return 'PT'
 
     @property
-    def compensation(self):
-        raw_compensation = self.contract_salary
-        return float(raw_compensation)
-
-    @property
     def hire_date(self):
-        raw_date = self.get_mapped_value('hire_date')
-        return datetime.strptime(raw_date, '%m/%d/%Y')
+        raw_hire_date = self.get_mapped_value('hire_date')
+        parsed_hire_date = map(int, raw_hire_date.split('/'))
+
+        return '-'.join([
+            str(i) for i in
+            [parsed_hire_date[2], parsed_hire_date[0], parsed_hire_date[1]]
+        ])
 
     @property
     def person(self):
@@ -184,7 +201,7 @@ class TransformedRecord(
         return r
 
     def get_raw_name(self):
-        split_name = self.full_name.split(', ')
+        split_name = self.get_mapped_value('full_name').split(', ')
         last_name = split_name[0]
         split_firstname = split_name[1].split(' ')
         first_name = split_firstname[0]
@@ -195,5 +212,6 @@ class TransformedRecord(
             middle_name = ''
 
         return u' '.join([first_name, middle_name, last_name])
+
 
 transform = base.transform_factory(TransformedRecord)
