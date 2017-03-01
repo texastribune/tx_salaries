@@ -17,12 +17,13 @@ class TransformedRecord(
         # 'middle_name': '', if needed
         # 'full_name': '', if needed
         # 'suffix': '', if needed
-        'department': 'Main Department',
-        'job_title': 'Job',
-        'hire_date': 'Current Hire Date',
+        'department': 'Dept.',
+        'job_title': 'Title',
+        'hire_date': 'ORIG HD',
         'compensation': 'Annual salary',
-        'gender': 'Gender',
-        'race': 'Race',
+        'gender': 'Gender Key',
+        'race': 'Ethnic origin',
+        'status': 'PT/FT'
     }
 
     # The order of the name fields to build a full name.
@@ -42,7 +43,7 @@ class TransformedRecord(
     description = 'Annual salary'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2015, 4, 17)
+    DATE_PROVIDED = date(2017, 2, 20)
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
@@ -56,7 +57,16 @@ class TransformedRecord(
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.first_name.strip() != ''
+        return self.last_name.strip() != ''
+
+    @property
+    def compensation_type(self):
+        status = self.status
+
+        if 'FT' in status:
+            return 'FT'
+        elif 'PT' in status:
+            return 'PT'
 
     @property
     def person(self):
