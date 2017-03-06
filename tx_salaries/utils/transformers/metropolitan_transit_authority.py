@@ -35,7 +35,8 @@ class TransformedRecord(
     # What type of organization is this? This MUST match what we use on the site, double check against salaries.texastribune.org
     ORGANIZATION_CLASSIFICATION = 'Transit'
 
-    # ???
+    # `compensation_type` determines what type of salary this is, and is taken into account when calculating
+    # stats. The only two valid options are `FT` and `PT`
     compensation_type = 'FT'
 
     # How would you describe the compensation field? We try to respect how they use their system.
