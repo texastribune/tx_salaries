@@ -36,9 +36,6 @@ class TransformedRecord(
     # What type of organization is this? This MUST match what we use on the site, double check against salaries.texastribune.org
     ORGANIZATION_CLASSIFICATION = 'Transit'
 
-    # ???
-    compensation_type = 'FT'
-
     # How would you describe the compensation field? We try to respect how they use their system.
     description = 'Annual salary'
 
@@ -62,7 +59,7 @@ class TransformedRecord(
     @property
     def compensation_type(self):
         status = self.status
-
+        # checks full-time/part-time status and labels accordingly
         if 'FT' in status:
             return 'FT'
         elif 'PT' in status:
