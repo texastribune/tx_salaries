@@ -198,3 +198,14 @@ class LinkMixin(object):
             'url': self.URL,
             'note': 'Salary information'
         }
+
+class CompensationMap(object):
+    """
+    Allows use of a mapping COMPENSATION_MAP between the labels
+    in a column of compensation types and the two strings we can return from
+    the property compensation_type, 'FT' and 'PT'
+    """
+
+    @property
+    def compensation_type(self):
+        return self.COMPENSATION_MAP[self.get_mapped_value('compensation_type')]
