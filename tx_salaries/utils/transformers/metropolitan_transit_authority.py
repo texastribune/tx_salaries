@@ -50,11 +50,31 @@ class TransformedRecord(
     # How do they track gender? We need to map what they use to `F` and `M`.
     gender_map = {'Female': 'F', 'Male': 'M'}
 
+    description_map = {
+        'FT Hrly NE Maint': 'Full Time Hourly Non Exempt Maintenance',
+        'FT Hrly NE PSA': 'Full Time Hourly- Professional Services Agreement (temporary)',
+        'FT Hrly NE Transp': 'Full Time Hourly Non Exempt Transportation',
+        'FT Salaried Exempt': 'Full Time Salaried Exempt',
+        'FT Salaried NE': 'Full Time Salaried Non Exempt',
+        'PT Hrly NE Non Union': 'Part Time Hourly Non Exempt Non-Union',
+        'PT Hrly NE Ret-Maint': 'Part Time Hourly Non Exempt Retired-Maintenance',
+        'PT Hrly NE Ret-Trans': 'Part Time Non Exempt Retired-Transportation',
+        'PT Hrly NE Transp': 'Part Time Hourly Non Exempt Transportation'
+    }
+
     # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.last_name.strip() != ''
+
+    def process_compensation_description(self):
+        return self.description_map[self.compensation_type.strip()].title()
+
+    @property
+    def description(self):
+        compDescription = self.description_map[self.status.strip()].title()
+        return compDescription
 
     @property
     def compensation_type(self):
