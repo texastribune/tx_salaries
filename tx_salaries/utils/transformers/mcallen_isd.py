@@ -104,9 +104,9 @@ class TransformedRecord(
         '819': 'DEPARTMENT OF RESEARCH AND POLICY',
         '998': 'UNALLOCATED',
         '999': 'SUBSTITUTE',
-        '180': '',
-        '100': '',
-        '104': ''
+        '180': 'STUDENT WORKER',
+        '100': 'STUDENT WORKER',
+        '104': 'STUDENT WORKER'
     }
 
     race_map = {
@@ -146,7 +146,7 @@ class TransformedRecord(
 
     @property
     def department(self):
-        departmentCode = self.DEPARTMENT_MAP[self.get_mapped_value("department_code").strip()[:3]]
+        departmentCode = self.DEPARTMENT_MAP[self.get_mapped_value("department_code").strip()[:3]].title()
         return departmentCode
 
     @property
