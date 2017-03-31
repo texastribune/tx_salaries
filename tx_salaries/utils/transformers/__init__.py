@@ -22,6 +22,7 @@ from . import hays_county
 from . import houston
 from . import houston_community_college
 from . import katy_isd
+from . import lamar_institute_of_technology
 from . import metropolitan_transit_authority
 from . import midwestern_state_university
 from . import north_east_isd
@@ -83,9 +84,10 @@ TRANSFORMERS = {
     'b91a9f78c4db005d73b11c228f30657ced7ed3c7': [houston.transform, ],
     'a4f1152500a1c25df0705463266f75a9b15f6b5a': [houston_community_college.transform, ],
     '63756f881651e50857ed321b897b34a6440b47c6': [katy_isd.transform, ],
-    'd982fa55bf19391e9f756cf03614cdd3969c4311': [north_east_isd.transform, ],
+    '9fdb6528b025440215c596f69488bf2acbb617ce': [lamar_institute_of_technology.transform, ],
     'd84e2b3a0005d7d80672ccc80f5793cd07981439': [metropolitan_transit_authority.transform, ],
     'c98e393bf1b3fc2635b31fcedb0cfbc69766e5ac': [midwestern_state_university.transform, ],
+    'd982fa55bf19391e9f756cf03614cdd3969c4311': [north_east_isd.transform, ],
     '2252263014de05fa4efd240e0a3716c484495a93': [pasadena_isd.transform, ],
     '0e027f3d0038d81f570cbda2aeedf3dd1f720881': [potter_county.transform, ],
     'f53125485535c4619b16838160dc4bd41875389f': [san_antonio.transform, ],
