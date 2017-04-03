@@ -46,8 +46,8 @@ class TransformedRecord(
     DATE_PROVIDED = date(2017, 3, 31)
 
     # The URL to find the raw data in our S3 bucket.
-    URL = ('http://s3.amazonaws.com/raw.texastribune.org/'
-           'lamar_institute_of_technology/salaries/2017-3/'
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
+           'lamar_institute_of_technology/salaries/2017-03/'
            'lamar-institute-of-technology.xlsx')
 
     # How do they track gender? We need to map what they use to `F` and `M`.
