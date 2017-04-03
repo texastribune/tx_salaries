@@ -33,7 +33,7 @@ class TransformedRecord(
     ORGANIZATION_NAME = 'Lamar Institute of Technology'
 
     # What type of organization is this? This MUST match what we use on the site, double check against salaries.texastribune.org
-    ORGANIZATION_CLASSIFICATION = 'Public State College'
+    ORGANIZATION_CLASSIFICATION = 'Two-year College'
 
     # `compensation_type` determines what type of salary this is, and is taken into account when calculating
     # stats. The only two valid options are `FT` and `PT`
