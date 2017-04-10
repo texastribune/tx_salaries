@@ -57,7 +57,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     @property
     def compensation_type(self):
-        status = self.employment_type
+        status = self.get_mapped_value('employee_type')
 
         # hourly rates, everyone else is paid as annual rate
         if status == 'H':
@@ -68,8 +68,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     @property
     def description(self):
-        status = self.employment_type
-
+        status = self.get_mapped_value('employee_type')
         if status == 'A' or status == 'M':
             return "Annual salary"
 
@@ -80,13 +79,10 @@ class TransformedRecord(mixins.GenericCompensationMixin,
             return 'Hourly rate'
 
     @property
-    def compensation(self):
-         return Decimal(self.get_mapped_value('compensation'))
-
-    @property
     def race(self):
         return {
             'name': self.race_map[self.nationality.strip()]
         }
+
 
 transform = base.transform_factory(TransformedRecord)
