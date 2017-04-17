@@ -17,6 +17,7 @@ from . import dallas_isd
 from . import eanes_isd
 from . import el_paso_county
 from . import fort_worth
+from . import hays_county
 from . import houston
 from . import houston_community_college
 from . import katy_isd
@@ -57,6 +58,7 @@ from . import ut_san_antonio
 from . import ut_southwestern
 from . import ut_system
 from . import ut_tyler
+from . import williamson_county
 
 TRANSFORMERS = {
     'ddd655aafc883a905a0e2b3556c0e42b34f21d04': [alamo_colleges.transform, ],
@@ -71,24 +73,25 @@ TRANSFORMERS = {
     'bbeaab35571afadf074586ef3d75f739a4dfe471': [college_station_isd.transform, ],
     '39bcb735ae0a6d3b9bddb839337680abf76be1fd': [collin_college.transform, ],
     '7c9088d4ddd84422e7ccc26b986bd7d6c4c6fd45': [cypress_fairbanks_isd.transform, ],
-    '1a55d6050f034d84f6551cd629e46805c8788297': [dallas.transform, ],
+    '95e5f3c47affecfb924230ce117cfb88599c2368': [dallas.transform, ],
     '695426d2122576c140691958c145818d31f95c89': [dallas_county_comm_college.transform, ],
     'eb61956148a1c009ab8f5275650b279531f970d6': [dallas_county.transform, ],
     '9cd2f59f4b4ec7b7b1fbf5b0da6571a671d22662': [dallas_isd.transform, ],
     'b3ac361fd078f04d8035cef647ac839ef3f0f353': [eanes_isd.transform, ],
     'd18ad5c9635a40de15b0ead0e8f8fe97b8ccca31': [el_paso_county.transform, ],
     '578a8bb56581d0cae8154b26286abc93f2bf093a': [fort_worth.transform, ],
+    'a9c48289c0c112b10e91baca6cf42159597f2c6d': [hays_county.transform, ],
     'b91a9f78c4db005d73b11c228f30657ced7ed3c7': [houston.transform, ],
     'a4f1152500a1c25df0705463266f75a9b15f6b5a': [houston_community_college.transform, ],
     '63756f881651e50857ed321b897b34a6440b47c6': [katy_isd.transform, ],
     'd982fa55bf19391e9f756cf03614cdd3969c4311': [north_east_isd.transform, ],
     '10339a3c4cc7dfb78c7120fc5a92da052062ccc5': [mcallen_isd.transform, ],
-    'd84e2b3a0005d7d80672ccc80f5793cd07981439': [metropolitan_transit_authority.transform, ],
+    '87a9564706644a2287ad4cd16cdddf8c330b0af0': [metropolitan_transit_authority.transform, ],
     'c98e393bf1b3fc2635b31fcedb0cfbc69766e5ac': [midwestern_state_university.transform, ],
     '2252263014de05fa4efd240e0a3716c484495a93': [pasadena_isd.transform, ],
     '0e027f3d0038d81f570cbda2aeedf3dd1f720881': [potter_county.transform, ],
     'f53125485535c4619b16838160dc4bd41875389f': [san_antonio.transform, ],
-    '5034d589091e79d58ee3c51766bd6ab05f08d3a5': [rockwall_isd.transform, ],
+    '2412f56c1cbced970ab823b9603a082778a0b3b1': [rockwall_isd.transform, ],
     '60f6cef782e44830c94d719a9e9e460f31723e07': [state_of_texas.transform, ],
     '2aaf4d7f6687edfb719e84bd4a370c49425399b7': [tarrant_county.transform, ],
     '5f34613a2026006655ae15c0e31e8ed4f5ef29fa': [tarrant_comm_college.transform, ],
@@ -120,4 +123,5 @@ TRANSFORMERS = {
     '5714aa39bed15a7d032097c2aa0be7df68507e56': [ut_southwestern.transform, ],
     'fd66132338a69d2fb76faa1d91b6f0d21ffc5aec': [ut_san_antonio.transform, ],
     '068d88f0ea10973339f5a4d57c8d806686d2df40': [ut_tyler.transform, ],
+    '82fbe7f20bd25bf024dfd909f0370de9f8427a62': [williamson_county.transform, ]
 }
