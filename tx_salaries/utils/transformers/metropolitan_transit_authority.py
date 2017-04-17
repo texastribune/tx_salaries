@@ -17,12 +17,13 @@ class TransformedRecord(
         # 'middle_name': '', if needed
         # 'full_name': '', if needed
         # 'suffix': '', if needed
-        'department': 'Main Department',
-        'job_title': 'Job',
-        'hire_date': 'Current Hire Date',
+        'department': 'Dept.',
+        'job_title': 'Title',
+        'hire_date': 'ORIG HD',
         'compensation': 'Annual salary',
-        'gender': 'Gender',
-        'race': 'Race',
+        'gender': 'Gender Key',
+        'race': 'Ethnic origin',
+        'status': 'PT/FT'
     }
 
     # The order of the name fields to build a full name.
@@ -43,21 +44,50 @@ class TransformedRecord(
     description = 'Annual salary'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2015, 4, 17)
+    DATE_PROVIDED = date(2017, 2, 20)
 
     # The URL to find the raw data in our S3 bucket.
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'metropolitan_transit_authority/salaries/2015-04/'
-           'metropolitan_transit_authority.xls')
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
+           'metropolitan_transit_authority/salaries/2017-02/'
+           'metropolitan_transit_authority.xlsx')
 
     # How do they track gender? We need to map what they use to `F` and `M`.
     gender_map = {'Female': 'F', 'Male': 'M'}
+
+    description_map = {
+        'FT Hrly NE Maint': 'Full Time Hourly Non Exempt Maintenance',
+        'FT Hrly NE PSA': 'Full Time Hourly- Professional Services Agreement (temporary)',
+        'FT Hrly NE Transp': 'Full Time Hourly Non Exempt Transportation',
+        'FT Salaried Exempt': 'Full Time Salaried Exempt',
+        'FT Salaried NE': 'Full Time Salaried Non Exempt',
+        'PT Hrly NE Non Union': 'Part Time Hourly Non Exempt Non-Union',
+        'PT Hrly NE Ret-Maint': 'Part Time Hourly Non Exempt Retired-Maintenance',
+        'PT Hrly NE Ret-Trans': 'Part Time Non Exempt Retired-Transportation',
+        'PT Hrly NE Transp': 'Part Time Hourly Non Exempt Transportation'
+    }
 
     # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.first_name.strip() != ''
+        return self.last_name.strip() != ''
+
+    def process_compensation_description(self):
+        return self.description_map[self.compensation_type.strip()].title()
+
+    @property
+    def description(self):
+        compDescription = self.description_map[self.status.strip()].title()
+        return compDescription
+
+    @property
+    def compensation_type(self):
+        status = self.status
+        # checks full-time/part-time status and labels accordingly
+        if 'FT' in status:
+            return 'FT'
+        elif 'PT' in status:
+            return 'PT'
 
     @property
     def person(self):
