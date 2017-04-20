@@ -33,7 +33,7 @@ class TransformedRecord(
 
     # How would you describe the compensation field? We try to respect how
     # they use their system.
-    description = 'Salary'
+    # description = 'Salary'
 
     DEPARTMENT_MAP = {
         '001': 'MCALLEN HIGH SCHOOL',
@@ -176,6 +176,15 @@ class TransformedRecord(
         elif emp_type == 'SURT':
             # substitute teacher who is also a retired teacher
             return 'PT'
+
+    @property
+    def description(self):
+        status = self.get_mapped_value('status')
+
+        if status in ['E', 'RTRH']:
+            return 'Annual salary'
+        elif status in ['SU', 'PT', 'PTRT', 'SURT']:
+            return 'Part-time annual salary'
 
     @property
     def hire_date(self):
