@@ -5,7 +5,52 @@ from datetime import date
 from . import base
 from . import mixins
 
-from .. import cleaver
+ARTICLES = ['a', 'an', 'the', ]
+CONJUNCTIONS = ['and', 'but', 'for', 'nor', 'or', ]
+PREPOSITIONS = ['at', 'by', 'for', 'in', 'of', 'on', 'to', ]
+ABBREVIATIONS = ['hhs', 'hr', 'hvac', 'tdcj', 'vc', ]
+
+STOP_WORDS = ARTICLES + CONJUNCTIONS + PREPOSITIONS
+
+ROMAN_NUMERAL_REGEX = re.compile('^(X|IX|IV|V?I{0,3})$', re.I)
+APOSTROPHE_LETTER_REGEX = re.compile("([a-z])'([A-Z])")
+DIGIT_LETTER_REGEX = re.compile(r'\d([A-Z])')
+COMMA_REGEX = re.compile(r',\s*')
+
+
+def better_title(value):
+    """Convert a string into titlecase."""
+    t = APOSTROPHE_LETTER_REGEX.sub(
+        lambda m: m.group(0).lower(), value.title())
+    return DIGIT_LETTER_REGEX.sub(lambda m: m.group(0).lower(), t)
+
+
+def normalize_organization_name(name):
+    output = []
+
+    for idx, s in enumerate(name.split()):
+        word = s.lower()
+
+        # if the word is a valid abbreviation, always uppercase it
+        if word in ABBREVIATIONS:
+            converted = word.upper()
+        # if this is the first word, it should be capitalized
+        elif idx == 0:
+            converted = better_title(s)
+        # if this is a valid stop word, it should remain lowercase
+        elif word in STOP_WORDS:
+            converted = word
+        # if this is a Roman numeral, it should be uppercase
+        elif ROMAN_NUMERAL_REGEX.match(word):
+            converted = word.upper()
+        # finally, just treat it normally otherwise
+        else:
+            converted = better_title(s)
+
+        output.append(converted)
+
+    combined_output = ' '.join(output)
+    return ', '.join(COMMA_REGEX.split(combined_output))
 
 
 class TransformedRecord(
@@ -18,18 +63,19 @@ class TransformedRecord(
     MAP = {
         'last_name': 'LAST NAME',
         'first_name': 'FIRST NAME',
+        'middle_name': 'MI',
         'department': 'AGENCY NAME',
         'job_title': 'CLASS TITLE',
         'gender': 'GENDER',
         'race': 'ETHNICITY',
         'hire_date': 'HIRE DATE',
-        'compensation': 'ANNUAL SALARY',
+        'compensation': 'AUTH ANNUAL SALARY',
         'compensation_type': 'EMPLOYEE TYPE',
         'agency_number': 'AGENCY',
         'state_number': 'STATE NUMBER',
     }
 
-    NAME_FIELDS = ('first_name', 'last_name', )
+    NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
 
     # State of Texas uses these employment status codes:
     description_map = {
@@ -43,18 +89,24 @@ class TransformedRecord(
         'CTF': 'CLASSIFIED TEMPORARY FULL-TIME',
         'CTP': 'CLASSIFIED TEMPORARY PART-TIME',
     }
-    status_map = {'F': 'FT', 'P': 'PT'}
+    status_map = {
+        'F': 'FT',
+        'P': 'PT',
+    }
 
-    gender_map = {'FEMALE': 'F', 'MALE': 'M'}
+    gender_map = {
+        'FEMALE': 'F',
+        'MALE': 'M',
+    }
 
     ORGANIZATION_NAME = 'State Comptroller Payroll'
 
     ORGANIZATION_CLASSIFICATION = 'State'
 
-    DATE_PROVIDED = date(2016, 2, 29)
+    DATE_PROVIDED = date(2017, 3, 28)
 
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/state_of_texas/'
-           'salaries/2016-02/USPS_SPRS_ASOFJAN312016_.xlsx')
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/state_of_texas/'
+           'salaries/2017-04/state_comptroller_feb_mar_2017.csv')
 
     @property
     def is_valid(self):
@@ -64,9 +116,11 @@ class TransformedRecord(
     @property
     def person(self):
         name = self.get_name()
+
         r = {
             'family_name': name.last,
             'given_name': name.first,
+            'additional_name': name.middle,
             'name': unicode(name),
             'gender': self.gender_map[self.gender.strip()]
         }
@@ -77,48 +131,19 @@ class TransformedRecord(
         '''
         Use the last letter of the code to determine part time or full time
         '''
-        return self.status_map[self.compensation_type.strip()[-1]]
+        compensation_type = self.compensation_type.split(' - ')[0]
+        return self.status_map[compensation_type[-1]]
 
     def process_compensation_description(self):
-        return self.description_map[self.compensation_type.strip()].title()
+        compensation_description = self.compensation_type.split(' - ')[1]
+        return normalize_organization_name(compensation_description.strip())
 
     def process_job_title(self):
-        # don't titlecase roman numerals
-        roman_regex = re.compile("^(IX|IV|V?I{0,3})")
-
-        def is_roman(snippet):
-            if len(roman_regex.match(snippet).group()) > 0:
-                return snippet
-            else:
-                return snippet.title()
-
-        return (u" ").join([is_roman(s) for s in self.data["CLASS TITLE"]
-                                                     .split(" ")])
+        return normalize_organization_name(self.data['CLASS TITLE'])
 
     @property
     def post(self):
         return {'label': self.process_job_title()}
-
-    @property
-    def hire_date(self):
-        raw_hire_date = self.get_mapped_value('hire_date')
-        parsed_hire_date = map(int, raw_hire_date.split('/'))
-
-        return '-'.join([
-            str(i) for i in
-            [parsed_hire_date[2], parsed_hire_date[0], parsed_hire_date[1]]
-        ])
-
-    def calculate_tenure(self):
-        hire_date_data = map(int, self.hire_date.split('-'))
-        hire_date = date(hire_date_data[0], hire_date_data[1],
-                         hire_date_data[2])
-        tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
-        if tenure < 0:
-            error_msg = ("An employee was hired after the data was provided.\n"
-                         "Is DATE_PROVIDED correct?")
-            raise ValueError(error_msg)
-        return tenure
 
     @property
     def compensations(self):
@@ -162,11 +187,9 @@ class TransformedRecord(
     @property
     # department names have trailing whitespace
     def department_as_child(self):
-        if self.department == "Governor'S Office, Trustee Programs":
-            # TODO make dept name cleaver handle this case
-            return [{'name': "Governor's Office, Trustee Programs", }, ]
-        return [{'name': unicode(cleaver.DepartmentNameCleaver(self.department)
-                                        .parse()), }, ]
+        return [{
+            'name': normalize_organization_name(self.department)
+        }]
 
 
 transform = base.transform_factory(TransformedRecord)
