@@ -103,10 +103,10 @@ class TransformedRecord(
 
     ORGANIZATION_CLASSIFICATION = 'State'
 
-    DATE_PROVIDED = date(2017, 3, 28)
+    DATE_PROVIDED = date(2017, 4, 24)
 
     URL = ('https://s3.amazonaws.com/raw.texastribune.org/state_of_texas/'
-           'salaries/2017-04/state_comptroller_feb_mar_2017.csv')
+           'salaries/2017-04/state_of_texas.csv')
 
     @property
     def is_valid(self):
