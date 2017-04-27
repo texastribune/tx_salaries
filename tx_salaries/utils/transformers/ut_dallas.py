@@ -30,7 +30,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     ORGANIZATION_CLASSIFICATION = 'University'
 
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-          'ut_dallas/salaries/2017-03/ut-dallas-edit.csv')
+          'ut_dallas/salaries/2017-03/ut-dallas-edit.xlsx')
 
     race_map = {
         'AMIND': 'American Indian/Alaska Native',
