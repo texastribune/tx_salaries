@@ -12,21 +12,25 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
     MAP = {
-        'full_name': 'Name',
-        'department': 'Dept Name',
-        'job_title': 'Title',
+        'last_name': 'Last',
+        'first_name': 'First Name',
+        'department': 'Department Descr',
+        'job_title': 'Job Code Descr',
         'hire_date': 'Hire Date',
-        'nationality': 'Ethnicity',
+        'nationality': 'Race',
         'gender': 'Gender',
-        'compensation': 'Annual Rt',
+        'compensation': 'Comp Rate',
+        'employee_type': 'Comp Freq',
     }
+
+    NAME_FIELDS = ('first_name', 'last_name', )
 
     ORGANIZATION_NAME = 'University of Texas at Dallas'
 
     ORGANIZATION_CLASSIFICATION = 'University'
 
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-          'ut_dallas/salaries/2015-05/ut_dallas.xls')
+          'ut_dallas/salaries/2017-03/ut-dallas-edit.xlsx')
 
     race_map = {
         'AMIND': 'American Indian/Alaska Native',
@@ -41,62 +45,44 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'WHITE': 'White',
         'VIET': 'Vietnamese',
         'PR': 'Puerto Rican',
-        'No response': 'No Response',
+        '#N/A': 'Unknown',
     }
 
-    compensation_type = 'FT'
-
-    # How would you describe the compensation field? We try to respect how they use their system.
-    description = 'Annual Rate'
-
-    DATE_PROVIDED = date(2015, 5, 27)
+    DATE_PROVIDED = date(2017, 3, 15)
 
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.full_name.strip() != ''
+        return self.last_name.strip() != ''
 
     @property
-    def compensation(self):
-        raw = self.get_mapped_value('compensation')
-        return raw.strip(' $').replace(',', '')
+    def compensation_type(self):
+        status = self.get_mapped_value('employee_type')
+
+        # hourly rates, everyone else is paid as annual rate
+        if status == 'H':
+            return 'PT'
+
+        else:
+            return 'FT'
+
+    @property
+    def description(self):
+        status = self.get_mapped_value('employee_type')
+        if status == 'A' or status == 'M':
+            return "Annual salary"
+
+        if status == 'M9':
+            return "Nine-month salary"
+
+        if status == 'H':
+            return 'Hourly rate'
 
     @property
     def race(self):
-        raw = self.get_mapped_value('nationality')
-        races = raw.split(',')
-        if len(races) > 1:
-            return {
-                'name': 'Two or more races'
-            }
         return {
             'name': self.race_map[self.nationality.strip()]
         }
 
-    @property
-    def person(self):
-        name = self.get_name()
-        r = {
-            'family_name': name.last,
-            'given_name': name.first,
-            'additional_name': name.middle,
-            'name': unicode(name),
-            'gender': self.gender.strip()
-        }
-
-        return r
-
-    def get_raw_name(self):
-        split_name = self.full_name.split(',')
-        last_name = split_name[0]
-        split_firstname = split_name[1].split(' ')
-        first_name = split_firstname[0]
-        if len(split_firstname) == 2 and len(split_firstname[1]) == 1:
-            middle_name = split_firstname[1]
-        else:
-            first_name = split_name[1]
-            middle_name = ''
-
-        return u' '.join([first_name, middle_name, last_name])
 
 transform = base.transform_factory(TransformedRecord)
