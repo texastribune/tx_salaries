@@ -8,7 +8,7 @@ from django.core import exceptions
 from .transformers import TRANSFORMERS
 
 
-def convert_to_csv_reader(filename, sheet=None):
+def convert_to_csv_reader(filename, sheet=None, infer_types=True):
     format = convert.guess_format(filename)
     f = open(filename, "rb")
     convert_kwargs = {}
@@ -17,12 +17,12 @@ def convert_to_csv_reader(filename, sheet=None):
         # a non-None value.  This is done to satisfy csvkit which checks
         # for the presence of `sheet`, not whether it's valid.
         convert_kwargs['sheet'] = sheet
-    converted = StringIO(convert.convert(f, format, **convert_kwargs))
+    converted = StringIO(convert.convert(f, format, infer_types=infer_types, **convert_kwargs))
     reader = UnicodeCSVReader(converted)
     return reader
 
 
-def transform(filename, sheet=None, label_row=1):
+def transform(filename, sheet=None, label_row=1, infer_types=True):
     """
     Return a list of records to import for given spreadsheet filename
 
@@ -30,7 +30,8 @@ def transform(filename, sheet=None, label_row=1):
     row of a spreadsheet and executes the transformer to convert the
     spreadsheet to importable records.
     """
-    reader = convert_to_csv_reader(filename, sheet=sheet)
+    reader = convert_to_csv_reader(
+        filename, sheet=sheet, infer_types=infer_types)
     for i in range(1, int(label_row)):
         reader.next()
     labels = reader.next()

@@ -2,7 +2,6 @@ from . import alamo_colleges
 from . import allen_isd
 from . import austin_community_college
 from . import austin_isd
-from . import austin_community_college
 from . import austin
 from . import beaumont_isd
 from . import bexar_county
@@ -22,6 +21,7 @@ from . import hays_county
 from . import houston
 from . import houston_community_college
 from . import katy_isd
+from . import mcallen_isd
 from . import metropolitan_transit_authority
 from . import midwestern_state_university
 from . import north_east_isd
@@ -85,13 +85,14 @@ TRANSFORMERS = {
     'a4f1152500a1c25df0705463266f75a9b15f6b5a': [houston_community_college.transform, ],
     '63756f881651e50857ed321b897b34a6440b47c6': [katy_isd.transform, ],
     'd982fa55bf19391e9f756cf03614cdd3969c4311': [north_east_isd.transform, ],
-    'd84e2b3a0005d7d80672ccc80f5793cd07981439': [metropolitan_transit_authority.transform, ],
+    '10339a3c4cc7dfb78c7120fc5a92da052062ccc5': [mcallen_isd.transform, ],
+    '87a9564706644a2287ad4cd16cdddf8c330b0af0': [metropolitan_transit_authority.transform, ],
     'c98e393bf1b3fc2635b31fcedb0cfbc69766e5ac': [midwestern_state_university.transform, ],
     '2252263014de05fa4efd240e0a3716c484495a93': [pasadena_isd.transform, ],
     '0e027f3d0038d81f570cbda2aeedf3dd1f720881': [potter_county.transform, ],
     'f53125485535c4619b16838160dc4bd41875389f': [san_antonio.transform, ],
     '2412f56c1cbced970ab823b9603a082778a0b3b1': [rockwall_isd.transform, ],
-    '60f6cef782e44830c94d719a9e9e460f31723e07': [state_of_texas.transform, ],
+    'fe04a26f9020282230d1a133d0f1a5c00a264b62': [state_of_texas.transform, ],
     '2aaf4d7f6687edfb719e84bd4a370c49425399b7': [tarrant_county.transform, ],
     '5f34613a2026006655ae15c0e31e8ed4f5ef29fa': [tarrant_comm_college.transform, ],
     'e1af1d516d482dc89008704156ed2cc4e40ea18e': [texas_am_system.transform, ],
@@ -106,7 +107,7 @@ TRANSFORMERS = {
     '30c0ee0b76df0b8ae4007901f38af1e959acd889': [university_of_north_texas_system.transform, ],
     '2115235d43a6f292c7a37e26e12cd0e77a683a1a': [ut_austin.transform, ],
     'a1cb75442f33c2f0152296838771087192643869': [ut_brownsville.transform, ],
-    '1124210f0bdca6e3713c422117cd721e38bff3cb': [ut_dallas.transform, ],
+    '1d67811bdfeccbc7d4464c7090d1e4544b352c54': [ut_dallas.transform, ],
     '7a3671ec33d3ca63ee3aa9b532e42c36f616e56c': [ut_el_paso.transform, ],
     '4df8b9322ef4273b4613d57449b314a0d05c8713': [ut_health_houston.transform, ],
     '6f13d4a1fd50874ee952b4f07058d027c9ef2a44': [ut_health_northeast.transform, ],
