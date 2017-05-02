@@ -20,8 +20,7 @@ you want to use ``tx_salaries``.
 
 Importing Data
 """"""""""""""
-Data is imported using the ``import_salary_data`` management command.  You can run it once
-``tx_salaries`` is properly installed like this::
+Data is imported using the ``import_salary_data`` management command. You can run it in the `salaries.texastribune.org`_ repo once ``tx_salaries`` is properly installed like so::
 
     python salaries/manage.py import_salary_data /path/to/some-salary-spreadsheet.xlsx
 
@@ -228,7 +227,7 @@ what they add.
 The last line generates a ``transform`` function that uses the ``TransformedRecord``
 that you just created.  Now you're ready to run the importer.
 
-Back on the command line, run this::
+Back on the command line, run this in the `salaries.texastribune.org`_ repo::
 
     python salaries/manage.py import_salary_data /path/to/rio_grande_county.xls
 
