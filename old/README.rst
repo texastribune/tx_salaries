@@ -1,18 +1,24 @@
 tx_salaries
 ===========
-This Django application was generated using the `Texas Tribune`_ Generic
+This Django application was generated using the `Texas Tribune's`__ Generic
 Django app template.
+
+.. __: http://www.texastribune.org/
 
 
 Installation & Configuration
 ----------------------------
-You can install this using `pip`_ like this::
+You can install this using `pip`_ like this:
+
+::
 
     pip install tx_salaries
 
 Once installed, you need to add it to your ``INSTALLED_APPS``.  You can do that
 however you like or you can copy-and-paste this in after your
 ``INSTALLED_APPS`` are defined.
+
+::
 
     INSTALLED_APPS += ['tx_salaries', ]
 
@@ -35,49 +41,30 @@ Data is imported using the ``import_salary_data`` management command.  You can r
 Data is imported using `csvkit`_, so it can import from any spreadsheet format
 that csvkit's `in2csv`_ understands.
 
-
-Setup
-"""""
+Setup for Salaries: Updated 4/1/16
+""""""""""""""""""""""""""""""""""
 + Pull `master` for both `salaries.texastribune.org` and `tx_salaries`
-+ Get rid of your old virtual environment for salaries. Run::
-
-    rmvirtualenv <name of virtual env>
-
-+ Make a new virtual environment::
-    
-    mkvirtualenv <name of virtual env>
-
-+ Install the requirements::
-    
-    pip install -r requirements/local.txt
-
-+ Install your local `tx_salaries` into this::
-
-    pip install -e ../tx_salaries
-
-+ If you're using the local postgres database (which I recommend!), then you need to set that up. First set the DATABASE_URL::
-
-    export DATABASE_URL=postgres://localhost/salaries
-
-+ Then pull down the backup::
-
-    make local/db-fetch
-
-+ And load it::
-
-    make local/db-restore
++ Get rid of your old virtual environment for salaries. Run `rmvirtualenv <name of virtual env>`.
++ Make a new virtual environment. `mkvirtualenv <name of virtual env>`
++ Install the requirements. `pip install -r requirements/local.txt`
++ Install your local `tx_salaries` into this. `pip install -e ../tx_salaries`
++ If you're using the local postgres database (which I recommend!), then you need to set that up. First set the DATABASE_URL. `export DATABASE_URL=postgres://localhost/salaries`
++ Then pull down the backup. `make local/db-fetch`
++ And load it. `make local/db-restore`
 
 Now, you should be good to work on `tx_salaries` like normal! If you have any transformers already in progress, you'll need to merge `master` of `tx_salaries` into it. Don't forget!
-
 
 Start the salaries.texastribune.org server
 """"""""""""""""""""""""""""""""""""""""""
 
-In the terminal, go to [salaries.texastribune.org](https://github.com/texastribune/salaries.texastribune.org) repo. While the transformers live in tx_salaries, all of the data management happens in the salaries.texastribune repo, and that's where you'll run these commands::
+In the terminal, go to [salaries.texastribune.org](https://github.com/texastribune/salaries.texastribune.org) repo. While the transformers live in tx_salaries, all of the data management happens in the salaries.texastribune repo, and that's where you'll run all of the commands in these instructions:
 
-    workon <name of virtual env>
-    export DATABASE_URL=postgres://localhost/salaries
-    npm run serve
+1. `workon salaries-dev`
+2. `boot2docker down`
+3. `boot2docker up`
+4. `source .env`
+5. `make docker/db` or `make docker/refresh-db`
+6. `python salaries/manage.py runserver`
 
 Check localhost:8000, should be up and running.
 
@@ -96,7 +83,7 @@ Entries in the ``TRANSFORMERS`` dictionary are made up of a unique hash that
 serves as the key to a given spreadsheet and a callable function that can
 transform it.
 
-To generate a key, run the following command in the [salaries.texastribune.org](https://github.com/texastribune/salaries.texastribune.org) virtualenv::
+To generate a key, run the following command in the [salaries.texastribune.org](https://github.com/texastribune/salaries.texastribune.org) virtualenv:
 
     python salaries/manage.py generate_transformer_hash path/to/rio_grande_county.xls --sheet=data_sheet --row=number_of_header_row
 
@@ -127,18 +114,16 @@ this::
     from . import base
     from . import mixins
 
-    import string
-
     from datetime import date
 
     # add if necessary: --sheet="Request data" --row=3
-    
-    class TransformedRecord(
-        mixins.GenericCompensationMixin,
-        mixins.GenericIdentifierMixin,
-        mixins.GenericPersonMixin,
-        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
+
+
+    class TransformedRecord(mixins.GenericCompensationMixin,
+            mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
+            mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
+            mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+            mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
         MAP = {
             'last_name': 'LABEL FOR LAST NAME',
@@ -146,32 +131,22 @@ this::
             'department': 'LABEL FOR DEPARTMENT',
             'job_title': 'LABEL FOR JOB TITLE',
             'hire_date': 'LABEL FOR HIRE DATE',
+            'status': 'LABEL FOR FT/PT STATUS',
             'compensation': 'LABEL FOR COMPENSATION',
             'gender': 'LABEL FOR GENDER',
             'race': 'LABEL FOR RACE',
-            'compensation_type': 'LABEL FOR FT/PT STATUS'
         }
 
-        # The order of the name fields to build a full name.
-        # If `full_name` is in MAP, you don't need this at all.
         NAME_FIELDS = ('first_name', 'last_name', )
 
-        # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
         ORGANIZATION_NAME = 'Rio Grande County'
 
-        # What type of organization is this? This MUST match what we use on the site, double check against salaries.texastribune.org
         ORGANIZATION_CLASSIFICATION = 'County'
 
-        # Y/M/D agency provided the data
         DATE_PROVIDED = date(2013, 10, 31)
+        # Y/M/D agency provided the data
 
-        # How do they track gender? We need to map what they use to `F` and `M`.
-        gender_map = {'Female': 'F', 'Male': 'M'}
-
-        # The URL to find the raw data in our S3 bucket.
-        URL = ( 'http://raw.texastribune.org.s3.amazonaws.com/'
-            'path/to/'
-            'rio_grande_county.xls' )
+        URL = "http://raw.texastribune.org.s3.amazonaws.com/path/to/rio_grande_county.xls"
 
         @property
         def is_valid(self):
@@ -179,38 +154,18 @@ this::
             return self.last_name.strip() != ''
 
         @property
-        def person(self):
-            name = self.get_name()
-        
-            print self.gender_map[self.gender.strip()]
-        
-            r = {
-                'family_name': name.last,
-                'given_name': name.first,
-                'additional_name': name.middle,
-                'name': unicode(name),
-                'gender': self.gender_map[self.gender.strip()]
-            }
-
-            return r
-
-        @property
         def compensation_type(self):
-            comptype = self.get_mapped_value('compensation_type')
-
-            if comptype.upper() == 'FULL TIME':
+            if self.status.upper() == 'FT':
                 return 'FT'
             else:
                 return 'PT'
 
         @property
         def description(self):
-            comptype = self.get_mapped_value('compensation_type')
-
-            if comptype == 'FT':
-                return 'Annual gross salary'
-            elif comptype == 'PT':
-                return 'Part-time, annual gross salary'
+            if self.status.upper() == 'FT':
+                return 'Full-time salary'
+            else:
+                return 'Part-time salary'
 
     transform = base.transform_factory(TransformedRecord)
 
@@ -245,6 +200,7 @@ Congratulations!  You just completed your first salary transformer.
 
 Understanding Transformers
 """"""""""""""""""""""""""
+.. _warning: This section is under development
 
 Transformers are callable functions that take two arguments and return an array
 of data to be processed.  At its simplest, it would look like this::
@@ -298,7 +254,16 @@ That's a high-level view of transformers. Read the comments in ``mixins.py`` and
 check out the data template in ``base.py`` for more details on the specific attributes
 transformers require.
 
-.. _Texas Tribune: http://www.texastribune.org/
+Tasks
+-----
+* Document parallel usage once `Issue 2`_ is resolved.
+* Document errors encountered when hitting an unknown parser (see `Issue 3`_).
+
+.. _Issue 2: https://github.com/texastribune/tx_salaries/issues/2
+.. _Issue 3: https://github.com/texastribune/tx_salaries/issues/3
+
+
+
 .. _csvkit: http://csvkit.readthedocs.org/en/latest/
 .. _in2csv: http://csvkit.readthedocs.org/en/latest/scripts/in2csv.html
 .. _pip: http://www.pip-installer.org/en/latest/
