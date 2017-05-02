@@ -14,6 +14,8 @@ Once installed, you need to add it to your ``INSTALLED_APPS``.  You can do that
 however you like or you can copy-and-paste this in after your
 ``INSTALLED_APPS`` are defined.
 
+.. code-block:: python
+    
     INSTALLED_APPS += ['tx_salaries', ]
 
 Now you're ready to start using ``tx_salaries``.
@@ -103,12 +105,16 @@ To generate a key, run the following command in the `salaries.texastribune.org`_
 The output should be a 40-character string.  Copy that value and open the
 ``tx_salaries/utils/transformers/__init__.py`` file which contains all of the
 known transformers.  Find the spot where ``rio_grande_county`` would fit in the
-alphabetical dictionary in ``TRANSFORMERS`` and add this line::
+alphabetical dictionary in ``TRANSFORMERS`` and add this line:
+
+.. code-block:: python
 
     '{ generated hash }': [rio_grande_county.transform, ],
 
 If the generated hash already exists with another transformer, provide a tuple with a text
-label for the transformer and the transformer module like this::
+label for the transformer and the transformer module like this:
+
+.. code-block:: python
 
     '{ generated hash }': [('Rio Grande County', rio_grande_county.transform),
                             ('Other Existing County', other_county.transform), ],
