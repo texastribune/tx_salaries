@@ -40,32 +40,32 @@ that csvkit's `in2csv`_ understands.
 
 Setup
 """""
-+ Pull `master` for both `salaries.texastribune.org` and `tx_salaries`
-+ Get rid of your old virtual environment for salaries. Run::
+1. Pull `master` for both `salaries.texastribune.org` and `tx_salaries`
+2. Get rid of your old virtual environment for salaries. Run::
 
     rmvirtualenv <name of virtual env>
 
-+ Make a new virtual environment::
+3. Make a new virtual environment::
     
     mkvirtualenv <name of virtual env>
 
-+ Install the requirements::
+4. Install the requirements::
     
     pip install -r requirements/local.txt
 
-+ Install your local `tx_salaries` into this::
+5. Install your local `tx_salaries` into this::
 
     pip install -e ../tx_salaries
 
-+ If you're using the local postgres database (which I recommend!), then you need to set that up. First set the DATABASE_URL::
+6. If you're using the local postgres database (which I recommend!), then you need to set that up. First set the DATABASE_URL::
 
     export DATABASE_URL=postgres://localhost/salaries
 
-+ Then pull down the backup::
+7. Then pull down the backup::
 
     make local/db-fetch
 
-+ And load it::
+8. And load it::
 
     make local/db-restore
 
