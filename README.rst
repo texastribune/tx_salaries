@@ -121,7 +121,9 @@ label for the transformer and the transformer module like this:
 
 Note that the second value isn't a string -- instead it's a module.  Now you need to
 import that module.  Go up to the top of the ``__init__.py`` file and add an
-import::
+import:
+
+.. code-block:: python
 
     from . import rio_grande_county
 
