@@ -122,7 +122,9 @@ import::
 Save that file.  Next up, you need to create the new module that you just
 referenced.  Inside the ``tx_salaries/utils/transformers/`` directory, create a
 new file call ``rio_grande_county.py``  At the first pass, it should look like
-this::
+this:
+
+.. code-block:: python
 
     from . import base
     from . import mixins
