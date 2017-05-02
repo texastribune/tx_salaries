@@ -27,6 +27,7 @@ class Command(BaseCommand):
                     help='Location of the row of labels, defaults to 1'),
         make_option('--v', action='store', dest='verbosity', default=0,
                     help='1=Every record; 2=100 records; 3=500 records'),
+        make_option('--skip-infer-types', action='store_false', default=True),
     )
 
     def download_file(self, url, filename):
@@ -65,8 +66,10 @@ class Command(BaseCommand):
             self.import_file(filename, **kwargs)
 
     def import_file(self, filename, **kwargs):
-        records, warnings = transformer.transform(filename, kwargs['sheet'],
-                                                  kwargs['label_row'])
+        records, warnings = transformer.transform(
+            filename, kwargs['sheet'],
+            kwargs['label_row'],
+            infer_types=kwargs['skip_infer_types'])
 
         verbosity = int(kwargs['verbosity'])
 
