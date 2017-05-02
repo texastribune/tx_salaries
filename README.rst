@@ -41,7 +41,7 @@ that csvkit's `in2csv`_ understands.
 Setup
 """""
 1. Pull `master` for both `salaries.texastribune.org` and `tx_salaries`
-2. Get rid of your old virtual environment for salaries. Run::
+2. Get rid of your old virtual environment for salaries::
 
     rmvirtualenv <name of virtual env>
 
