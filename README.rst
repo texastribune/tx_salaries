@@ -257,7 +257,9 @@ Understanding Transformers
 """"""""""""""""""""""""""
 
 Transformers are callable functions that take two arguments and return an array
-of data to be processed.  At its simplest, it would look like this::
+of data to be processed.  At its simplest, it would look like this:
+
+.. code-block:: python
 
     def transform(labels, source):
         data = []
@@ -268,7 +270,9 @@ of data to be processed.  At its simplest, it would look like this::
         return data
 
 The data contained in the fictitious ``structured_record`` variable is a
-dictionary that must look something like this::
+dictionary that must look something like this:
+
+.. code-block:: python
 
     structured_record = {
         'original': ...,  # dictionary of key/value pairs for the data
