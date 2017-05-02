@@ -73,7 +73,7 @@ Now, you should be good to work on `tx_salaries` like normal! If you have any tr
 Start the salaries.texastribune.org server
 """"""""""""""""""""""""""""""""""""""""""
 
-In the terminal, go to [salaries.texastribune.org](https://github.com/texastribune/salaries.texastribune.org) repo. While the transformers live in tx_salaries, all of the data management happens in the salaries.texastribune repo, and that's where you'll run these commands::
+In the terminal, go to the `salaries.texastribune.org`_ repo. While the transformers live in tx_salaries, all of the data management happens in the salaries.texastribune repo, and that's where you'll run these commands::
 
     workon <name of virtual env>
     export DATABASE_URL=postgres://localhost/salaries
@@ -96,7 +96,7 @@ Entries in the ``TRANSFORMERS`` dictionary are made up of a unique hash that
 serves as the key to a given spreadsheet and a callable function that can
 transform it.
 
-To generate a key, run the following command in the [salaries.texastribune.org](https://github.com/texastribune/salaries.texastribune.org) virtualenv::
+To generate a key, run the following command in the `salaries.texastribune.org`_ virtualenv::
 
     python salaries/manage.py generate_transformer_hash path/to/rio_grande_county.xls --sheet=data_sheet --row=number_of_header_row
 
@@ -301,6 +301,7 @@ transformers require.
 .. _Texas Tribune: http://www.texastribune.org/
 .. _csvkit: http://csvkit.readthedocs.org/en/latest/
 .. _in2csv: http://csvkit.readthedocs.org/en/latest/scripts/in2csv.html
+.. _salaries.texastribune.org: https://github.com/texastribune/salaries.texastribune.org
 .. _pip: http://www.pip-installer.org/en/latest/
 
 .. _import_salary_data: tx_salaries/management/commands/import_salary_data.py
