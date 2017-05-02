@@ -4,21 +4,11 @@ This Django application was generated using the `Texas Tribune`_ Generic
 Django app template.
 
 
-Installation & Configuration
-----------------------------
+Installation
+------------
 You can install this using `pip`_ like this::
 
     pip install tx_salaries
-
-Once installed, you need to add it to your ``INSTALLED_APPS``.  You can do that
-however you like or you can copy-and-paste this in after your
-``INSTALLED_APPS`` are defined.
-
-.. code-block:: python
-    
-    INSTALLED_APPS += ['tx_salaries', ]
-
-Now you're ready to start using ``tx_salaries``.
 
 
 Usage
@@ -26,6 +16,7 @@ Usage
 ``tx_salaries`` is meant to be used in conjunction with data received from
 various departments around the state.  You must request this data yourself if
 you want to use ``tx_salaries``.
+
 
 Importing Data
 """"""""""""""
