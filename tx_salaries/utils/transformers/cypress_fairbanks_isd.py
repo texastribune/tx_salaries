@@ -17,13 +17,13 @@ class TransformedRecord(
         # 'middle_name': '', if needed
         # 'full_name': '', if needed
         # 'suffix': '', if needed
-        'department': 'Base Location Building Name',
-        'job_title': 'Current Job Class Title',
+        'department': 'Department Desc',
+        'job_title': 'Contract Title',
         'hire_date': 'Hire Date',
-        'compensation': 'Annual Salary',
+        'compensation': 'Annl Sal',
         'gender': 'Sex',
         'nationality': 'Race',
-        'employee_type': 'Part Time/Full Time',
+        'employee_type': 'Part Time',
     }
 
     # The order of the name fields to build a full name.
@@ -40,7 +40,7 @@ class TransformedRecord(
     description = 'Annual salary'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2015, 10, 21)
+    DATE_PROVIDED = date(2017, 5, 4)
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
@@ -50,20 +50,21 @@ class TransformedRecord(
     gender_map = {'F': 'F', 'M': 'M'}
 
     race_map = {
-        'I': 'Indian',
+        'I': 'American Indian or Alaskan',
         'W': 'White',
         'H': 'Hispanic',
-        'A': 'Asian',
-        'B': 'Black',
+        'A': 'Asian or Pacific Islander',
+        'B': 'Black or African American',
         'O': 'Other',
     }
+
 
     # This is how the loader checks for valid people.
     # Defaults to checking to see if `last_name` is empty.
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.first_name.strip() != ''
+        return self.compensation.strip() != '-' and self.first_name.strip() != ''
 
     @property
     def race(self):
@@ -82,6 +83,13 @@ class TransformedRecord(
             return 'PT'
 
     @property
+    def job_title(self):
+        jobTitle = self.get_mapped_value('job_title')
+        departmentName = self.get_mapped_value('department')
+        if jobTitle == '' and departmentName == 'SUBSTITUTE':
+            return 'Substitute'
+
+    @property
     def person(self):
         name = self.get_name()
         r = {
@@ -94,13 +102,14 @@ class TransformedRecord(
 
         return r
 
-    def calculate_tenure(self):
-        hire_date_data = map(int, self.hire_date.split('-'))
-        hire_date = date(hire_date_data[0], hire_date_data[1],
-                         hire_date_data[2])
-        tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
-        if tenure < 0:
-            tenure = 0
-        return tenure
+    # def calculate_tenure(self):
+    #     hire_date_data = map(int, self.hire_date.split('/'))
+    #     print self.get_mapped_value('hire_date')
+    #     hire_date = date(hire_date_data[2], hire_date_data[0],
+    #                      hire_date_data[1])
+    #     tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
+    #     if tenure < 0:
+    #         return 0
+    #     return tenure
 
 transform = base.transform_factory(TransformedRecord)
