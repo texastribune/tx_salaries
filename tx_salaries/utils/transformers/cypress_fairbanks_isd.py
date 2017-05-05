@@ -58,13 +58,26 @@ class TransformedRecord(
         'O': 'Other',
     }
 
-
     # This is how the loader checks for valid people.
     # Defaults to checking to see if `last_name` is empty.
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.compensation.strip() != '-' and self.first_name.strip() != ''
+        return self.compensation.strip() != '-' and self.last_name.strip() != ''
+
+    @property
+    def person(self):
+        name = self.get_name()
+        r = {
+            'family_name': name.last,
+            'given_name': name.first,
+            # 'additional_name': name.middle,
+            'name': unicode(name),
+            'gender': self.gender_map[self.gender.strip()]
+        }
+
+        return r
+
 
     @property
     def race(self):
@@ -84,23 +97,14 @@ class TransformedRecord(
 
     @property
     def job_title(self):
-        jobTitle = self.get_mapped_value('job_title')
-        departmentName = self.get_mapped_value('department')
-        if jobTitle == '' and departmentName == 'SUBSTITUTE':
-            return 'Substitute'
-
-    @property
-    def person(self):
-        name = self.get_name()
-        r = {
-            'family_name': name.last,
-            'given_name': name.first,
-            # 'additional_name': name.middle,
-            'name': unicode(name),
-            'gender': self.gender_map[self.gender.strip()]
-        }
-
-        return r
+        jobTitle = self.get_mapped_value('job_title').strip()
+        departmentName = self.get_mapped_value('department').strip()
+        substitute = 'Substitute'
+        if jobTitle and departmentName == 'SUBSTITUTE':
+            return jobTitle
+        else:
+            print jobTitle + departmentName
+            return substitute
 
     # def calculate_tenure(self):
     #     hire_date_data = map(int, self.hire_date.split('/'))
