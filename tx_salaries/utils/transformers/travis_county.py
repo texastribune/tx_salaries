@@ -34,7 +34,7 @@ class TransformedRecord(
     DATE_PROVIDED = date(2017, 4, 21)
 
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'salaries/2017-05/'
+           'travis_county/salaries/2017-05/'
            'PIR.xlsx')
 
     @property
