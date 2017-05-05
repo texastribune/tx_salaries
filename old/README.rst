@@ -1,14 +1,28 @@
 tx_salaries
 ===========
-This Django application was generated using the `Texas Tribune`_ Generic
+This Django application was generated using the `Texas Tribune's`__ Generic
 Django app template.
 
+.. __: http://www.texastribune.org/
 
-Installation
-------------
-You can install this using `pip`_ like this::
+
+Installation & Configuration
+----------------------------
+You can install this using `pip`_ like this:
+
+::
 
     pip install tx_salaries
+
+Once installed, you need to add it to your ``INSTALLED_APPS``.  You can do that
+however you like or you can copy-and-paste this in after your
+``INSTALLED_APPS`` are defined.
+
+::
+
+    INSTALLED_APPS += ['tx_salaries', ]
+
+Now you're ready to start using ``tx_salaries``.
 
 
 Usage
@@ -17,59 +31,40 @@ Usage
 various departments around the state.  You must request this data yourself if
 you want to use ``tx_salaries``.
 
-
 Importing Data
 """"""""""""""
-Data is imported using the ``import_salary_data`` management command. You can run it in the `salaries.texastribune.org`_ repo once ``tx_salaries`` is properly installed like so::
+Data is imported using the ``import_salary_data`` management command.  You can run it once
+``tx_salaries`` is properly installed like this::
 
     python salaries/manage.py import_salary_data /path/to/some-salary-spreadsheet.xlsx
 
 Data is imported using `csvkit`_, so it can import from any spreadsheet format
 that csvkit's `in2csv`_ understands.
 
-
-Setup
-"""""
-1. Pull `master` for both `salaries.texastribune.org` and `tx_salaries`
-2. Get rid of your old virtual environment for salaries::
-
-    rmvirtualenv <name of virtual env>
-
-3. Make a new virtual environment::
-    
-    mkvirtualenv <name of virtual env>
-
-4. Install the requirements::
-    
-    pip install -r requirements/local.txt
-
-5. Install your local `tx_salaries` into this::
-
-    pip install -e ../tx_salaries
-
-6. If you're using the local postgres database (which I recommend!), then you need to set that up. First set the DATABASE_URL::
-
-    export DATABASE_URL=postgres://localhost/salaries
-
-7. Then pull down the backup::
-
-    make local/db-fetch
-
-8. And load it::
-
-    make local/db-restore
+Setup for Salaries: Updated 4/1/16
+""""""""""""""""""""""""""""""""""
++ Pull `master` for both `salaries.texastribune.org` and `tx_salaries`
++ Get rid of your old virtual environment for salaries. Run `rmvirtualenv <name of virtual env>`.
++ Make a new virtual environment. `mkvirtualenv <name of virtual env>`
++ Install the requirements. `pip install -r requirements/local.txt`
++ Install your local `tx_salaries` into this. `pip install -e ../tx_salaries`
++ If you're using the local postgres database (which I recommend!), then you need to set that up. First set the DATABASE_URL. `export DATABASE_URL=postgres://localhost/salaries`
++ Then pull down the backup. `make local/db-fetch`
++ And load it. `make local/db-restore`
 
 Now, you should be good to work on `tx_salaries` like normal! If you have any transformers already in progress, you'll need to merge `master` of `tx_salaries` into it. Don't forget!
-
 
 Start the salaries.texastribune.org server
 """"""""""""""""""""""""""""""""""""""""""
 
-In the terminal, go to the `salaries.texastribune.org`_ repo. While the transformers live in tx_salaries, all of the data management happens in the salaries.texastribune repo, and that's where you'll run these commands::
+In the terminal, go to [salaries.texastribune.org](https://github.com/texastribune/salaries.texastribune.org) repo. While the transformers live in tx_salaries, all of the data management happens in the salaries.texastribune repo, and that's where you'll run all of the commands in these instructions:
 
-    workon <name of virtual env>
-    export DATABASE_URL=postgres://localhost/salaries
-    npm run serve
+1. `workon salaries-dev`
+2. `boot2docker down`
+3. `boot2docker up`
+4. `source .env`
+5. `make docker/db` or `make docker/refresh-db`
+6. `python salaries/manage.py runserver`
 
 Check localhost:8000, should be up and running.
 
@@ -88,57 +83,47 @@ Entries in the ``TRANSFORMERS`` dictionary are made up of a unique hash that
 serves as the key to a given spreadsheet and a callable function that can
 transform it.
 
-To generate a key, run the following command in the `salaries.texastribune.org`_ virtualenv::
+To generate a key, run the following command in the [salaries.texastribune.org](https://github.com/texastribune/salaries.texastribune.org) virtualenv:
 
     python salaries/manage.py generate_transformer_hash path/to/rio_grande_county.xls --sheet=data_sheet --row=number_of_header_row
 
 The output should be a 40-character string.  Copy that value and open the
 ``tx_salaries/utils/transformers/__init__.py`` file which contains all of the
 known transformers.  Find the spot where ``rio_grande_county`` would fit in the
-alphabetical dictionary in ``TRANSFORMERS`` and add this line:
-
-.. code-block:: python
+alphabetical dictionary in ``TRANSFORMERS`` and add this line::
 
     '{ generated hash }': [rio_grande_county.transform, ],
 
 If the generated hash already exists with another transformer, provide a tuple with a text
-label for the transformer and the transformer module like this:
-
-.. code-block:: python
+label for the transformer and the transformer module like this::
 
     '{ generated hash }': [('Rio Grande County', rio_grande_county.transform),
                             ('Other Existing County', other_county.transform), ],
 
 Note that the second value isn't a string -- instead it's a module.  Now you need to
 import that module.  Go up to the top of the ``__init__.py`` file and add an
-import:
-
-.. code-block:: python
+import::
 
     from . import rio_grande_county
 
 Save that file.  Next up, you need to create the new module that you just
 referenced.  Inside the ``tx_salaries/utils/transformers/`` directory, create a
 new file call ``rio_grande_county.py``  At the first pass, it should look like
-this:
-
-.. code-block:: python
+this::
 
     from . import base
     from . import mixins
 
-    import string
-
     from datetime import date
 
     # add if necessary: --sheet="Request data" --row=3
-    
-    class TransformedRecord(
-        mixins.GenericCompensationMixin,
-        mixins.GenericIdentifierMixin,
-        mixins.GenericPersonMixin,
-        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
+
+
+    class TransformedRecord(mixins.GenericCompensationMixin,
+            mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
+            mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
+            mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+            mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
         MAP = {
             'last_name': 'LABEL FOR LAST NAME',
@@ -146,32 +131,22 @@ this:
             'department': 'LABEL FOR DEPARTMENT',
             'job_title': 'LABEL FOR JOB TITLE',
             'hire_date': 'LABEL FOR HIRE DATE',
+            'status': 'LABEL FOR FT/PT STATUS',
             'compensation': 'LABEL FOR COMPENSATION',
             'gender': 'LABEL FOR GENDER',
             'race': 'LABEL FOR RACE',
-            'compensation_type': 'LABEL FOR FT/PT STATUS'
         }
 
-        # The order of the name fields to build a full name.
-        # If `full_name` is in MAP, you don't need this at all.
         NAME_FIELDS = ('first_name', 'last_name', )
 
-        # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
         ORGANIZATION_NAME = 'Rio Grande County'
 
-        # What type of organization is this? This MUST match what we use on the site, double check against salaries.texastribune.org
         ORGANIZATION_CLASSIFICATION = 'County'
 
-        # Y/M/D agency provided the data
         DATE_PROVIDED = date(2013, 10, 31)
+        # Y/M/D agency provided the data
 
-        # How do they track gender? We need to map what they use to `F` and `M`.
-        gender_map = {'Female': 'F', 'Male': 'M'}
-
-        # The URL to find the raw data in our S3 bucket.
-        URL = ( 'http://raw.texastribune.org.s3.amazonaws.com/'
-            'path/to/'
-            'rio_grande_county.xls' )
+        URL = "http://raw.texastribune.org.s3.amazonaws.com/path/to/rio_grande_county.xls"
 
         @property
         def is_valid(self):
@@ -179,38 +154,18 @@ this:
             return self.last_name.strip() != ''
 
         @property
-        def person(self):
-            name = self.get_name()
-        
-            print self.gender_map[self.gender.strip()]
-        
-            r = {
-                'family_name': name.last,
-                'given_name': name.first,
-                'additional_name': name.middle,
-                'name': unicode(name),
-                'gender': self.gender_map[self.gender.strip()]
-            }
-
-            return r
-
-        @property
         def compensation_type(self):
-            comptype = self.get_mapped_value('compensation_type')
-
-            if comptype.upper() == 'FULL TIME':
+            if self.status.upper() == 'FT':
                 return 'FT'
             else:
                 return 'PT'
 
         @property
         def description(self):
-            comptype = self.get_mapped_value('compensation_type')
-
-            if comptype == 'FT':
-                return 'Annual gross salary'
-            elif comptype == 'PT':
-                return 'Part-time, annual gross salary'
+            if self.status.upper() == 'FT':
+                return 'Full-time salary'
+            else:
+                return 'Part-time salary'
 
     transform = base.transform_factory(TransformedRecord)
 
@@ -227,7 +182,7 @@ what they add.
 The last line generates a ``transform`` function that uses the ``TransformedRecord``
 that you just created.  Now you're ready to run the importer.
 
-Back on the command line, run this in the `salaries.texastribune.org`_ repo::
+Back on the command line, run this::
 
     python salaries/manage.py import_salary_data /path/to/rio_grande_county.xls
 
@@ -245,11 +200,10 @@ Congratulations!  You just completed your first salary transformer.
 
 Understanding Transformers
 """"""""""""""""""""""""""
+.. _warning: This section is under development
 
 Transformers are callable functions that take two arguments and return an array
-of data to be processed.  At its simplest, it would look like this:
-
-.. code-block:: python
+of data to be processed.  At its simplest, it would look like this::
 
     def transform(labels, source):
         data = []
@@ -260,9 +214,7 @@ of data to be processed.  At its simplest, it would look like this:
         return data
 
 The data contained in the fictitious ``structured_record`` variable is a
-dictionary that must look something like this:
-
-.. code-block:: python
+dictionary that must look something like this::
 
     structured_record = {
         'original': ...,  # dictionary of key/value pairs for the data
@@ -302,10 +254,18 @@ That's a high-level view of transformers. Read the comments in ``mixins.py`` and
 check out the data template in ``base.py`` for more details on the specific attributes
 transformers require.
 
-.. _Texas Tribune: http://www.texastribune.org/
+Tasks
+-----
+* Document parallel usage once `Issue 2`_ is resolved.
+* Document errors encountered when hitting an unknown parser (see `Issue 3`_).
+
+.. _Issue 2: https://github.com/texastribune/tx_salaries/issues/2
+.. _Issue 3: https://github.com/texastribune/tx_salaries/issues/3
+
+
+
 .. _csvkit: http://csvkit.readthedocs.org/en/latest/
 .. _in2csv: http://csvkit.readthedocs.org/en/latest/scripts/in2csv.html
-.. _salaries.texastribune.org: https://github.com/texastribune/salaries.texastribune.org
 .. _pip: http://www.pip-installer.org/en/latest/
 
 .. _import_salary_data: tx_salaries/management/commands/import_salary_data.py
