@@ -37,7 +37,7 @@ class TransformedRecord(
     ORGANIZATION_CLASSIFICATION = 'School District'
 
     # How would you describe the compensation field? We try to respect how they use their system.
-    description = 'Annual salary'
+    # description = 'Annual salary'
 
     # When did you receive the data? NOT when we added it to the site.
     DATE_PROVIDED = date(2017, 5, 4)
@@ -78,6 +78,14 @@ class TransformedRecord(
 
         return r
 
+    @property
+    def description(self):
+        status = self.get_mapped_value('employee_type')
+
+        if status == 'F':
+            return 'Annual salary'
+        elif status == 'P':
+            return 'Part-time salary'
 
     @property
     def race(self):
@@ -87,7 +95,7 @@ class TransformedRecord(
 
     @property
     def compensation_type(self):
-        employee_type = self.employee_type
+        employee_type = self.get_mapped_value('employee_type')
 
         if employee_type == 'F':
             return 'FT'
@@ -103,7 +111,6 @@ class TransformedRecord(
         if jobTitle and departmentName == 'SUBSTITUTE':
             return jobTitle
         else:
-            print jobTitle + departmentName
             return substitute
 
     # def calculate_tenure(self):
