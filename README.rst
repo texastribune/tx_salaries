@@ -4,19 +4,11 @@ This Django application was generated using the `Texas Tribune`_ Generic
 Django app template.
 
 
-Installation & Configuration
-----------------------------
+Installation
+------------
 You can install this using `pip`_ like this::
 
     pip install tx_salaries
-
-Once installed, you need to add it to your ``INSTALLED_APPS``.  You can do that
-however you like or you can copy-and-paste this in after your
-``INSTALLED_APPS`` are defined.
-
-    INSTALLED_APPS += ['tx_salaries', ]
-
-Now you're ready to start using ``tx_salaries``.
 
 
 Usage
@@ -25,10 +17,10 @@ Usage
 various departments around the state.  You must request this data yourself if
 you want to use ``tx_salaries``.
 
+
 Importing Data
 """"""""""""""
-Data is imported using the ``import_salary_data`` management command.  You can run it once
-``tx_salaries`` is properly installed like this::
+Data is imported using the ``import_salary_data`` management command. You can run it in the `salaries.texastribune.org`_ repo once ``tx_salaries`` is properly installed like so::
 
     python salaries/manage.py import_salary_data /path/to/some-salary-spreadsheet.xlsx
 
@@ -38,32 +30,32 @@ that csvkit's `in2csv`_ understands.
 
 Setup
 """""
-+ Pull `master` for both `salaries.texastribune.org` and `tx_salaries`
-+ Get rid of your old virtual environment for salaries. Run::
+1. Pull `master` for both `salaries.texastribune.org` and `tx_salaries`
+2. Get rid of your old virtual environment for salaries::
 
     rmvirtualenv <name of virtual env>
 
-+ Make a new virtual environment::
+3. Make a new virtual environment::
     
     mkvirtualenv <name of virtual env>
 
-+ Install the requirements::
+4. Install the requirements::
     
     pip install -r requirements/local.txt
 
-+ Install your local `tx_salaries` into this::
+5. Install your local `tx_salaries` into this::
 
     pip install -e ../tx_salaries
 
-+ If you're using the local postgres database (which I recommend!), then you need to set that up. First set the DATABASE_URL::
+6. If you're using the local postgres database (which I recommend!), then you need to set that up. First set the DATABASE_URL::
 
     export DATABASE_URL=postgres://localhost/salaries
 
-+ Then pull down the backup::
+7. Then pull down the backup::
 
     make local/db-fetch
 
-+ And load it::
+8. And load it::
 
     make local/db-restore
 
@@ -73,7 +65,7 @@ Now, you should be good to work on `tx_salaries` like normal! If you have any tr
 Start the salaries.texastribune.org server
 """"""""""""""""""""""""""""""""""""""""""
 
-In the terminal, go to [salaries.texastribune.org](https://github.com/texastribune/salaries.texastribune.org) repo. While the transformers live in tx_salaries, all of the data management happens in the salaries.texastribune repo, and that's where you'll run these commands::
+In the terminal, go to the `salaries.texastribune.org`_ repo. While the transformers live in tx_salaries, all of the data management happens in the salaries.texastribune repo, and that's where you'll run these commands::
 
     workon <name of virtual env>
     export DATABASE_URL=postgres://localhost/salaries
@@ -96,33 +88,41 @@ Entries in the ``TRANSFORMERS`` dictionary are made up of a unique hash that
 serves as the key to a given spreadsheet and a callable function that can
 transform it.
 
-To generate a key, run the following command in the [salaries.texastribune.org](https://github.com/texastribune/salaries.texastribune.org) virtualenv::
+To generate a key, run the following command in the `salaries.texastribune.org`_ virtualenv::
 
     python salaries/manage.py generate_transformer_hash path/to/rio_grande_county.xls --sheet=data_sheet --row=number_of_header_row
 
 The output should be a 40-character string.  Copy that value and open the
 ``tx_salaries/utils/transformers/__init__.py`` file which contains all of the
 known transformers.  Find the spot where ``rio_grande_county`` would fit in the
-alphabetical dictionary in ``TRANSFORMERS`` and add this line::
+alphabetical dictionary in ``TRANSFORMERS`` and add this line:
+
+.. code-block:: python
 
     '{ generated hash }': [rio_grande_county.transform, ],
 
 If the generated hash already exists with another transformer, provide a tuple with a text
-label for the transformer and the transformer module like this::
+label for the transformer and the transformer module like this:
+
+.. code-block:: python
 
     '{ generated hash }': [('Rio Grande County', rio_grande_county.transform),
                             ('Other Existing County', other_county.transform), ],
 
 Note that the second value isn't a string -- instead it's a module.  Now you need to
 import that module.  Go up to the top of the ``__init__.py`` file and add an
-import::
+import:
+
+.. code-block:: python
 
     from . import rio_grande_county
 
 Save that file.  Next up, you need to create the new module that you just
 referenced.  Inside the ``tx_salaries/utils/transformers/`` directory, create a
 new file call ``rio_grande_county.py``  At the first pass, it should look like
-this::
+this:
+
+.. code-block:: python
 
     from . import base
     from . import mixins
@@ -227,7 +227,7 @@ what they add.
 The last line generates a ``transform`` function that uses the ``TransformedRecord``
 that you just created.  Now you're ready to run the importer.
 
-Back on the command line, run this::
+Back on the command line, run this in the `salaries.texastribune.org`_ repo::
 
     python salaries/manage.py import_salary_data /path/to/rio_grande_county.xls
 
@@ -247,7 +247,9 @@ Understanding Transformers
 """"""""""""""""""""""""""
 
 Transformers are callable functions that take two arguments and return an array
-of data to be processed.  At its simplest, it would look like this::
+of data to be processed.  At its simplest, it would look like this:
+
+.. code-block:: python
 
     def transform(labels, source):
         data = []
@@ -258,7 +260,9 @@ of data to be processed.  At its simplest, it would look like this::
         return data
 
 The data contained in the fictitious ``structured_record`` variable is a
-dictionary that must look something like this::
+dictionary that must look something like this:
+
+.. code-block:: python
 
     structured_record = {
         'original': ...,  # dictionary of key/value pairs for the data
@@ -301,6 +305,7 @@ transformers require.
 .. _Texas Tribune: http://www.texastribune.org/
 .. _csvkit: http://csvkit.readthedocs.org/en/latest/
 .. _in2csv: http://csvkit.readthedocs.org/en/latest/scripts/in2csv.html
+.. _salaries.texastribune.org: https://github.com/texastribune/salaries.texastribune.org
 .. _pip: http://www.pip-installer.org/en/latest/
 
 .. _import_salary_data: tx_salaries/management/commands/import_salary_data.py
