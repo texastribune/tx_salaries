@@ -71,14 +71,14 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     @property
     def compensation(self):
-        pay = self.get_mapped_value('compensation')
+        pay = float(self.get_mapped_value('compensation'))
         status = self.get_mapped_value('employee_type')
         wage_type = self.get_mapped_value('wage_type')
 
         if status == 'Full Time':
             if wage_type == 'Cadet Period Salary':
-                # cadets salary is listed outright
-                return pay
+                # cadets salary isn't an annual thing, so do hourly
+                return pay / 80
             else:
                 # everyone else is two-week period, multiple by 26 for annual
                 return pay * 26
@@ -95,38 +95,38 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         wage_type = self.get_mapped_value('wage_type')
 
         # cadets are listed as full-timers but we dont want them in the calcs
-        if status == 'Full Time' && wage_type != 'Cadet Period Salary':
+        if status == 'Full Time' and wage_type != 'Cadet Period Salary':
             return 'FT'
         else:
             return 'PT'
 
     @property
     def description(self):
-        status = self.get_mapped_value('employment_type')
+        status = self.get_mapped_value('employee_type')
         wage_type = self.get_mapped_value('wage_type')
 
         if status == 'Full Time':
             if wage_type == 'Cadet Period Salary':
-                return 'Cadet Period Salary'
+                return 'Cadet hourly rate'
             else:
                 return 'Annualized base pay'
         else:
-            'Part-time hourly rate'
+            return 'Part-time hourly rate'
 
     @property
     def department(self):
-        return self.department_map[self.department.strip()]
-
+        dept = self.get_mapped_value('department')
+        return self.department_map[dept]
 
     @property
     def race(self):
-        if self.race == '':
+        if self.get_mapped_value('race') == '':
             return {
                 'name': 'Not specified'
             }
         else:
             return {
-                'name': self.race.strip()
+                'name': self.get_mapped_value('race')
             }
 
     @property
