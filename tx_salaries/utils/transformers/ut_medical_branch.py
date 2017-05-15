@@ -11,16 +11,16 @@ class TransformedRecord(
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        'last_name': 'FAMILY NAME',
-        'first_name': 'GIVEN NAME',
+        'last_name': 'FAMILY_NAME',
+        'first_name': 'GIVEN_NAME',
         'department': 'DEPARTMENT',
         'job_title': 'JOBTITLE',
         'gender': 'GENDER',
-        'race': 'RACE/ETHNICITY',
-        'hire_date': 'LAST HIRE DATE',
-        'compensation': 'ANNUAL PAY',
-        'longevity': 'ANNUALIZED LONGEVITY',
-        'employee_type': 'FULL/PART TIME',
+        'race': 'ETHNIC_GROUP_DESCR',
+        'hire_date': 'LAST_HIRE_DT',
+        'compensation': 'ANNUAL_PAY',
+        'longevity': 'ANNUALIZED_LONGEVITY',
+        'employee_type': 'FULL_PART_TIME',
     }
 
     NAME_FIELDS = ('first_name', 'last_name', )
@@ -31,10 +31,10 @@ class TransformedRecord(
 
     ORGANIZATION_CLASSIFICATION = 'University Hospital'
 
-    DATE_PROVIDED = date(2015, 6, 24)
+    DATE_PROVIDED = date(2017, 5, 15)
 
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/ut_medical_branch/'
-            'salaries/2015-06/ut_medical_galveston.xlsx')
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/ut_medical_branch/'
+            'salaries/2017-05/utmb.xlsx')
 
     @property
     def compensation_type(self):
@@ -54,6 +54,7 @@ class TransformedRecord(
 
     @property
     def compensation(self):
+        #longevity is in addition to base annual_pay, add if applicable
         if self.get_mapped_value('longevity') == '0':
             return self.get_mapped_value('compensation')
         else:
