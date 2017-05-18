@@ -36,13 +36,13 @@ class TransformedRecord(
            'ut_health_northeast/2017-05/uthealth-tyler.xls')
 
     race_map = {
-        'AMIND': 'American Indian',
-        'BLACK': 'Black',
+        'AMIND': 'American Indian/Alaska Native',
+        'BLACK': 'Black/African American',
         'WHITE': 'White',
         'ASIAN': 'Asian',
-        'UNK': 'Unknown',
-        'HISPA': 'Hispanic',
-        'PACIF': 'Pacific Islander'
+        'UNK': 'Ethnicity Unknown',
+        'HISPA': 'Hispanic/Latino',
+        'PACIF': 'Native Hawaiian/Other Pacific Island'
     }
 
     # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
@@ -82,7 +82,7 @@ class TransformedRecord(
             'given_name': name.first,
             'additional_name': name.middle,
             'name': unicode(name),
-            'gender': self.gender_map[self.gender.strip()]
+            'gender': self.gender.strip()
         }
 
         return r
