@@ -120,4 +120,5 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     @property
     def description(self):
         return 'N/A'
->>>>>>> Beginning of houston_isd.py transformer. Incomplete because we need to follow up with the department.
+        
+transform = base.transform_factory(TransformedRecord)
