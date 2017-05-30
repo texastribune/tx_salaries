@@ -13,12 +13,13 @@ class TransformedRecord(
 
     MAP = {
         'full_name': 'Name',
-        'department': 'Dept',
-        'job_title': 'Title',
-        'hire_date': 'Last DOH',
-        'compensation': 'Sum Earnings',
-        'gender': 'Gender',
-        'nationality': 'Race',
+        'department': 'Department',
+        'job_title': 'Job Title',
+        'hire_date': 'Hire Dt',
+        'compensation': 'Annual Rt',
+        'gender': 'Sex',
+        'nationality': 'Ethnic Grp',
+        'employee_type': 'Full/Part',
     }
 
     #This organization used to be named 'University of Texas Health Science Center at Tyler'
@@ -28,27 +29,21 @@ class TransformedRecord(
     # What type of organization is this? This MUST match what we use on the site, double check against salaries.texastribune.org
     ORGANIZATION_CLASSIFICATION = 'University Hospital'
 
-    gender_map = {'F': 'F', 'M': 'M'}
-
-    compensation_type = 'FT'
-
-    description = 'Sum Earnings'
-
-    DATE_PROVIDED = date(2015, 6, 23)
+    DATE_PROVIDED = date(2017, 5, 12)
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'ut_health_northeast/2015-06/ut_health_northeast.xls')
+           'ut_health_northeast/2017-05/uthealth-tyler.xls')
 
     race_map = {
-        'AMIND': 'American Indian',
-        'BLACK': 'Black',
+        'AMIND': 'American Indian/Alaska Native',
+        'BLACK': 'Black/African American',
         'WHITE': 'White',
         'ASIAN': 'Asian',
-        'UNK': 'Unknown',
-        'HISPA': 'Hispanic'
+        'UNK': 'Ethnicity Unknown',
+        'HISPA': 'Hispanic/Latino',
+        'PACIF': 'Native Hawaiian/Other Pacific Island'
     }
-
 
     # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
     @property
@@ -56,6 +51,22 @@ class TransformedRecord(
         # Adjust to return False on invalid fields.  For example:
         if self.compensation:
             return self.full_name.strip() != ''
+
+    @property
+    def compensation_type(self):
+
+        if self.employee_type == 'P':
+            return 'PT'
+        else:
+            return 'FT'
+
+    @property
+    def description(self):
+
+        if self.employee_type == 'P':
+            return "Part-time annual rate"
+        else:
+            return "Annual rate"
 
     @property
     def race(self):
@@ -69,9 +80,9 @@ class TransformedRecord(
         r = {
             'family_name': name.last,
             'given_name': name.first,
-            # 'additional_name': name.middle,
+            'additional_name': name.middle,
             'name': unicode(name),
-            'gender': self.gender_map[self.gender.strip()]
+            'gender': self.gender.strip()
         }
 
         return r
