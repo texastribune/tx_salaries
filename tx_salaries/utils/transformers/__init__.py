@@ -20,6 +20,7 @@ from . import fort_worth
 from . import hays_county
 from . import houston
 from . import houston_community_college
+from . import houston_isd
 from . import katy_isd
 from . import mcallen_isd
 from . import metropolitan_transit_authority
@@ -83,6 +84,7 @@ TRANSFORMERS = {
     'a9c48289c0c112b10e91baca6cf42159597f2c6d': [hays_county.transform, ],
     'e5f6cf05268ab2b6198dfa297d40f87f59f5c3d7': [houston.transform, ],
     'a4f1152500a1c25df0705463266f75a9b15f6b5a': [houston_community_college.transform, ],
+    'c81cfde5a929b4641b8890330287a7c592640211': [houston_isd.transform, ],
     '63756f881651e50857ed321b897b34a6440b47c6': [katy_isd.transform, ],
     'd982fa55bf19391e9f756cf03614cdd3969c4311': [north_east_isd.transform, ],
     '10339a3c4cc7dfb78c7120fc5a92da052062ccc5': [mcallen_isd.transform, ],
