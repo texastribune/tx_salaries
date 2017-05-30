@@ -113,7 +113,7 @@ TRANSFORMERS = {
     '016ea020af8d794acb552fc1f7494a9649fb3c92': [ut_health_northeast.transform, ],
     '2af31c303e013d25eeb1d1e68281aae30e090f8f': [ut_health_san_antonio.transform, ],
     'bba2c6a05fee0a4a1adf771686c66c4797665c4b': [ut_md_anderson.transform, ],
-    '258ae8c47dc5b5bd842fb82569b1be7ba8c1bd7d': [ut_medical_branch.transform, ],
+    '7d89fdb0178d051e02bc77bf74f1542e59e0ce25': [ut_medical_branch.transform, ],
     'bf2d8d6cad54567327b44050c507096885f925b7': [ut_pan_american.transform, ],
     'dc125c8ca1bdfbe9888abefcb2806064d5b6b55d': [ut_permian_basin.transform, ],
     '3eede716c96db3c302eaa2b9b3af6e176daf7727': [ut_san_antonio.transform, ],
