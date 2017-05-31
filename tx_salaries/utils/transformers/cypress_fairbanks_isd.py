@@ -20,7 +20,7 @@ class TransformedRecord(
         'department': 'Department Desc',
         'job_title': 'Contract Title',
         'hire_date': 'Hire Date',
-        'compensation': 'Annl Sal',
+        'compensation': 'Salary/Hourly or Daily Rate',
         'gender': 'Sex',
         'nationality': 'Race',
         'employee_type': 'Part Time',
@@ -40,7 +40,7 @@ class TransformedRecord(
     # description = 'Annual salary'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2017, 5, 4)
+    DATE_PROVIDED = date(2017, 5, 9)
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
@@ -80,12 +80,18 @@ class TransformedRecord(
 
     @property
     def description(self):
-        status = self.get_mapped_value('employee_type')
+        status = self.get_mapped_value('employee_type').strip()
+        jobTitle = self.get_mapped_value('department').strip()
+        salary = self.get_mapped_value('compensation')
 
         if status == 'F':
             return 'Annual salary'
-        elif status == 'P':
+        elif status == 'P' and jobTitle != 'SUBSTITUTE' and salary > 100:
             return 'Part-time salary'
+        elif status == 'P' and jobTitle != 'SUBSTITUTE' and salary < 100:
+            return 'Hourly rate'
+        elif status == 'P' and jobTitle == 'SUBSTITUTE':
+            return 'Daily rate'
 
     @property
     def race(self):
