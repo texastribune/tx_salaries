@@ -17,7 +17,7 @@ class TransformedRecord(
         # 'middle_name': '', if needed
         # 'full_name': '', if needed
         # 'suffix': '', if needed
-        'department': 'Department Desc',
+        'department': 'Department Title',
         'job_title': 'Contract Title',
         'hire_date': 'Hire Date',
         'compensation': 'Salary/Hourly or Daily Rate',
@@ -82,15 +82,15 @@ class TransformedRecord(
     def description(self):
         status = self.get_mapped_value('employee_type').strip()
         jobTitle = self.get_mapped_value('department').strip()
-        salary = self.get_mapped_value('compensation')
+        salary = float(self.get_mapped_value('compensation'))
 
-        if status == 'F':
+        if jobTitle != 'SUBSTITUTE' and salary > 100.00 and status == 'F':
             return 'Annual salary'
-        elif status == 'P' and jobTitle != 'SUBSTITUTE' and salary > 100:
+        elif jobTitle != 'SUBSTITUTE' and salary > 100.00:
             return 'Part-time salary'
-        elif status == 'P' and jobTitle != 'SUBSTITUTE' and salary < 100:
+        elif jobTitle != 'SUBSTITUTE' and salary < 100.00:
             return 'Hourly rate'
-        elif status == 'P' and jobTitle == 'SUBSTITUTE':
+        elif jobTitle == 'SUBSTITUTE':
             return 'Daily rate'
 
     @property
@@ -102,11 +102,16 @@ class TransformedRecord(
     @property
     def compensation_type(self):
         employee_type = self.get_mapped_value('employee_type')
+        jobTitle = self.get_mapped_value('department').strip()
+        salary = float(self.get_mapped_value('compensation'))
 
-        if employee_type == 'F':
+        if jobTitle != 'SUBSTITUTE' and salary > 100.00 and employee_type == 'F':
             return 'FT'
-
-        if employee_type == 'P':
+        elif jobTitle != 'SUBSTITUTE' and salary > 100.00:
+            return 'PT'
+        elif jobTitle != 'SUBSTITUTE' and salary < 100.00:
+            return 'PT'
+        elif jobTitle == 'SUBSTITUTE':
             return 'PT'
 
     @property
@@ -114,19 +119,23 @@ class TransformedRecord(
         jobTitle = self.get_mapped_value('job_title').strip()
         departmentName = self.get_mapped_value('department').strip()
         substitute = 'Substitute'
-        if jobTitle and departmentName == 'SUBSTITUTE':
-            return jobTitle
-        else:
+        if departmentName == 'SUBSTITUTE' and jobTitle == '':
             return substitute
+        else:
+            return jobTitle
 
-    # def calculate_tenure(self):
-    #     hire_date_data = map(int, self.hire_date.split('/'))
-    #     print self.get_mapped_value('hire_date')
-    #     hire_date = date(hire_date_data[2], hire_date_data[0],
-    #                      hire_date_data[1])
-    #     tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
-    #     if tenure < 0:
-    #         return 0
-    #     return tenure
+    def calculate_tenure(self):
+        hire_date_data = self.hire_date.split('/')
+        try:
+            hire_date = date(hire_date_data[2], hire_date_data[0],
+                         hire_date_data[1])
+        except:
+            return None
+        tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
+        if tenure < 0:
+            error_msg = ("An employee was hired after the data was provided.\n"
+                         "Is DATE_PROVIDED correct?")
+            raise ValueError(error_msg)
+        return tenure
 
 transform = base.transform_factory(TransformedRecord)
