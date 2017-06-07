@@ -49,7 +49,6 @@ from . import ut_dallas
 from . import ut_el_paso
 from . import ut_health_houston
 from . import ut_health_northeast
-from . import ut_health_tyler
 from . import ut_health_san_antonio
 from . import ut_md_anderson
 from . import ut_medical_branch
