@@ -15,37 +15,17 @@ class TransformedRecord(
         'department': 'Department',
         'job_title': 'Job Title',
         'hire_date': 'Hire Date',
-        'AMIND': 'AMIND',
-        'ASIAN': 'ASIAN',
-        'BLACK': 'BLACK',
-        'HISPA': 'HISPA',
-        'NSPEC': 'NSPEC',
-        'PACIF': 'PACIF',
-        'WHITE': 'WHITE',
+        'race': 'Race',
         'gender': 'Gender',
-        'compensation': 'Rate',
+        'compensation': 'Annual Salary',
         'status': 'Full/Part',
-        'employment_frequency': 'Freq'
     }
-
-    race_map = {
-        'AMIND': 'American Indian or Alaskan Native',
-        'ASIAN': 'Asian',
-        'BLACK': 'Black or African American',
-        'HISPA': 'Hispanic or Latino',
-        'NSPEC': 'Not specified',
-        'PACIF': 'Native Hawaiian or Pacific Islander',
-        'WHITE': 'White'
-    }
-
-    # How do they track gender? We need to map what they use to `F` and `M`.
-    gender_map = {'F': 'F', 'M': 'M', 'U': 'Unknown'}
 
     ORGANIZATION_NAME = 'University of Texas at San Antonio'
 
     ORGANIZATION_CLASSIFICATION = 'University'
 
-    DATE_PROVIDED = date(2015, 10, 7)
+    DATE_PROVIDED = date(2017, 6, 9)
 
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/ut_san_antonio/'
             'salaries/2015-10/utsanantonio.xls')
@@ -74,54 +54,34 @@ class TransformedRecord(
     @property
     def description(self):
         emp_type = self.status
-        freq = self.employment_frequency
 
-        if freq == 'A':
-            if emp_type == 'P':
-                return "Part-time annual salary"
+        if emp_type == 'F':
             return "Annual salary"
 
-        if freq == 'H':
-            return "Hourly rate"
-
-        if freq == 'C':
-            return "Contract salary"
+        if emp_type == 'P':
+            return "Part-time annual salary"
 
     @property
     def race(self):
-        races = [self.AMIND,self.ASIAN,self.BLACK,self.HISPA,self.NSPEC,self.PACIF,self.WHITE]
-        raceNames = ['AMIND','ASIAN','BLACK','HISPA','NSPEC','PACIF','WHITE']
-        i = 0
-        raceList = []
-
-        for indivRace in races:
-            if indivRace == u'1':
-                raceList.append(self.race_map[raceNames[i].strip()])
-            i += 1
-
-        if len(raceList) > 1:
+        if '2 or more' in self.get_mapped_value('race'):
             return {
                 'name': 'Two or more races'
             }
-        elif len(raceList) == 0:
-            return {
-                'name': 'Not given'
-            }
         else:
             return {
-                'name': raceList[0]
+                'name': self.get_mapped_value('race')
             }
 
     @property
     def person(self):
         name = self.get_name()
-        gender = self.get_mapped_value('gender')
+        gender = self.gender
         r = {
             'family_name': name.last,
             'given_name': name.first,
             'additional_name': name.middle,
             'name': unicode(name),
-            'gender': self.gender_map[self.gender.strip()]
+            'gender': self.gender.strip()
         }
 
         return r
