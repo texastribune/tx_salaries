@@ -27,7 +27,7 @@ for dirpath, dirnames, filenames in os.walk('tx_salaries'):
 
 setup(
     name='tx_salaries',
-    version='1.13.0',
+    version='1.15.1',
     description='Texas Tribune: tx_salaries',
     author='Tribune Tech',
     author_email='tech@texastribune.org',

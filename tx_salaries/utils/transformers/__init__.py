@@ -20,6 +20,7 @@ from . import fort_worth
 from . import hays_county
 from . import houston
 from . import houston_community_college
+from . import houston_isd
 from . import katy_isd
 from . import mcallen_isd
 from . import metropolitan_transit_authority
@@ -48,7 +49,6 @@ from . import ut_dallas
 from . import ut_el_paso
 from . import ut_health_houston
 from . import ut_health_northeast
-from . import ut_health_tyler
 from . import ut_health_san_antonio
 from . import ut_md_anderson
 from . import ut_medical_branch
@@ -81,8 +81,9 @@ TRANSFORMERS = {
     'd18ad5c9635a40de15b0ead0e8f8fe97b8ccca31': [el_paso_county.transform, ],
     '578a8bb56581d0cae8154b26286abc93f2bf093a': [fort_worth.transform, ],
     'a9c48289c0c112b10e91baca6cf42159597f2c6d': [hays_county.transform, ],
-    'b91a9f78c4db005d73b11c228f30657ced7ed3c7': [houston.transform, ],
+    'e5f6cf05268ab2b6198dfa297d40f87f59f5c3d7': [houston.transform, ],
     'a4f1152500a1c25df0705463266f75a9b15f6b5a': [houston_community_college.transform, ],
+    'c81cfde5a929b4641b8890330287a7c592640211': [houston_isd.transform, ],
     '63756f881651e50857ed321b897b34a6440b47c6': [katy_isd.transform, ],
     'd982fa55bf19391e9f756cf03614cdd3969c4311': [north_east_isd.transform, ],
     '10339a3c4cc7dfb78c7120fc5a92da052062ccc5': [mcallen_isd.transform, ],
@@ -101,7 +102,7 @@ TRANSFORMERS = {
     'c60489252da989ab04f6a47a86265dc047dd367b': [texas_tech_university.transform, ],
     '6ed63202860363b3add42ec5418c00c73efe96ac': [texas_tech_university_hsc.transform, ],
     '63ca4b9cd0465cb3daaad24b070689a0c065d863': [texas_womans_university.transform, ],
-    'facd5bf54a4a075309fd32b2e1931e3a939d325e': [travis_county.transform, ],
+    'd511e81acc629e5d701826885dfb4c6a1181ef05': [travis_county.transform, ],
     '67d1306dcef659d2e9df5b080e70a326b5dcc178': [ut_arlington.transform, ],
     '0578da0ef48fcbf96a52b96798397460c6f286d5': [university_of_houston.transform, ],
     '30c0ee0b76df0b8ae4007901f38af1e959acd889': [university_of_north_texas_system.transform, ],
@@ -110,11 +111,10 @@ TRANSFORMERS = {
     '1d67811bdfeccbc7d4464c7090d1e4544b352c54': [ut_dallas.transform, ],
     '7a3671ec33d3ca63ee3aa9b532e42c36f616e56c': [ut_el_paso.transform, ],
     '4df8b9322ef4273b4613d57449b314a0d05c8713': [ut_health_houston.transform, ],
-    '6f13d4a1fd50874ee952b4f07058d027c9ef2a44': [ut_health_northeast.transform, ],
-    '16355b9afdb4766ce6578d8fbf6f70fd1bb9af47': [ut_health_tyler.transform, ],
+    '016ea020af8d794acb552fc1f7494a9649fb3c92': [ut_health_northeast.transform, ],
     '2af31c303e013d25eeb1d1e68281aae30e090f8f': [ut_health_san_antonio.transform, ],
     'bba2c6a05fee0a4a1adf771686c66c4797665c4b': [ut_md_anderson.transform, ],
-    '258ae8c47dc5b5bd842fb82569b1be7ba8c1bd7d': [ut_medical_branch.transform, ],
+    '7d89fdb0178d051e02bc77bf74f1542e59e0ce25': [ut_medical_branch.transform, ],
     'bf2d8d6cad54567327b44050c507096885f925b7': [ut_pan_american.transform, ],
     'dc125c8ca1bdfbe9888abefcb2806064d5b6b55d': [ut_permian_basin.transform, ],
     '3eede716c96db3c302eaa2b9b3af6e176daf7727': [ut_san_antonio.transform, ],
