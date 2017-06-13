@@ -13,65 +13,60 @@ class TransformedRecord(
     mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        'full_name': 'Name',
-        'department_name': 'Organization',
-        'job_title': 'Title',
-        'hire_date': 'Hire Date',
-        'compensation': 'Salary',
-        'gender': 'Gender',
-        'race': 'Ethnicity',
-        'status': 'Full-time/Part-time'
+        'full_name': 'EMPL_NAME',
+        'department': 'DEPT_NAME',
+        'job_title': 'JOB_TITLE',
+        'hire_date': 'LAST_HIRE_DATE',
+        'compensation': 'ANNUAL_RATE',
+        'gender': 'GENDER',
+        'given_race': 'RACE',
+        'status': 'FULL-TIME/PART-TIME'
     }
 
-    # The order of the name fields to build a full name.
+     # The order of the name fields to build a full name.
     # If `full_name` is in MAP, you don't need this at all.
     NAME_FIELDS = ('full_name', )
 
     # The name of the organization this WILL SHOW UP ON THE SITE,
     #  so double check it!
-    ORGANIZATION_NAME = 'Dallas ISD'
+    ORGANIZATION_NAME = 'UT Southwestern Medical Center'
 
     # What type of organization is this? This MUST match what we use on the
     # site, double check against salaries.texastribune.org
-    ORGANIZATION_CLASSIFICATION = 'School District'
+    ORGANIZATION_CLASSIFICATION = 'University Hospital'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2017, 5, 30)
+    DATE_PROVIDED = date(2017, 5, 26)
 
     # How do they track gender? We need to map what they use to `F` and `M`.
-    gender_map = {'FEMALE': 'F', 'MALE': 'M'}
+    gender_map = {'Female': 'F', 'Male': 'M', 'Unknown': 'F'}
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'dallas_isd/salaries/2017-05/orr16243.xlsx')
+           'ut_southwestern_medical/salaries/2017-05/12295_PIR_UTSW_Employees.xlsx')
 
     # This is how the loader checks for valid people. Defaults to checking to
-    # see if `last_name` is empty.
+    # see if `full_name` is empty.
     @property
     def is_valid(self):
-        # Adjust to return False on invalid fields.  For example:
+        # Adjust to return False on invalid fields. For example:
         return self.full_name.strip() != ''
-
-    # @property
-    # def hire_date(self):
-    #     raw_date = self.get_mapped_value('hire_date')
-    #     return '-'.join([raw_date[-4:], raw_date[:2], raw_date[3:5]])
 
     @property
     def compensation_type(self):
-        emp_type = self.status
-
-        if emp_type == 'Full-Time':
+        if self.status == 'Full-Time':
             return 'FT'
-
-        if emp_type == 'Part-Time':
+        else:
             return 'PT'
 
     @property
     def compensation(self):
-        if not self.get_mapped_value('compensation'):
+        comp = self.get_mapped_value('compensation')
+
+        if not comp:
             return 0
-        return self.get_mapped_value('compensation')
+        else:
+            return comp
 
     @property
     def person(self):
@@ -86,16 +81,6 @@ class TransformedRecord(
         }
 
         return r
-
-    @property
-    def description(self):
-        comp = float( self.get_mapped_value('compensation') )
-
-        if comp > 36.08:
-            return 'Annual salary'
-        else:
-            return 'Hourly wage'
-
 
     @property
     def job_title(self):
@@ -115,23 +100,19 @@ class TransformedRecord(
             return split_three[0].title() + ' V'
 
     @property
-    def department(self):
-        # don't title case roman numerals
-        dept = self.get_mapped_value('department_name').title()
+    def race(self):
+        return {
+            'name': self.get_mapped_value('given_race').strip().title()
+        }
 
-        return dept
+    @property
+    def description(self):
+        if self.status == 'PRN':
+            return "Annual compensation (on-call employee)"
+        elif self.status == 'Full-Time':
+            return "Annual compensation"
+        else:
+            return "Part-time annual compensation"
 
-    # def get_raw_name(self):
-    #     split_name = self.full_name.split(', ')
-    #     last_name = split_name[0]
-    #     split_firstname = split_name[1].split(' ')
-    #     first_name = split_firstname[0]
-    #     if len(split_firstname) == 2 and len(split_firstname[1]) == 1:
-    #         middle_name = split_firstname[1]
-    #     else:
-    #         first_name = split_name[1]
-    #         middle_name = ''
-
-    #     return u' '.join([first_name, middle_name, last_name])
 
 transform = base.transform_factory(TransformedRecord)

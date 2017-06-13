@@ -57,6 +57,7 @@ from . import ut_pan_american
 from . import ut_permian_basin
 from . import ut_san_antonio
 from . import ut_southwestern
+from . import ut_southwestern_mc
 from . import ut_system
 from . import ut_tyler
 from . import williamson_county
@@ -122,6 +123,7 @@ TRANSFORMERS = {
     'de0167927d7162fb025b72c76a1fc157f081c00b': [ut_tyler.transform, ],
     'fe980380568d4efbc398522dfd71a3e872ea33ac': [ut_system.transform, ],
     '5714aa39bed15a7d032097c2aa0be7df68507e56': [ut_southwestern.transform, ],
+    '6121ff820451267363efe09a1249154334e4afb0': [ut_southwestern_mc.transform, ],
     'fd66132338a69d2fb76faa1d91b6f0d21ffc5aec': [ut_san_antonio.transform, ],
     '068d88f0ea10973339f5a4d57c8d806686d2df40': [ut_tyler.transform, ],
     '82fbe7f20bd25bf024dfd909f0370de9f8427a62': [williamson_county.transform, ]
