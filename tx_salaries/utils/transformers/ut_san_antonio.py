@@ -27,19 +27,13 @@ class TransformedRecord(
 
     DATE_PROVIDED = date(2017, 6, 9)
 
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/ut_san_antonio/'
-            'salaries/2015-10/utsanantonio.xls')
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/ut_san_antonio/'
+            'salaries/2017-06/utsa.csv')
 
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.full_name.strip() != ''
-
-    @property
-    def compensation(self):
-        if not self.get_mapped_value('compensation'):
-            return 0
-        return self.get_mapped_value('compensation')
 
     @property
     def compensation_type(self):
