@@ -78,7 +78,7 @@ TRANSFORMERS = {
     '95e5f3c47affecfb924230ce117cfb88599c2368': [dallas.transform, ],
     '695426d2122576c140691958c145818d31f95c89': [dallas_county_comm_college.transform, ],
     'eb61956148a1c009ab8f5275650b279531f970d6': [dallas_county.transform, ],
-    '87a0a6a8870a5d9efe15d76f8c63cdda5f7a39f2': [dallas_isd.transform, ],
+    '75e1bfa34014b500ab194c557b686fa1ca021afc': [dallas_isd.transform, ],
     'b3ac361fd078f04d8035cef647ac839ef3f0f353': [eanes_isd.transform, ],
     'd18ad5c9635a40de15b0ead0e8f8fe97b8ccca31': [el_paso_county.transform, ],
     '578a8bb56581d0cae8154b26286abc93f2bf093a': [fort_worth.transform, ],

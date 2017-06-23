@@ -90,7 +90,7 @@ class TransformedRecord(
         split_two = title.split('IV')
         split_three = title.split(' V')
 
-        if len(split) == 1 and len(split_two) and len(split_three):
+        if len(split) == 1 and len(split_two) == 1  and len(split_three) == 1:
             return title.title()
         elif len(split) > 1:
             return split[0].title() + ' II' + split[1]
