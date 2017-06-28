@@ -93,7 +93,7 @@ TRANSFORMERS = {
     'c98e393bf1b3fc2635b31fcedb0cfbc69766e5ac': [midwestern_state_university.transform, ],
     '2252263014de05fa4efd240e0a3716c484495a93': [pasadena_isd.transform, ],
     '0e027f3d0038d81f570cbda2aeedf3dd1f720881': [potter_county.transform, ],
-    'f53125485535c4619b16838160dc4bd41875389f': [san_antonio.transform, ],
+    '465604c88252932722ac0ed913354d54e8780b69': [san_antonio.transform, ],
     '2412f56c1cbced970ab823b9603a082778a0b3b1': [rockwall_isd.transform, ],
     'fe04a26f9020282230d1a133d0f1a5c00a264b62': [state_of_texas.transform, ],
     '2aaf4d7f6687edfb719e84bd4a370c49425399b7': [tarrant_county.transform, ],

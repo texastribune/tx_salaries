@@ -130,8 +130,6 @@ class TransformedRecord(
         elif len(split_four) > 1:
             return dept.replace("Vi-B","VI-B")
         elif len(split_five) > 1:
-            print dept.replace("It-","IT-")
-
             return dept.replace("It-","IT-")
 
     # def get_raw_name(self):
