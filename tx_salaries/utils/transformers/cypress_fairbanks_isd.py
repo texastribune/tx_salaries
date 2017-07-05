@@ -42,6 +42,8 @@ class TransformedRecord(
     # When did you receive the data? NOT when we added it to the site.
     DATE_PROVIDED = date(2017, 5, 9)
 
+    # REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
+
     # The URL to find the raw data in our S3 bucket.
     URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
            'cypress_fairbanks_isd/salaries/2017-05/cypress-fairbanks-isd.xlsx')
@@ -125,17 +127,12 @@ class TransformedRecord(
             return jobTitle
 
     def calculate_tenure(self):
-        hire_date_data = self.hire_date.split('/')
-        try:
-            hire_date = date(hire_date_data[2], hire_date_data[0],
-                         hire_date_data[1])
-        except:
-            return None
+        hire_date_data = map(int, self.hire_date.split('-'))
+        hire_date = date(hire_date_data[0], hire_date_data[1],
+                         hire_date_data[2])
         tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
         if tenure < 0:
-            error_msg = ("An employee was hired after the data was provided.\n"
-                         "Is DATE_PROVIDED correct?")
-            raise ValueError(error_msg)
+            tenure = 0
         return tenure
 
 transform = base.transform_factory(TransformedRecord)
