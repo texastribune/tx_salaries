@@ -14,9 +14,6 @@ class TransformedRecord(
     MAP = {
         'last_name': 'Last Name',
         'first_name': 'First Name',
-        # 'middle_name': '', if needed
-        # 'full_name': '', if needed
-        # 'suffix': '', if needed
         'department': 'Department Title',
         'job_title': 'Contract Title',
         'hire_date': 'Hire Date',
@@ -41,8 +38,6 @@ class TransformedRecord(
 
     # When did you receive the data? NOT when we added it to the site.
     DATE_PROVIDED = date(2017, 5, 9)
-
-    # REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
@@ -85,13 +80,19 @@ class TransformedRecord(
         status = self.get_mapped_value('employee_type').strip()
         jobTitle = self.get_mapped_value('department').strip()
         salary = float(self.get_mapped_value('compensation'))
-
+        # If the employee isn't a sub, their rate is more than $100 and
+        # they're a full-time employee, their pay is their Annual salary
         if jobTitle != 'SUBSTITUTE' and salary > 100.00 and status == 'F':
             return 'Annual salary'
+        # If the employee isn't a sub, their salary is more than $100, and
+        # then their pay is their Part-time salary
         elif jobTitle != 'SUBSTITUTE' and salary > 100.00:
             return 'Part-time salary'
+        # If the employee isn't a sub and their salary is less than $100,
+        # then their pay is an hourly rate
         elif jobTitle != 'SUBSTITUTE' and salary < 100.00:
             return 'Hourly rate'
+        # If the employee is a sub, their salary is a daily rate
         elif jobTitle == 'SUBSTITUTE':
             return 'Daily rate'
 
@@ -103,28 +104,39 @@ class TransformedRecord(
 
     @property
     def compensation_type(self):
-        employee_type = self.get_mapped_value('employee_type')
+        status = self.get_mapped_value('employee_type').strip()
         jobTitle = self.get_mapped_value('department').strip()
         salary = float(self.get_mapped_value('compensation'))
-
-        if jobTitle != 'SUBSTITUTE' and salary > 100.00 and employee_type == 'F':
+        # If the employee isn't a sub, their rate is more than $100 and
+        # they're a full-time employee, their pay is their Annual salary
+        if jobTitle != 'SUBSTITUTE' and salary > 100.00 and status == 'F':
             return 'FT'
+        # If the employee isn't a sub, their salary is more than $100, and
+        # then their pay is their Part-time salary
         elif jobTitle != 'SUBSTITUTE' and salary > 100.00:
             return 'PT'
+        # If the employee isn't a sub and their salary is less than $100,
+        # then their pay is an hourly rate
         elif jobTitle != 'SUBSTITUTE' and salary < 100.00:
             return 'PT'
+        # If the employee is a sub, their salary is a daily rate
         elif jobTitle == 'SUBSTITUTE':
             return 'PT'
 
     @property
     def job_title(self):
-        jobTitle = self.get_mapped_value('job_title').strip()
-        departmentName = self.get_mapped_value('department').strip()
+        jobTitle = self.get_mapped_value('job_title').strip().upper()
+        departmentName = self.get_mapped_value('department').strip().upper()
         substitute = 'Substitute'
         if departmentName == 'SUBSTITUTE' and jobTitle == '':
             return substitute
         else:
             return jobTitle
+
+    @property
+    def department(self):
+        jobDepartment = self.get_mapped_value('department').strip().upper()
+        return jobDepartment
 
     def calculate_tenure(self):
         hire_date_data = map(int, self.hire_date.split('-'))
