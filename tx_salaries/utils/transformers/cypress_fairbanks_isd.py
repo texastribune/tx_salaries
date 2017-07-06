@@ -125,18 +125,13 @@ class TransformedRecord(
 
     @property
     def job_title(self):
-        jobTitle = self.get_mapped_value('job_title').strip().upper()
-        departmentName = self.get_mapped_value('department').strip().upper()
+        jobTitle = self.get_mapped_value('job_title').strip()
+        departmentName = self.get_mapped_value('department').strip()
         substitute = 'Substitute'
         if departmentName == 'SUBSTITUTE' and jobTitle == '':
             return substitute
         else:
             return jobTitle
-
-    @property
-    def department(self):
-        jobDepartment = self.get_mapped_value('department').strip().upper()
-        return jobDepartment
 
     def calculate_tenure(self):
         hire_date_data = map(int, self.hire_date.split('-'))
