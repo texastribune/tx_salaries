@@ -91,13 +91,13 @@ class TransformedRecord(
 
     @property
     def job_title(self):
-        jobTitle = self.get_mapped_value('job_title').strip()
+        jobTitle = self.get_mapped_value('job_title').strip().capwords()
         departmentName = self.get_mapped_value('department').strip()
         substitute = 'Substitute'
         if departmentName == 'SUBSTITUTE' and jobTitle == '':
             return substitute
         else:
-            return better_title(jobTitle)
+            return better_title(jobTitle).strip().capwords()
 
     @property
     def description(self):
