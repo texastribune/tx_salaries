@@ -1,4 +1,5 @@
 import re
+import string
 
 from . import base
 from . import mixins
@@ -11,8 +12,9 @@ DIGIT_LETTER_REGEX = re.compile(r'\d([A-Z])')
 
 def better_title(value):
     """Convert a string into titlecase."""
+    m = ' '.join(word.strip(string.punctuation) for word in value.split())
     t = APOSTROPHE_LETTER_REGEX.sub(
-        lambda m: m.group(0).lower(), value.title())
+        lambda m: m.group(0).lower(), m.title())
     t = DIGIT_LETTER_REGEX.sub(lambda m: m.group(0).lower(), t)
 
     return ' '.join(t.split())
@@ -90,16 +92,6 @@ class TransformedRecord(
         return r
 
     @property
-    def job_title(self):
-        jobTitle = self.get_mapped_value('job_title').strip().capwords()
-        departmentName = self.get_mapped_value('department').strip()
-        substitute = 'Substitute'
-        if departmentName == 'SUBSTITUTE' and jobTitle == '':
-            return substitute
-        else:
-            return better_title(jobTitle).strip().capwords()
-
-    @property
     def description(self):
         status = self.get_mapped_value('employee_type').strip()
         department = self.get_mapped_value('department').strip()
@@ -119,6 +111,17 @@ class TransformedRecord(
         # If the employee is a sub, their salary is a daily rate
         elif department == 'SUBSTITUTE':
             return 'Daily rate'
+
+    @property
+    def job_title(self):
+        jobTitle = self.get_mapped_value('job_title').strip()
+        department = self.get_mapped_value('department').strip()
+        substitute = 'Substitute'
+        print better_title(jobTitle)
+        if department == 'SUBSTITUTE' and jobTitle == '':
+            return substitute
+        else:
+            return better_title(jobTitle)
 
     @property
     def race(self):
