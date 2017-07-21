@@ -14,11 +14,12 @@ class TransformedRecord(
     MAP = {
         'last_name': 'LAST_NAME',
         'first_name': 'FIRST_NAME',
-        'department': 'DEPARTMENT',
+        'department': 'DEPT',
         'job_title': 'TITLE',
-        'hire_date': 'ORIGINAL_DATE_OF_HIRE',
-        'compensation': 'ANNUAL_SALARY',
-        'gender': 'SEX',
+        'hire_date': 'ORIGINAL HIRE DATE',
+        'compensation': 'ANNUAL SALARY',
+        'hourly_rate': 'HOURLY SALARY',
+        'gender': 'GENDER',
         'nationality': 'ETHNICITY',
     }
 
@@ -39,39 +40,53 @@ class TransformedRecord(
     description = 'Annual salary'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2015, 7, 9)
+    DATE_PROVIDED = date(2017, 6, 30)
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
            'texas_womans_university/salaries/2015-07/'
            'texas_womans_university.xls')
 
-    race_map = {
-        'Asian (Not Hispanic or Latino)': 'Asian (Not Hispanic or Latino)',
-        'White (Not Hispanic or Latino)': 'White (Not Hispanic or Latino)',
-        'American Indian or Alaskan Native (Not Hispanic or Latino)': 'American Indian or Alaskan Native (Not Hispanic or Latino)',
-        'Native Hawiian or Other Pacific (Not Hispanic/Latino)': 'Native Hawiian or Other Pacific (Not Hispanic/Latino)',
-        'Black or African American (Not Hispanic or Latino)': 'Black or African American (Not Hispanic or Latino)',
-        'HAWAIIAN': 'Native Hawaiian/Other Pacific Islander',
-        'UKN': 'Not Known',
-        'Hispanic or Latino': 'Hispanic or Latino',
-        'Not Known': 'Not Known',
-    }
-
     # How do they track gender? We need to map what they use to `F` and `M`.
-    gender_map = {'F': 'F', 'M': 'M'}
+    # gender_map = {'F': 'F', 'M': 'M'}
 
     # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.first_name.strip() != ''
+        return self.hire_date.strip() != ''
 
     @property
-    def race(self):
-        return {
-            'name': self.race_map[self.nationality.strip()]
-        }
+    def compensation_type(self):
+        annual_salary = self.get_mapped_value('compensation')
+        hourly_rate = self.get_mapped_value('hourly_rate')
+
+        if annual_salary:
+            return 'FT'
+
+        if hourly_rate:
+            return 'PT'
+
+    @property
+    def description(self):
+        annual_salary = self.get_mapped_value('compensation')
+        hourly_rate = self.get_mapped_value('hourly_rate')
+
+        if annual_salary:
+            return 'Annual salary'
+
+        if hourly_rate:
+            return 'Hourly rate'
+
+    @property
+    def compensation(self):
+        salary = self.get_mapped_value('compensation')
+        wage = self.get_mapped_value('hourly_rate')
+
+        if salary:
+            return salary
+        else:
+            return wage
 
     @property
     def person(self):
@@ -81,7 +96,7 @@ class TransformedRecord(
             'given_name': name.first,
             # 'additional_name': name.middle,
             'name': unicode(name),
-            'gender': self.gender_map[self.gender.strip()]
+            'gender': self.gender
         }
 
         return r
