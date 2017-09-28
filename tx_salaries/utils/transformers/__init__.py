@@ -114,7 +114,7 @@ TRANSFORMERS = {
     '4df8b9322ef4273b4613d57449b314a0d05c8713': [ut_health_houston.transform, ],
     '016ea020af8d794acb552fc1f7494a9649fb3c92': [ut_health_northeast.transform, ],
     '2af31c303e013d25eeb1d1e68281aae30e090f8f': [ut_health_san_antonio.transform, ],
-    'bba2c6a05fee0a4a1adf771686c66c4797665c4b': [ut_md_anderson.transform, ],
+    '4a6620f449d5653a0a5372f9ab5f9d85befa2ec8': [ut_md_anderson.transform, ],
     '7d89fdb0178d051e02bc77bf74f1542e59e0ce25': [ut_medical_branch.transform, ],
     'bf2d8d6cad54567327b44050c507096885f925b7': [ut_pan_american.transform, ],
     'dc125c8ca1bdfbe9888abefcb2806064d5b6b55d': [ut_permian_basin.transform, ],
