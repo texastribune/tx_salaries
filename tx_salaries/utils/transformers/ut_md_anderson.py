@@ -18,7 +18,7 @@ class TransformedRecord(
         'hire_date': 'Last Start Dt',
         'compensation': 'Annual Rate',
         'gender': 'Gender',
-        'race': 'Ethnic Grp Descr',
+        'nationality': 'Ethnic Grp Descr',
         'employee_type': 'Full/Part',
     }
 
@@ -49,6 +49,14 @@ class TransformedRecord(
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.full_name.strip() != ''
+
+    @property
+    def race(self):
+        nationality = self.get_mapped_value('nationality')
+        if nationality == '2+RACE':
+            return {'name': 'Two or more races'}
+        else:
+            return {'name': nationality}
 
     @property
     def compensation_type(self):
