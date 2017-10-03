@@ -44,6 +44,17 @@ class TransformedRecord(
     # How do they track gender? We need to map what they use to `F` and `M`.
     gender_map = {'Female': 'F', 'Male': 'M'}
 
+    race_map = {
+        '2+RACE': 'Two or more races',
+        'American Indian/Alaska Native': 'American Indian/Alaska Native',
+        'Asian': 'Asian',
+        'Black/African American': 'Black/African American',
+        'Hispanic/Latino': 'Hispanic/Latino',
+        'Native Hawaiian/Oth Pac Island': 'Native Hawaiian/Oth Pac Island',
+        'White': 'White',
+        '': 'Not given',
+    }
+
     # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
     @property
     def is_valid(self):
@@ -52,11 +63,9 @@ class TransformedRecord(
 
     @property
     def race(self):
-        nationality = self.get_mapped_value('nationality')
-        if nationality == '2+RACE':
-            return {'name': 'Two or more races'}
-        else:
-            return {'name': nationality}
+        return {
+            'name': self.race_map[self.nationality.strip()]
+        }
 
     @property
     def compensation_type(self):
