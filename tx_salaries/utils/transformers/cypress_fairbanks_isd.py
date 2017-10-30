@@ -117,7 +117,6 @@ class TransformedRecord(
         jobTitle = self.get_mapped_value('job_title').strip()
         department = self.get_mapped_value('department').strip()
         substitute = 'Substitute'
-        print better_title(jobTitle)
         if department == 'SUBSTITUTE' and jobTitle == '':
             return substitute
         else:
