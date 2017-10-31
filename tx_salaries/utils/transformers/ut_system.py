@@ -10,13 +10,14 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
     MAP = {
         'last_name': 'Last',
-        'first_name': 'First',
-        'department': 'Dept Descr',
-        'job_title': 'Job Title',
-        'hire_date': 'Start Date',
-        'nationality': 'ETHNICITY',
-        'gender': 'Sex',
-        'compensation': 'Annual Rt',
+        'first_name': 'First Name',
+        'department': 'DEPARTMENT',
+        'job_title': 'Position Title',
+        'hire_date': 'Last Start',
+        'nationality': 'Ethnicity',
+        'gender': 'Gender',
+        'compensation': 'Comp Rate',
+        'status': 'Status'
     }
 
     NAME_FIELDS = ('first_name', 'last_name', )
@@ -25,11 +26,9 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_CLASSIFICATION = 'University'
 
-    # All employees are full-time right now
-    compensation_type = 'FT'
     description = 'Annual compensation'
 
-    DATE_PROVIDED = date(2015, 10, 14)
+    DATE_PROVIDED = date(2017, 10, 30)
 
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
            'ut_system/salaries/2015-10/ut_system.xls')
@@ -41,7 +40,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'ASIAN': 'Asian',
         'AMIND': 'American Indian',
         'PACIF': 'Pacific Islander',
-        '42': 'Not given',
+        '#N/A': 'Not given',
     }
 
     @property
@@ -54,6 +53,14 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         return {
             'name': self.race_map[self.nationality.strip()]
         }
+
+    @property
+    def compensation_type(self):
+        status = self.get_mapped_value('employee_type').strip()
+        if status == 'Full time':
+            return 'FT'
+        else:
+            return 'PT'
 
     @property
     def person(self):
