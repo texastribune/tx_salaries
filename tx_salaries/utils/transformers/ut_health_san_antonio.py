@@ -5,18 +5,12 @@ import string
 
 from datetime import date
 
-# --row 5
-
-
 class TransformedRecord(
     mixins.GenericCompensationMixin,
     mixins.GenericIdentifierMixin,
     mixins.GenericPersonMixin,
     mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
     mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
-
-    # They included people without compensation and have clarified they do not consider them employees
-    REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
 
     MAP = {
         'full_name': 'Name',
@@ -42,10 +36,10 @@ class TransformedRecord(
     NAME_FIELDS = ('full_name', )
 
     # How do they track gender? We need to map what they use to `F` and `M`.
-    gender_map = {'Female': 'F', 'Male': 'M', 'Unknown': 'Not given'}
+    gender_map = {'Female': 'F', 'Male': 'M'}
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2017, 7, 4)
+    DATE_PROVIDED = date(2017, 7, 3)
 
     # The URL to find the raw data in our S3 bucket.
     URL = 'http://raw.texastribune.org.s3.amazonaws.com/'
@@ -53,14 +47,18 @@ class TransformedRecord(
 
     @property
     def is_valid(self):
-        # return self.get_mapped_value('status') != 'Non-regular' and len(self.full_name) != 0
+        comp_type = self.get_mapped_value('compensation_type')
+
+        # check for name length is because CSVKit keeps going on an empty row for some reason
+        return comp_type != 'Non-regular' and len(self.full_name) != 0
 
         # Adjust to return False on invalid fields.  For example:
-        return self.full_name.strip() != ''
+        # return self.full_name.strip() != ''
 
     @property
     def person(self):
         name = self.get_name()
+
         r = {
             'family_name': name.last,
             'given_name': name.first,
@@ -73,30 +71,37 @@ class TransformedRecord(
 
     @property
     def compensation(self):
-        if self.get_mapped_value('compensation') == 'Varies':
+        comp = self.get_mapped_value('compensation')
+
+        if comp == 'Varies':
             return 0
         else:
-            return self.get_mapped_value('compensation')
+            return comp
 
     @property
     def compensation_type(self):
-        emp_type = self.get_mapped_value('compensation_type')
+        comp_type = self.get_mapped_value('compensation_type')
 
-        if emp_type == 'Full Time' or emp_type == 'DUAL':
+        if comp_type == 'Full Time' or comp_type == 'DUAL':
             return 'FT'
         else:
             return 'PT'
+        return ''
 
     @property
     def description(self):
-        if self.get_mapped_value('compensation') == 'Varies':
+        comp = self.get_mapped_value('compensation')
+        comp_type = self.get_mapped_value('compensation_type')
+
+        if comp == 'Varies':
             return "Pay varies"
-        elif self.get_mapped_value('compensation_type') == 'DUAL':
+        elif comp_type == 'DUAL':
             return 'Annual gross salary (DUAL employment)'
-        elif self.get_mapped_value('compensation_type') == 'Part Time':
+        elif comp_type == 'Part Time':
             return 'Annual gross salary (Part time)'
         else:
             return 'Annual gross salary'
 
+    # Alain = Ah-Lane
 
 transform = base.transform_factory(TransformedRecord)
