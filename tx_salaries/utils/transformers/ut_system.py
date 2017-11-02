@@ -5,7 +5,8 @@ from . import mixins
 
 
 class TransformedRecord(mixins.GenericCompensationMixin,
-        mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
+        mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
+        mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
     MAP = {
@@ -13,11 +14,11 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'first_name': 'First Name',
         'department': 'DEPARTMENT',
         'job_title': 'Position Title',
-        'hire_date': 'Last Start',
+        'hire_date': 'Last Start Date',
         'nationality': 'Ethnicity',
         'gender': 'Gender',
         'compensation': 'Comp Rate',
-        'status': 'Status'
+        'status': 'Status',
     }
 
     NAME_FIELDS = ('first_name', 'last_name', )
@@ -26,7 +27,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_CLASSIFICATION = 'University'
 
-    description = 'Annual compensation'
+    # description = 'Annual compensation'
 
     DATE_PROVIDED = date(2017, 10, 30)
 
@@ -40,11 +41,12 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'ASIAN': 'Asian',
         'AMIND': 'American Indian',
         'PACIF': 'Pacific Islander',
-        '#N/A': 'Not given',
+        'N/A': 'Not given',
     }
 
     @property
     def is_valid(self):
+        print(self.compensation.strip())
         # Adjust to return False on invalid fields.  For example:
         return self.last_name.strip() != ''
 
@@ -56,11 +58,32 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     @property
     def compensation_type(self):
-        status = self.get_mapped_value('employee_type').strip()
-        if status == 'Full time':
-            return 'FT'
-        else:
-            return 'PT'
+        status = self.get_mapped_value('status').strip()
+        salary = float(self.get_mapped_value('compensation'))
+
+        if salary > 125 and status == 'Full time':
+            return "FT"
+        elif salary > 125 and status == 'Part time':
+            return "PT"
+        elif salary <= 125 and status == 'Full time':
+            return "PT"
+        elif salary <= 125 and status == 'Part time':
+            return "PT"
+
+    @property
+    def description(self):
+        salary = float(self.get_mapped_value('compensation'))
+        status = self.get_mapped_value('status').strip()
+
+        if salary > 125 and status == 'Full time':
+            return "Full-time annual salary"
+        elif salary > 125 and status == 'Part time':
+            return "Part-time annual salary"
+
+        if salary <= 125.0 and status == 'Full time':
+            return "Full-time hourly rate"
+        elif salary <= 125.0 and status == 'Part time':
+            return "Part-time hourly rate"
 
     @property
     def person(self):
