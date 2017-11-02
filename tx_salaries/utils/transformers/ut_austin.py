@@ -24,7 +24,11 @@ class TransformedRecord(
         'compensation': 'SALARY (FY ALLOCATION)',
     }
 
-    gender_map = {u'FEMALE                                            ': u'F', u'MALE                                              ': u'M', u'                                                  ': u'Unknown'}
+    gender_map = {
+        'FEMALE':'F',
+        'MALE':'M',
+        '': u'Unknown'
+    }
 
     NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
 
@@ -32,7 +36,7 @@ class TransformedRecord(
 
     ORGANIZATION_CLASSIFICATION = 'University'
 
-    DATE_PROVIDED = date(2016, 6, 6)
+    DATE_PROVIDED = date(2017, 7, 5)
 
     URL = 'http://s3.amazonaws.com/raw.texastribune.org/ut_austin/salaries/2016-06/ut_austin.xlsx'
 
