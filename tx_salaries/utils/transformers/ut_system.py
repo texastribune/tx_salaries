@@ -31,8 +31,8 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     DATE_PROVIDED = date(2017, 10, 30)
 
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'ut_system/salaries/2015-10/ut_system.xls')
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
+           'ut_system/salaries/2017-10/ut_system.XLS')
 
     race_map = {
         'WHITE': 'White',
@@ -46,7 +46,6 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     @property
     def is_valid(self):
-        print(self.compensation.strip())
         # Adjust to return False on invalid fields.  For example:
         return self.last_name.strip() != ''
 
@@ -60,7 +59,9 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     def compensation_type(self):
         status = self.get_mapped_value('status').strip()
         salary = float(self.get_mapped_value('compensation'))
-
+        # The hourly rate threshold is $125. Above that, it's annual salary
+        # If an employee is full time and has an hourly rate, they're marked
+        # as part-time so they don't screw up the math.
         if salary > 125 and status == 'Full time':
             return "FT"
         elif salary > 125 and status == 'Part time':
@@ -74,15 +75,15 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     def description(self):
         salary = float(self.get_mapped_value('compensation'))
         status = self.get_mapped_value('status').strip()
-
+        # The hourly rate threshold is $125. Above that, it's annual salary
         if salary > 125 and status == 'Full time':
             return "Full-time annual salary"
         elif salary > 125 and status == 'Part time':
             return "Part-time annual salary"
 
-        if salary <= 125.0 and status == 'Full time':
+        if salary <= 125 and status == 'Full time':
             return "Full-time hourly rate"
-        elif salary <= 125.0 and status == 'Part time':
+        elif salary <= 125 and status == 'Part time':
             return "Part-time hourly rate"
 
     @property
