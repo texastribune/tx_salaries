@@ -102,6 +102,4 @@ class TransformedRecord(
         else:
             return 'Annual gross salary'
 
-    # Alain = Ah-Lane
-
 transform = base.transform_factory(TransformedRecord)
