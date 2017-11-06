@@ -29,14 +29,14 @@ class TransformedRecord(
     gender_map = {
         'FEMALE':'F',
         'MALE':'M',
-        '': u'Unknown'
+        '': 'Unknown'
     }
 
     ORGANIZATION_NAME = 'University of Texas at Austin'
     ORGANIZATION_CLASSIFICATION = 'University'
     NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
 
-    DATE_PROVIDED = date(2017, 7, 5)
+    DATE_PROVIDED = date(2017, 7, 6)
 
     URL = 'http://raw.texastribune.org.s3.amazonaws.com/'
     'ut_austin/salaries/OPENRECORDS.ESSIG.20160705.xlsx'
@@ -45,6 +45,30 @@ class TransformedRecord(
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.gender.strip() != ''
+
+    @property
+    def department(self):
+        department = self.get_mapped_value('department').title()
+
+        return department
+
+    @property
+    def race(self):
+        race = self.given_race.strip().title()
+
+        if race == '':
+            race = 'Unknown'
+        return {
+            'name': race
+        }
+
+    @property
+    def gender(self):
+        sex = self.gender_map[self.get_mapped_value('gender')].strip().title()
+
+        if sex == "":
+            return ""
+        return sex
 
     @property
     def person(self):
@@ -58,13 +82,6 @@ class TransformedRecord(
         }
 
         return r
-
-    @property
-    def gender(self):
-        sex = self.gender_map[self.get_mapped_value('gender')]
-        if sex.strip() == "":
-            return ""
-        return sex.strip()
 
     @property
     def compensation_type(self):
@@ -85,13 +102,6 @@ class TransformedRecord(
 
         if employee_type == 'PART TIME':
             return "Part-time compensation"
-
-    @property
-    def race(self):
-        race = self.given_race.strip()
-        if race == '':
-            race = 'UNKNOWN'
-        return {'name': race}
 
     @property
     def hire_date(self):
