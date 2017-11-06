@@ -42,8 +42,8 @@ class TransformedRecord(
     DATE_PROVIDED = date(2017, 7, 3)
 
     # The URL to find the raw data in our S3 bucket.
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/'
-    'ut_health_san_antonio/salaries/2017-11/Texas_Tribune_Data_6-30-17.xlsx'
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
+    'ut_health_san_antonio/salaries/2017-11/Texas_Tribune_Data_6-30-17.xlsx')
 
     @property
     def is_valid(self):
