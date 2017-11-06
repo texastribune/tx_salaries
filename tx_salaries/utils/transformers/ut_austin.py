@@ -38,8 +38,9 @@ class TransformedRecord(
 
     DATE_PROVIDED = date(2017, 7, 6)
 
+
     URL = 'http://raw.texastribune.org.s3.amazonaws.com/'
-    'ut_austin/salaries/OPENRECORDS.ESSIG.20160705.xlsx'
+    'ut_austin/salaries/2017-07/OPENRECORDS.ESSIG.20160705.xlsx'
 
     @property
     def is_valid(self):
