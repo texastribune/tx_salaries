@@ -39,7 +39,7 @@ class TransformedRecord(
     DATE_PROVIDED = date(2017, 7, 6)
 
 
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/'
+    URL = 'https://s3.amazonaws.com/raw.texastribune.org'
     'ut_austin/salaries/2017-07/OPENRECORDS.ESSIG.20160705.xlsx'
 
     @property
