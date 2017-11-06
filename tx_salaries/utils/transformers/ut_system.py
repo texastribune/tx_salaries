@@ -32,7 +32,7 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     DATE_PROVIDED = date(2017, 10, 30)
 
     URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
-           'ut_system/salaries/2017-10/ut_system.XLS')
+           'ut_system/salaries/2017-10/ut_system.xls')
 
     race_map = {
         'WHITE': 'White',
