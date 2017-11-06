@@ -42,8 +42,8 @@ class TransformedRecord(
     gender_map = {'Female': 'F', 'Male': 'M', 'Unknown': 'F'}
 
     # The URL to find the raw data in our S3 bucket.
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'ut_southwestern_medical/salaries/2017-05/12295_PIR_UTSW_Employees.xlsx')
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
+        'ut_southwestern_medical/salaries/2017-05/12295_PIR_UTSW_Employees.xlsx')
 
     # This is how the loader checks for valid people. Defaults to checking to
     # see if `full_name` is empty.

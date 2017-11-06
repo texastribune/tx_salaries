@@ -107,7 +107,7 @@ TRANSFORMERS = {
     '67d1306dcef659d2e9df5b080e70a326b5dcc178': [ut_arlington.transform, ],
     '0578da0ef48fcbf96a52b96798397460c6f286d5': [university_of_houston.transform, ],
     '30c0ee0b76df0b8ae4007901f38af1e959acd889': [university_of_north_texas_system.transform, ],
-    '2115235d43a6f292c7a37e26e12cd0e77a683a1a': [ut_austin.transform, ],
+    '635e2f22442ecacad7e7028951ed6f61a7f07671': [ut_austin.transform, ],
     'a1cb75442f33c2f0152296838771087192643869': [ut_brownsville.transform, ],
     '1d67811bdfeccbc7d4464c7090d1e4544b352c54': [ut_dallas.transform, ],
     '7a3671ec33d3ca63ee3aa9b532e42c36f616e56c': [ut_el_paso.transform, ],
