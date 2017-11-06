@@ -80,9 +80,12 @@ class TransformedRecord(
 
     @property
     def compensation_type(self):
+        comp = self.get_mapped_value('compensation')
         comp_type = self.get_mapped_value('compensation_type')
 
-        if comp_type == 'Full Time' or comp_type == 'DUAL':
+        if comp == 'Varies':
+            return ''
+        elif comp_type == 'Full Time' or comp_type == 'DUAL':
             return 'FT'
         else:
             return 'PT'
