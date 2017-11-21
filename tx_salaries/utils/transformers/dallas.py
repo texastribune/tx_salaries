@@ -1,12 +1,15 @@
 from . import base
 from . import mixins
 
+from .. import cleaver
+
 from datetime import date
 from decimal import Decimal
 
+
 class TransformedRecord(
         mixins.GenericCompensationMixin,
-        mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
+        mixins.GenericIdentifierMixin,
         mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
@@ -31,6 +34,12 @@ class TransformedRecord(
 
     # When did you receive the data? NOT when we added it to the site.
     DATE_PROVIDED = date(2017, 2, 7)
+
+    # Cleaver with custom department name regular expressions.
+    cleaver.DepartmentName.MAP = (cleaver.DepartmentName.MAP +
+                                  ((cleaver.regex_i(r'Uinform'), 'Uniform'), ) +
+                                  ((cleaver.regex_i(r'Mcc'), 'MCC'), ) +
+                                  ((cleaver.regex_i(r'Pom'), 'POM'), ))
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
@@ -126,6 +135,11 @@ class TransformedRecord(
         }
 
         return r
+
+    @property
+    def department_as_child(self):
+        return [{'name': unicode(cleaver.DepartmentNameCleaver(self.department)
+                                        .parse()), }, ]
 
     def get_raw_name(self):
         split_name = self.full_name.split(', ')
