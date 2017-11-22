@@ -34,8 +34,8 @@ class TransformedRecord(
 
     DATE_PROVIDED = date(2017, 11, 20)
 
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/dallas_county_community_college_district'
-           '/salaries/2017-11/OpenRecordsRequest_TexasTribune.xlsx')
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
+           'dallas_county_community_college_district/salaries/2017-11/OpenRecordsRequest_TexasTribune.xlsx')
 
     # There are some adjuncts who don't have a salary or wage
     REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
