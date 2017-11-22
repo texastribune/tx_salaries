@@ -3,31 +3,30 @@ from . import mixins
 
 from datetime import date
 
-
 class TransformedRecord(
-    mixins.GenericCompensationMixin,
-    mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
-    mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
-    mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+        mixins.GenericCompensationMixin,
+        mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
+        mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
+        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
         'last_name': 'Last',
         'first_name': 'First Name',
-        'department': 'Dept',
-        'job_title': 'Job Title',
-        'hire_date': 'Start Date',
-        'compensation': 'Annual Rt',
+        'department': 'DEPT',
+        'job_title': 'Position Title',
+        'hire_date': 'DOH',
+        'compensation': 'Salary',
         'gender': 'Sex',
-        'given_race': 'Race',
-        'employee_type': 'Full/Part',
+        'given_race': 'Ethnic',
+        'employee_type': 'F/PT',
     }
 
     ORGANIZATION_NAME = 'University of Texas of the Permian Basin'
 
     ORGANIZATION_CLASSIFICATION = 'Universtiy'
 
-    DATE_PROVIDED = date(2016, 2, 29)
+    DATE_PROVIDED = date(2017, 11, 21)
 
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/ut_permian_basin'
            '/salaries/2016-02/ut_permbasin.xls')
