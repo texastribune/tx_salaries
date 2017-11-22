@@ -28,8 +28,8 @@ class TransformedRecord(
 
     DATE_PROVIDED = date(2017, 11, 21)
 
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/ut_permian_basin'
-           '/salaries/2016-02/ut_permbasin.xls')
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
+           'ut_permian_basin/salaries/2017-11/UTPB_Tribune_Request_11-15-2017.xlsx')
 
     @property
     def is_valid(self):
