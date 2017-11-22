@@ -99,4 +99,17 @@ class TransformedRecord(
             race = 'Unknown'
         return {'name': race}
 
+
+    @property
+    def department(self):
+        dept = self.get_mapped_value('department')
+
+        return dept
+
+    @property
+    def job_title(self):
+        job = self.get_mapped_value('job_title')
+
+        return job
+
 transform = base.transform_factory(TransformedRecord)
