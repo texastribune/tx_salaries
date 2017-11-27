@@ -4,6 +4,7 @@ from . import mixins
 import string
 
 from datetime import date
+from decimal import Decimal
 
 class TransformedRecord(
     mixins.GenericCompensationMixin,
@@ -59,6 +60,19 @@ class TransformedRecord(
         }
 
         return r
+
+    @property
+    def compensation(self):
+        comp = self.get_mapped_value('compensation')
+
+        if comp == '':
+            comp = '0'
+
+        print(comp)
+        print( Decimal(comp) )
+        print('---')
+
+        return  Decimal(comp)
 
     @property
     def compensation_type(self):
