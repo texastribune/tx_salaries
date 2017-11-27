@@ -17,15 +17,14 @@ class TransformedRecord(
         'department': 'Dept',
         'job_title': 'Job Title',
         'hire_date': 'Last Hire Date',
-        'compensation': 'Comp Rate',
-        'gender': 'Gender',
+        'gender': 'Sex',
         'race': 'Ethnicity',
+        'compensation': 'Comp Rate',
         'employee_type': 'Overall Status (All Positions)',
-        'hourly_salary': 'Hourly/Salary'
+        'compensation_type': 'Hourly/Salary'
     }
 
     # The order of the name fields to build a full name.
-    # If `full_name` is in MAP, you don't need this at all.
     NAME_FIELDS = ('full_name', )
 
     # The name of the organization this WILL SHOW UP ON THE SITE,
@@ -55,7 +54,6 @@ class TransformedRecord(
         r = {
             'family_name': name.last,
             'given_name': name.first,
-            'additional_name': name.middle,
             'name': unicode(name),
             'gender': self.gender.strip()
         }
@@ -85,5 +83,17 @@ class TransformedRecord(
             return 'Full time hourly wage'
         elif comp_type == 'Hourly' and emp_type == 'Part Time':
             return 'Part time hourly wage'
+
+    @property
+    def department(self):
+        dept = self.get_mapped_value('department')
+
+        return dept
+
+    @property
+    def job_title(self):
+        job = self.get_mapped_value('job_title')
+
+        return job
 
 transform = base.transform_factory(TransformedRecord)
