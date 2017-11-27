@@ -7,8 +7,8 @@ from datetime import date
 
 class TransformedRecord(
     mixins.GenericCompensationMixin,
-    mixins.GenericIdentifierMixin,
-    mixins.GenericPersonMixin,
+    mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
+    mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
     mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
     mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
@@ -16,12 +16,17 @@ class TransformedRecord(
         'full_name': 'Name',
         'department': 'Dept',
         'job_title': 'Job Title',
-        'hire_date': 'Hire Date',
-        'compensation': 'Gross Annual Salary',
+        'hire_date': 'Last Hire Date',
+        'compensation': 'Comp Rate',
         'gender': 'Gender',
-        'race': 'Race',
-        'compensation_type': 'Full/Part'
+        'race': 'Ethnicity',
+        'employee_type': 'Overall Status (All Positions)',
+        'hourly_salary': 'Hourly/Salary'
     }
+
+    # The order of the name fields to build a full name.
+    # If `full_name` is in MAP, you don't need this at all.
+    NAME_FIELDS = ('full_name', )
 
     # The name of the organization this WILL SHOW UP ON THE SITE,
     #  so double check it!
@@ -31,29 +36,17 @@ class TransformedRecord(
     # site, double check against salaries.texastribune.org
     ORGANIZATION_CLASSIFICATION = 'University Hospital'
 
-    # The order of the name fields to build a full name.
-    # If `full_name` is in MAP, you don't need this at all.
-    NAME_FIELDS = ('full_name', )
-
-    # How do they track gender? We need to map what they use to `F` and `M`.
-    gender_map = {'Female': 'F', 'Male': 'M'}
-
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2017, 7, 3)
+    DATE_PROVIDED = date(2017, 11, 27)
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
-    'ut_health_san_antonio/salaries/2017-11/Texas_Tribune_Data_6-30-17.xlsx')
+    'ut_health_san_antonio/salaries/2017-11/325_-_Essig_TPIA_-_resp_docs.xls')
 
     @property
     def is_valid(self):
-        comp_type = self.get_mapped_value('compensation_type')
-
-        # check for name length is because CSVKit keeps going on an empty row for some reason
-        return comp_type != 'Non-regular' and len(self.full_name) != 0
-
         # Adjust to return False on invalid fields.  For example:
-        # return self.full_name.strip() != ''
+        return self.full_name.strip() != ''
 
     @property
     def person(self):
@@ -64,28 +57,16 @@ class TransformedRecord(
             'given_name': name.first,
             'additional_name': name.middle,
             'name': unicode(name),
-            'gender': self.gender_map[self.gender.strip()]
+            'gender': self.gender.strip()
         }
 
         return r
 
     @property
-    def compensation(self):
-        comp = self.get_mapped_value('compensation')
-
-        if comp == 'Varies':
-            return 0
-        else:
-            return comp
-
-    @property
     def compensation_type(self):
-        comp = self.get_mapped_value('compensation')
-        comp_type = self.get_mapped_value('compensation_type')
+        emp_type = self.employee_type
 
-        if comp == 'Varies':
-            return ''
-        elif comp_type == 'Full Time' or comp_type == 'DUAL':
+        if emp_type == 'Full Time':
             return 'FT'
         else:
             return 'PT'
@@ -93,16 +74,16 @@ class TransformedRecord(
 
     @property
     def description(self):
-        comp = self.get_mapped_value('compensation')
         comp_type = self.get_mapped_value('compensation_type')
+        emp_type = self.employee_type
 
-        if comp == 'Varies':
-            return "Pay varies"
-        elif comp_type == 'DUAL':
-            return 'Annual gross salary (DUAL employment)'
-        elif comp_type == 'Part Time':
-            return 'Annual gross salary (Part time)'
-        else:
-            return 'Annual gross salary'
+        if comp_type == 'Salary' and emp_type == 'Full Time':
+            return 'Annual salary'
+        elif comp_type == 'Salary' and emp_type == 'Part Time':
+            return 'Part time annual salary'
+        elif comp_type == 'Hourly' and emp_type == 'Full Time':
+            return 'Full time hourly wage'
+        elif comp_type == 'Hourly' and emp_type == 'Part Time':
+            return 'Part time hourly wage'
 
 transform = base.transform_factory(TransformedRecord)
