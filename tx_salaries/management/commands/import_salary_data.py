@@ -1,7 +1,7 @@
 import sys
 
 from django.core.management.base import BaseCommand
-from optparse import make_option
+# from argparse import add_argument
 from os.path import basename
 
 from ...utils import to_db, transformer
@@ -18,33 +18,60 @@ def out(s):
 # TODO: Display help if unable to transform a file
 # TODO: Switch to logging rather than direct output
 class Command(BaseCommand):
-    option_list = BaseCommand.option_list + (
-        make_option('--fetch', action='store', dest='fetch', default=None,
-                    help='Fetch the s3 url of given transformer'),
-        make_option('--sheet', action='store', dest='sheet', default=None,
-                    help='Sheet name'),
-        make_option('--row', action='store', dest='label_row', default=1,
-                    help='Location of the row of labels, defaults to 1'),
-        make_option('--v', action='store', dest='verbosity', default=0,
-                    help='1=Every record; 2=100 records; 3=500 records'),
-        make_option('--skip-infer-types', action='store_false', default=True),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('filename')
 
-    def download_file(self, url, filename):
+        parser.add_argument('--fetch',
+                            action='store',
+                            dest='fetch',
+                            default=None,
+                            help='Fetch the s3 url of given transformer')
+        parser.add_argument('--sheet',
+                            action='store',
+                            dest='sheet',
+                            default=None,
+                            help='Sheet name')
+        parser.add_argument('--row',
+                            action='store',
+                            dest='label_row',
+                            default=1,
+                            help='Location of the row of labels, defaults to 1')
+        parser.add_argument('--v',
+                            action='store',
+                            dest='verbosity',
+                            default=0,
+                            help='1=Every record; 2=100 records; 3=500 records')
+        parser.add_argument('--skip-infer-types',
+                            action='store_false',
+                            default=True)
+
+    # option_list = BaseCommand.option_list + (
+    #     make_option('--fetch', action='store', dest='fetch', default=None,
+    #                 help='Fetch the s3 url of given transformer'),
+    #     make_option('--sheet', action='store', dest='sheet', default=None,
+    #                 help='Sheet name'),
+    #     make_option('--row', action='store', dest='label_row', default=1,
+    #                 help='Location of the row of labels, defaults to 1'),
+    #     make_option('--v', action='store', dest='verbosity', default=0,
+    #                 help='1=Every record; 2=100 records; 3=500 records'),
+    #     make_option('--skip-infer-types', action='store_false', default=True),
+    # )
+
+    def download_file(self, url, **options):
         req = requests.get(url, stream=True)
-
+        filename = options['filename']
         with open(filename, 'wb') as fo:
             for chunk in req.iter_content(1024):
                 if chunk:
                     fo.write(chunk)
                     fo.flush()
 
-    def fetch_file(self, **kwargs):
+    def fetch_file(self, **options):
         import importlib
         from os import system
 
         # Convert file path to module path
-        transformer_path = 'tx_salaries.utils.transformers.' + kwargs['fetch']
+        transformer_path = 'tx_salaries.utils.transformers.' + options['fetch']
         transformer_file = importlib.import_module(transformer_path)
 
         # Fetch url string from transformer file
@@ -54,24 +81,43 @@ class Command(BaseCommand):
         # Download file
         self.download_file(url, filename)
 
-        self.import_file(filename, **kwargs)
+        self.import_file(**options)
         # Remove downloaded file
         system('rm %s' % filename)
 
-    def handle(self, *args, **kwargs):
-        if kwargs['fetch']:
-            filename = self.fetch_file(**kwargs)
+    def handle(self, *args, **options):
+        if options['fetch']:
+            file = options['fetch']
+            self.fetch_file(file, **options)
+        else:
+            files = options['filename']
+            # filename = self.import_file(file, **options)
+            for file in files:
+                self.import_file(file, **options)
 
-        for filename in args:
-            self.import_file(filename, **kwargs)
+    def import_file(self, *args, **options):
+        if options['sheet']:
+            sheet = options['sheet']
+        else:
+            sheet = None
 
-    def import_file(self, filename, **kwargs):
+        if options['label_row']:
+            label_row = options['label_row']
+        else:
+            label_row = 1
+
+        if options['skip_infer_types']:
+            skip_infer_types = options['skip_infer_types']
+        else:
+            skip_infer_types = True
+
+        filename = options['filename']
+
         records, warnings = transformer.transform(
-            filename, kwargs['sheet'],
-            kwargs['label_row'],
-            infer_types=kwargs['skip_infer_types'])
+            filename, sheet, label_row,
+            infer_types=skip_infer_types)
 
-        verbosity = int(kwargs['verbosity'])
+        verbosity = int(options['verbosity'])
 
         all_orgs = set([i['tx_people.Organization']['name'] for i in records])
 
