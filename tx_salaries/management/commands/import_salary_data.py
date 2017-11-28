@@ -1,7 +1,7 @@
 import sys
 
 from django.core.management.base import BaseCommand
-# from argparse import add_argument
+
 from os.path import basename
 
 from ...utils import to_db, transformer
@@ -44,18 +44,6 @@ class Command(BaseCommand):
         parser.add_argument('--skip-infer-types',
                             action='store_false',
                             default=True)
-
-    # option_list = BaseCommand.option_list + (
-    #     make_option('--fetch', action='store', dest='fetch', default=None,
-    #                 help='Fetch the s3 url of given transformer'),
-    #     make_option('--sheet', action='store', dest='sheet', default=None,
-    #                 help='Sheet name'),
-    #     make_option('--row', action='store', dest='label_row', default=1,
-    #                 help='Location of the row of labels, defaults to 1'),
-    #     make_option('--v', action='store', dest='verbosity', default=0,
-    #                 help='1=Every record; 2=100 records; 3=500 records'),
-    #     make_option('--skip-infer-types', action='store_false', default=True),
-    # )
 
     def download_file(self, url, **options):
         req = requests.get(url, stream=True)

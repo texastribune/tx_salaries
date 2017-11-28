@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand
-# from optparse import make_option
-# from django.core.management.basae import argparse
+
 from ...utils import transformer
 
 
@@ -18,13 +17,6 @@ class Command(BaseCommand):
                             dest='label_row',
                             default=1,
                             help='Location of the row of labels, defaults to 1')
-
-    # option_list = BaseCommand.option_list + (
-    #     make_option('--sheet', action='store', dest='sheet', default=None,
-    #                 help='Sheet name'),
-    #     make_option('--row', action='store', dest='label_row', default=1,
-    #                 help='Location of the row of labels, defaults to 1'),
-    # )
 
     def handle(self, *args, **options):
         if options['sheet']:
