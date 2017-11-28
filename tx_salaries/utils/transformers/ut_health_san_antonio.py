@@ -4,7 +4,6 @@ from . import mixins
 import string
 
 from datetime import date
-from decimal import Decimal
 
 class TransformedRecord(
     mixins.GenericCompensationMixin,
@@ -68,11 +67,7 @@ class TransformedRecord(
         if comp == '':
             comp = '0'
 
-        print(comp)
-        print( Decimal(comp) )
-        print('---')
-
-        return  Decimal(comp)
+        return comp
 
     @property
     def compensation_type(self):
@@ -109,5 +104,19 @@ class TransformedRecord(
         job = self.get_mapped_value('job_title')
 
         return job
+
+    def get_raw_name(self):
+        split_name = self.full_name.split(',')
+        last_name = split_name[0]
+        split_firstname = split_name[1].split(' ')
+        first_name = split_firstname[0]
+
+        if len(split_firstname) == 2 and len(split_firstname[1]) == 1:
+            middle_name = split_firstname[1]
+        else:
+            first_name = split_name[1]
+            middle_name = ''
+
+        return u' '.join([first_name, middle_name, last_name])
 
 transform = base.transform_factory(TransformedRecord)
