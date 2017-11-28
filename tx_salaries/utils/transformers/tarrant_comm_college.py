@@ -11,16 +11,16 @@ class TransformedRecord(
     mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        'last_name': 'Last Name',
-        'first_name': 'First Name',
+        'last_name': 'Last',
+        'first_name': 'First',
         'department': 'Department',
         'job_title': 'Title',
         'hire_date': 'Hire Date',
-        'status': 'FT/PT',
-        # 'contract': 'Months of Contract',
+        'status': 'Status',
+        'contract': 'Months of Contract',
         'gender': 'Gender',
-        'given_race': 'Race/Ethnicity',
-        'compensation': 'Salary (FT Annual ) (PT  Hourly)',
+        'given_race': 'Race',
+        'compensation': 'Salary',
     }
 
     NAME_FIELDS = ('first_name', 'last_name', )
@@ -29,7 +29,7 @@ class TransformedRecord(
 
     ORGANIZATION_CLASSIFICATION = 'Community College'
 
-    DATE_PROVIDED = date(2017, 11, 10)
+    DATE_PROVIDED = date(2015, 11, 13)
 
     URL = ('http://s3.amazonaws.com/raw.texastribune.org/tarrant_county_college/'
         'salaries/2015-11/tarrantcountycollege.xlsx')
@@ -43,19 +43,22 @@ class TransformedRecord(
     def compensation_type(self):
         emptype = self.get_mapped_value('status')
 
-        if emptype == 'FT':
+        if emptype == 'Full Time' or emptype == 'Temporary Full Time':
             return 'FT'
         else:
             return 'PT'
 
     @property
     def description(self):
-        status = self.get_mapped_value('status')
+        status = self.status
+        contract = float(self.contract)
 
-        if status == 'PT':
+        if status == 'Part Time':
             return 'Hourly rate'
-        elif status == 'FT':
-            return 'Annual salary'
+        elif status == '60% Full Time':
+            return 'Part time salary'
+        else:
+            return '{0:g}'.format(contract) + '-month salary'
 
     @property
     def person(self):
@@ -68,5 +71,12 @@ class TransformedRecord(
         }
 
         return r
+
+    @property
+    def race(self):
+        race = self.given_race.strip()
+        if race == '':
+            race = 'Not given'
+        return {'name': race}
 
 transform = base.transform_factory(TransformedRecord)
