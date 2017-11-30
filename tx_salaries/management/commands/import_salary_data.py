@@ -1,6 +1,6 @@
 import sys
 
-from django.core.management.base import BaseCommand
+from django.core.management import BaseCommand, CommandError
 
 from os.path import basename
 
@@ -19,35 +19,40 @@ def out(s):
 # TODO: Switch to logging rather than direct output
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument('filename')
+        parser.add_argument(
+            'filename',
+            nargs='*',
+        )
+        parser.add_argument(
+            '-f', '--fetch',
+            action='store',
+            dest='fetch',
+            default=None,
+            help='Fetch the S3 URL of given transformer',
+        )
+        parser.add_argument(
+            '-s', '--sheet',
+            action='store',
+            dest='sheet',
+            default=None,
+            help='Sheet name',
+        )
+        parser.add_argument(
+            '-r', '--row',
+            action='store',
+            dest='label_row',
+            default=1,
+            help='Location of the row of labels, defaults to 1',
+        )
+        parser.add_argument(
+            '--skip-infer-types',
+            action='store_false',
+            default=True,
+        )
 
-        parser.add_argument('--fetch',
-                            action='store',
-                            dest='fetch',
-                            default=None,
-                            help='Fetch the s3 url of given transformer')
-        parser.add_argument('--sheet',
-                            action='store',
-                            dest='sheet',
-                            default=None,
-                            help='Sheet name')
-        parser.add_argument('--row',
-                            action='store',
-                            dest='label_row',
-                            default=1,
-                            help='Location of the row of labels, defaults to 1')
-        parser.add_argument('--v',
-                            action='store',
-                            dest='verbosity',
-                            default=0,
-                            help='1=Every record; 2=100 records; 3=500 records')
-        parser.add_argument('--skip-infer-types',
-                            action='store_false',
-                            default=True)
-
-    def download_file(self, url, **options):
+    def download_file(self, url, filename):
         req = requests.get(url, stream=True)
-        filename = options['filename']
+
         with open(filename, 'wb') as fo:
             for chunk in req.iter_content(1024):
                 if chunk:
@@ -69,43 +74,33 @@ class Command(BaseCommand):
         # Download file
         self.download_file(url, filename)
 
-        self.import_file(**options)
+        self.import_file(filename, **options)
         # Remove downloaded file
         system('rm %s' % filename)
 
     def handle(self, *args, **options):
         if options['fetch']:
-            file = options['fetch']
-            self.fetch_file(file, **options)
+            self.fetch_file(**options)
         else:
             files = options['filename']
-            # filename = self.import_file(file, **options)
-            for file in files:
-                self.import_file(file, **options)
 
-    def import_file(self, *args, **options):
-        if options['sheet']:
-            sheet = options['sheet']
-        else:
-            sheet = None
+            if not files:
+                raise CommandError('No filename(s) provided')
 
-        if options['label_row']:
-            label_row = options['label_row']
-        else:
-            label_row = 1
+            for f in files:
+                self.import_file(f, **options)
 
-        if options['skip_infer_types']:
-            skip_infer_types = options['skip_infer_types']
-        else:
-            skip_infer_types = True
-
-        filename = options['filename']
+    def import_file(self, f, **options):
+        sheet = options['sheet']
+        label_row = options['label_row']
+        skip_infer_types = options['skip_infer_types']
 
         records, warnings = transformer.transform(
-            filename, sheet, label_row,
-            infer_types=skip_infer_types)
-
-        verbosity = int(options['verbosity'])
+            f,
+            sheet,
+            label_row,
+            infer_types=skip_infer_types,
+        )
 
         all_orgs = set([i['tx_people.Organization']['name'] for i in records])
 
@@ -114,7 +109,6 @@ class Command(BaseCommand):
             parent=None)
 
         if existing_orgs:
-
             self.stdout.write('The following organizations '
                               'already exist in the database:')
 
@@ -135,31 +129,52 @@ class Command(BaseCommand):
                 existing_orgs.delete()
                 self.stdout.write('Done! Moving on.')
 
-        self.stdout.write('Processing {} records from {}'.format(
-            len(records), basename(filename)))
+        verbosity = options['verbosity']
 
-        to_denormalize = {'organizations': set(), 'positions': set(),
-                          'date_provided': records[0]['date_provided']}
+        self.stdout.write(
+            'Processing {} records from {}'.format(
+                len(records),
+                basename(f),
+            )
+        )
+
+        to_denormalize = {
+            'organizations': set(),
+            'positions': set(),
+            'date_provided': records[0]['date_provided'],
+        }
+
         records_remaining = len(records)
 
         for record in records:
             save_for_stats = to_db.save(record)
 
             to_denormalize['organizations'].update(
-                save_for_stats['organizations'])
+                save_for_stats['organizations'],
+            )
             to_denormalize['positions'].update(
-                save_for_stats['positions'])
+                save_for_stats['positions'],
+            )
 
             records_remaining -= 1
-            if verbosity == 1:
-                out('.')
-            elif verbosity == 2 and records_remaining % 100 == 0:
-                print "%s records remaining" % records_remaining
-            elif verbosity >= 3 and records_remaining % 500 == 0:
-                print "%s records remaining" % records_remaining
 
-        if verbosity == 1:
-            out('\n')
+            if verbosity == 1 and records_remaining % 500 == 0:
+                self.stdout.write(
+                    '{0} records remaining'.format(
+                        records_remaining
+                    )
+                )
+            elif verbosity == 2 and records_remaining % 100 == 0:
+                self.stdout.write(
+                    '{0} records remaining'.format(
+                        records_remaining
+                    )
+                )
+            elif verbosity == 3:
+                self.stdout.write('.', ending='')
+                self.stdout.flush()
+
+        self.stdout.write('')
 
         to_db.denormalize(to_denormalize)
 
