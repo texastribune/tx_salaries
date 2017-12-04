@@ -30,6 +30,7 @@ class TransformedRecord(
 
     DATE_PROVIDED = date(2017, 11, 13)
 
+    # UPDATE THIS URL WITH 2017 URL WHEN CLEAN DATA COMES BACK
     URL = ('http://s3.amazonaws.com/raw.texastribune.org/tarrant_county_college/'
            'salaries/2015-11/tarrantcountycollege.xlsx')
 
