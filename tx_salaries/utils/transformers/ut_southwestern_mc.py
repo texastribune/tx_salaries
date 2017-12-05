@@ -12,6 +12,8 @@ class TransformedRecord(
     mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
     mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
+    # REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
+
     MAP = {
         'full_name': 'EMPL_NAME',
         'department': 'DEPT_NAME',
@@ -36,14 +38,14 @@ class TransformedRecord(
     ORGANIZATION_CLASSIFICATION = 'University Hospital'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2017, 5, 26)
+    DATE_PROVIDED = date(2017, 5, 27)
 
     # How do they track gender? We need to map what they use to `F` and `M`.
-    gender_map = {'Female': 'F', 'Male': 'M', 'Unknown': 'F'}
+    gender_map = {'Female': 'F', 'Male': 'M', 'Unknown': 'Unknown'}
 
     # The URL to find the raw data in our S3 bucket.
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'ut_southwestern_medical/salaries/2017-05/12295_PIR_UTSW_Employees.xlsx')
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
+        'ut_southwestern_medical/salaries/2017-05/12295_PIR_UTSW_Employees.xlsx')
 
     # This is how the loader checks for valid people. Defaults to checking to
     # see if `full_name` is empty.
@@ -79,6 +81,18 @@ class TransformedRecord(
             'name': unicode(name),
             'gender': self.gender_map[self.gender.strip()]
         }
+
+        # If we don't have a name that looks like so:
+        # Jones,Mike
+        # The name isn't parsed into first, last properly
+        # So we'll parse it out manually by splitting it by the comma
+        # And reversing order so we end up with:
+        # Mike Jones
+        if ',' in r['name']:
+            if ', ' not in r['name']:
+                name_split = r['name'].split(',')
+
+                r['name'] = name_split[1] + ' ' + name_split[0]
 
         return r
 

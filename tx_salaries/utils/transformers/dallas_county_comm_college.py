@@ -1,49 +1,48 @@
-from datetime import date
-
 from . import base
 from . import mixins
 
+from datetime import date
+
 
 class TransformedRecord(
-    mixins.GenericCompensationMixin,
-    mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
-    mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
-    mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+        mixins.GenericCompensationMixin,
+        mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
+        mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
+        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        'last_name': 'Last Name ',
-        'first_name': 'First Name ',
-        'middle_name': 'Middle Name ',
+        'last_name': 'Last Name',
+        'first_name': 'First Name',
         'department': 'Department',
-        'job_title': 'Title',
+        'job_title': 'TITLE',
         'hire_date': 'Latest Hire Date',
         'gender': 'Gender',
-        'given_race': 'Ethnicity/Race',
-        'employee_type': 'Emp Type',
+        'given_race': 'Race/Ethnicity',
+        'employee_type': 'Employee Type',
         'compensation': 'Annual Salary',
-        'rate': 'Hrly Rate',
+        'rate': 'Hourly Rate',
     }
 
-    gender_map = {u'Female': u'F', u'Male': u'M'}
+    gender_map = {'Female': 'F', 'Male': 'M'}
 
-    NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
+    NAME_FIELDS = ('first_name', 'last_name', )
 
     ORGANIZATION_NAME = 'Dallas County Community College District'
 
     ORGANIZATION_CLASSIFICATION = 'Community College'
 
-    DATE_PROVIDED = date(2016, 2, 17)
+    DATE_PROVIDED = date(2017, 11, 20)
 
-    URL = ('http://s3.amazonaws.com/raw.texastribune.org/dallas_county_'
-           'community_college_district/salaries/2016-02/dcccd.xlsx')
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
+           'dallas_county_community_college_district/salaries/2017-11/OpenRecordsRequest_TexasTribune.xlsx')
 
     # There are some adjuncts who don't have a salary or wage
     REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
 
     @property
     def is_valid(self):
-        return self.job_title.strip() != 'Pt Faculty, Non-Credit'
+        return self.job_title.strip() != 'Faculty, Adjunct, Non-Credit'
 
     @property
     def compensation(self):
@@ -99,5 +98,18 @@ class TransformedRecord(
         if race == '':
             race = 'Unknown'
         return {'name': race}
+
+
+    @property
+    def department(self):
+        dept = self.get_mapped_value('department')
+
+        return dept
+
+    @property
+    def job_title(self):
+        job = self.get_mapped_value('job_title')
+
+        return job
 
 transform = base.transform_factory(TransformedRecord)
