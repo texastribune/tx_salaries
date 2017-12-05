@@ -27,7 +27,7 @@ class TransformedRecord(
 
     NAME_FIELDS = ('first_name', 'last_name', )
 
-    ORGANIZATION_NAME = 'UT Tyler'
+    ORGANIZATION_NAME = 'University of Texas at Tyler'
 
     ORGANIZATION_CLASSIFICATION = 'University'
 
