@@ -1,7 +1,23 @@
+import re
+import string
+
 from . import base
 from . import mixins
 
 from datetime import date
+
+APOSTROPHE_LETTER_REGEX = re.compile("([a-z])'([A-Z])")
+DIGIT_LETTER_REGEX = re.compile(r'\d([A-Z])')
+
+
+def better_title(value):
+    """Convert a string into titlecase."""
+    m = ' '.join(word.strip(string.punctuation) for word in value.split())
+    t = APOSTROPHE_LETTER_REGEX.sub(
+        lambda m: m.group(0).lower(), m.title())
+    t = DIGIT_LETTER_REGEX.sub(lambda m: m.group(0).lower(), t)
+
+    return ' '.join(t.split())
 
 
 class TransformedRecord(
@@ -14,16 +30,13 @@ class TransformedRecord(
     MAP = {
         'last_name': 'Last Name',
         'first_name': 'First Name',
-        # 'middle_name': '', if needed
-        # 'full_name': '', if needed
-        # 'suffix': '', if needed
-        'department': 'Base Location Building Name',
-        'job_title': 'Current Job Class Title',
+        'department': 'Department Title',
+        'job_title': 'Contract Title',
         'hire_date': 'Hire Date',
-        'compensation': 'Annual Salary',
+        'compensation': 'Salary/Hourly or Daily Rate',
         'gender': 'Sex',
         'nationality': 'Race',
-        'employee_type': 'Part Time/Full Time',
+        'employee_type': 'Part Time',
     }
 
     # The order of the name fields to build a full name.
@@ -37,24 +50,24 @@ class TransformedRecord(
     ORGANIZATION_CLASSIFICATION = 'School District'
 
     # How would you describe the compensation field? We try to respect how they use their system.
-    description = 'Annual salary'
+    # description = 'Annual salary'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2015, 10, 21)
+    DATE_PROVIDED = date(2017, 5, 9)
 
     # The URL to find the raw data in our S3 bucket.
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-        'cypress_fairbanks_isd/salaries/2015-10/203-15.xlsx')
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
+           'cypress_fairbanks_isd/salaries/2017-05/cypress-fairbanks-isd.xlsx')
 
     # How do they track gender? We need to map what they use to `F` and `M`.
     gender_map = {'F': 'F', 'M': 'M'}
 
     race_map = {
-        'I': 'Indian',
+        'I': 'American Indian or Alaskan',
         'W': 'White',
         'H': 'Hispanic',
-        'A': 'Asian',
-        'B': 'Black',
+        'A': 'Asian or Pacific Islander',
+        'B': 'Black or African American',
         'O': 'Other',
     }
 
@@ -63,23 +76,7 @@ class TransformedRecord(
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        return self.first_name.strip() != ''
-
-    @property
-    def race(self):
-        return {
-            'name': self.race_map[self.nationality.strip()]
-        }
-
-    @property
-    def compensation_type(self):
-        employee_type = self.employee_type
-
-        if employee_type == 'F':
-            return 'FT'
-
-        if employee_type == 'P':
-            return 'PT'
+        return self.compensation.strip() != '-' and self.last_name.strip() != ''
 
     @property
     def person(self):
@@ -93,6 +90,64 @@ class TransformedRecord(
         }
 
         return r
+
+    @property
+    def description(self):
+        status = self.get_mapped_value('employee_type').strip()
+        department = self.get_mapped_value('department').strip()
+        salary = float(self.get_mapped_value('compensation'))
+        # If the employee isn't a sub, their rate is more than $100 and
+        # they're a full-time employee, their pay is their Annual salary
+        if department != 'SUBSTITUTE' and salary > 100.00 and status == 'F':
+            return 'Annual salary'
+        # If the employee isn't a sub, their salary is more than $100, and
+        # then their pay is their Part-time salary
+        elif department != 'SUBSTITUTE' and salary > 100.00:
+            return 'Part-time salary'
+        # If the employee isn't a sub and their salary is less than $100,
+        # then their pay is an hourly rate
+        elif department != 'SUBSTITUTE' and salary < 100.00:
+            return 'Hourly rate'
+        # If the employee is a sub, their salary is a daily rate
+        elif department == 'SUBSTITUTE':
+            return 'Daily rate'
+
+    @property
+    def job_title(self):
+        jobTitle = self.get_mapped_value('job_title').strip()
+        department = self.get_mapped_value('department').strip()
+        substitute = 'Substitute'
+        if department == 'SUBSTITUTE' and jobTitle == '':
+            return substitute
+        else:
+            return better_title(jobTitle)
+
+    @property
+    def race(self):
+        return {
+            'name': self.race_map[self.nationality.strip()]
+        }
+
+    @property
+    def compensation_type(self):
+        status = self.get_mapped_value('employee_type').strip()
+        department = self.get_mapped_value('department').strip()
+        salary = float(self.get_mapped_value('compensation'))
+        # If the employee isn't a sub, their rate is more than $100 and
+        # they're a full-time employee, their pay is their Annual salary
+        if department != 'SUBSTITUTE' and salary > 100.00 and status == 'F':
+            return 'FT'
+        # If the employee isn't a sub, their salary is more than $100, and
+        # then their pay is their Part-time salary
+        elif department != 'SUBSTITUTE' and salary > 100.00:
+            return 'PT'
+        # If the employee isn't a sub and their salary is less than $100,
+        # then their pay is an hourly rate
+        elif department != 'SUBSTITUTE' and salary < 100.00:
+            return 'PT'
+        # If the employee is a sub, their salary is a daily rate
+        elif department == 'SUBSTITUTE':
+            return 'PT'
 
     def calculate_tenure(self):
         hire_date_data = map(int, self.hire_date.split('-'))

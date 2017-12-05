@@ -12,13 +12,13 @@ class TransformedRecord(
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        'full_name': 'Name',
-        'department': 'Department',
+        'full_name': 'Employee Name',
+        'department': 'Dept Name',
         'job_title': 'Job Title',
-        'hire_date': 'Start Date',
-        'compensation': 'Annual Salary',
+        'hire_date': 'Last Start Dt',
+        'compensation': 'Annual Rate',
         'gender': 'Gender',
-        'nationality': 'Ethnic Grp',
+        'nationality': 'Ethnic Grp Descr',
         'employee_type': 'Full/Part',
     }
 
@@ -32,26 +32,26 @@ class TransformedRecord(
     compensation_type = 'FT'
 
     # How would you describe the compensation field? We try to respect how they use their system.
-    description = 'Annual salary'
+    # description = 'Annual salary'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2016, 5, 26)
+    DATE_PROVIDED = date(2017, 9, 20)
 
     # The URL to find the raw data in our S3 bucket.
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/ut_md_anderson'
-           '/salaries/2016-05/PIA%20-%20Texas%20Tribune%20-%202016.05.xlsx')
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
+           'ut_md_anderson/salaries/2017-09/ut_md_anderson.xlsx')
 
     # How do they track gender? We need to map what they use to `F` and `M`.
-    gender_map = {'F': 'F', 'M': 'M'}
+    gender_map = {'Female': 'F', 'Male': 'M'}
 
     race_map = {
-        'AMIND': 'American Indian',
-        'WHITE': 'White',
-        'HISPA': 'Hispanic',
-        'ASIAN': 'Asian',
-        '2+RACE': 'Mixed race',
-        'PACIF': 'Pacific Islander',
-        'BLACK': 'Black',
+        '2+RACE': 'Two or more races',
+        'American Indian/Alaska Native': 'American Indian/Alaska Native',
+        'Asian': 'Asian',
+        'Black/African American': 'Black/African American',
+        'Hispanic/Latino': 'Hispanic/Latino',
+        'Native Hawaiian/Oth Pac Island': 'Native Hawaiian/Oth Pac Island',
+        'White': 'White',
         '': 'Not given',
     }
 
@@ -71,11 +71,20 @@ class TransformedRecord(
     def compensation_type(self):
         employee_type = self.employee_type
 
-        if employee_type == 'F':
+        if employee_type == 'Full Time':
             return 'FT'
 
-        if employee_type == 'P':
+        if employee_type == 'Part Time':
             return 'PT'
+
+    @property
+    def description(self):
+        status = self.get_mapped_value('employee_type')
+        if status == 'Full Time':
+            return "Annual salary"
+
+        if status == 'Part Time':
+            return "Annual part-time salary"
 
     @property
     def person(self):

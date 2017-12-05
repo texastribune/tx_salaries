@@ -13,14 +13,14 @@ class TransformedRecord(
     mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        'full_name': 'Name',
-        'department_name': 'Organization',
-        'job_title': 'Title',
+        'full_name': 'FULL_NAME',
+        'department_name': 'ORGANIZATION',
+        'job_title': 'TITLE',
         'hire_date': 'Hire Date',
         'compensation': 'Salary',
         'gender': 'Gender',
-        'race': 'Ethnicity',
-        'status': 'Full-time/Part-time'
+        'race': 'ETHNICITY',
+        'status': 'Full time/Part time'
     }
 
     # The order of the name fields to build a full name.
@@ -36,14 +36,14 @@ class TransformedRecord(
     ORGANIZATION_CLASSIFICATION = 'School District'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2017, 5, 30)
+    DATE_PROVIDED = date(2017, 6, 22)
 
     # How do they track gender? We need to map what they use to `F` and `M`.
     gender_map = {'FEMALE': 'F', 'MALE': 'M'}
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'dallas_isd/salaries/2017-05/orr16243.xlsx')
+           'dallas_isd/salaries/2017-05/orr16243-rev2.xlsx')
 
     # This is how the loader checks for valid people. Defaults to checking to
     # see if `last_name` is empty.
@@ -89,12 +89,7 @@ class TransformedRecord(
 
     @property
     def description(self):
-        comp = float( self.get_mapped_value('compensation') )
-
-        if comp > 36.08:
-            return 'Annual salary'
-        else:
-            return 'Hourly wage'
+        return 'Salary'
 
 
     @property
@@ -105,7 +100,7 @@ class TransformedRecord(
         split_two = title.split('IV')
         split_three = title.split(' V')
 
-        if len(split) == 1 and len(split_two) and len(split_three):
+        if len(split) == 1 and len(split_two) == 1 and len(split_three) == 1:
             return title.title()
         elif len(split) > 1:
             return split[0].title() + ' II' + split[1]
@@ -118,8 +113,24 @@ class TransformedRecord(
     def department(self):
         # don't title case roman numerals
         dept = self.get_mapped_value('department_name').title()
+        split = dept.split('Eha')
+        split_two = dept.split("'S")
+        split_three = dept.split("Hs")
+        split_four = dept.split("Vi-B")
+        split_five = dept.split("It-")
 
-        return dept
+        if len(split) == 1 and len(split_two) == 1 and len(split_three) == 1 and len(split_four) == 1 and len(split_five) == 1:
+            return dept
+        elif len(split) > 1:
+            return dept.replace("Eha","EHA")
+        elif len(split_two) > 1:
+            return dept.replace("'S","'s")
+        elif len(split_three) > 1:
+            return dept.replace("Hs","HS")
+        elif len(split_four) > 1:
+            return dept.replace("Vi-B","VI-B")
+        elif len(split_five) > 1:
+            return dept.replace("It-","IT-")
 
     # def get_raw_name(self):
     #     split_name = self.full_name.split(', ')
