@@ -119,7 +119,7 @@ TRANSFORMERS = {
     'bf2d8d6cad54567327b44050c507096885f925b7': [ut_pan_american.transform, ],
     'dc125c8ca1bdfbe9888abefcb2806064d5b6b55d': [ut_permian_basin.transform, ],
     '00e36d75c87e700584d1ab70fe1f8c9b39f58bbb': [ut_san_antonio.transform, ],
-    'de0167927d7162fb025b72c76a1fc157f081c00b': [ut_tyler.transform, ],
+    '86f7d5e59772f88ebe483a5383fb07617f9dc4f3': [ut_tyler.transform, ],
     'ec2e93286df0335f4100f6550278ce8d128397dd': [ut_system.transform, ],
     '5714aa39bed15a7d032097c2aa0be7df68507e56': [ut_southwestern.transform, ],
     '6121ff820451267363efe09a1249154334e4afb0': [ut_southwestern_mc.transform, ],
