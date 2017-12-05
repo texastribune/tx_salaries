@@ -1,114 +1,122 @@
-from datetime import date
-
 from . import base
 from . import mixins
 
-# --row 5
+import string
 
+from datetime import date
 
-class TransformedRecord(mixins.GenericCompensationMixin,
-                        mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
-                        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-                        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
-    # They included people without compensation and have clarified they do not consider them employees
-    REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
+class TransformedRecord(
+    mixins.GenericCompensationMixin,
+    mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
+    mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
+    mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+    mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
         'full_name': 'Name',
-        'job_title': 'Job Title',
         'department': 'Dept',
-        'race': 'Race',
-        'gender': 'Gender',
-        'compensation_type': 'Employment Type',
-        'hire_date': 'Hire Date',
-        'compensation': 'Gross Annual Salary',
-        'hourly_comp': 'Hourly Compensation Rate',
+        'job_title': 'Job Title',
+        'hire_date': 'Last Hire Date',
+        'gender': 'Sex',
+        'race': 'Ethnicity',
+        'compensation': 'Comp Rate',
+        'employee_type': 'Overall Status (All Positions)',
+        'compensation_type': 'Hourly/Salary'
     }
 
-    RACE_MAP = {
-        'white': 'White',
-        'black': 'Black',
-        'hispa': 'Hispanic',
-        'asian': 'Asian',
-        'nspec': 'Not given',
-        'pacif': 'Pacific Islander',
-        'amind': 'American Indian',
-        '': 'Not given'
-    }
+    # The order of the name fields to build a full name.
+    NAME_FIELDS = ('full_name', )
 
-    gender_map = {'Female': 'F', 'Male': 'M', 'Unknown': 'Not given'}
+    # The name of the organization this WILL SHOW UP ON THE SITE,
+    #  so double check it!
+    ORGANIZATION_NAME = 'The University of Texas Health Science Center at San Antonio'
+
+    # What type of organization is this? This MUST match what we use on the
+    # site, double check against salaries.texastribune.org
+    ORGANIZATION_CLASSIFICATION = 'University Hospital'
+
+    # When did you receive the data? NOT when we added it to the site.
+    DATE_PROVIDED = date(2017, 11, 27)
+
+    # The URL to find the raw data in our S3 bucket.
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
+    'ut_health_san_antonio/salaries/2017-11/325_-_Essig_TPIA_-_resp_docs.xls')
+
+    @property
+    def is_valid(self):
+        # Adjust to return False on invalid fields.  For example:
+        return self.full_name.strip() != ''
 
     @property
     def person(self):
         name = self.get_name()
+
         r = {
             'family_name': name.last,
             'given_name': name.first,
-            'additional_name': name.middle,
             'name': unicode(name),
-            'gender': self.gender_map[self.gender.strip()]
+            'gender': self.gender.strip()
         }
 
         return r
 
     @property
-    def race(self):
-        return {'name': self.RACE_MAP[self.get_mapped_value('race').strip().lower()]}
+    def compensation(self):
+        comp = self.get_mapped_value('compensation')
+
+        if comp == '':
+            comp = '0'
+
+        return comp
 
     @property
-    def compensation(self):
-        if self.get_mapped_value('compensation') == 'Varies':
-            return self.hourly_comp
+    def compensation_type(self):
+        emp_type = self.employee_type
+
+        if emp_type == 'Full Time':
+            return 'FT'
         else:
-            return self.get_mapped_value('compensation')
+            return 'PT'
+        return ''
+
+    @property
+    def description(self):
+        comp_type = self.get_mapped_value('compensation_type')
+        emp_type = self.employee_type
+
+        if comp_type == 'Salary' and emp_type == 'Full Time':
+            return 'Annual salary'
+        elif comp_type == 'Salary' and emp_type == 'Part Time':
+            return 'Part time annual salary'
+        elif comp_type == 'Hourly' and emp_type == 'Full Time':
+            return 'Full time hourly wage'
+        elif comp_type == 'Hourly' and emp_type == 'Part Time':
+            return 'Part time hourly wage'
+
+    @property
+    def department(self):
+        dept = self.get_mapped_value('department')
+
+        return dept
+
+    @property
+    def job_title(self):
+        job = self.get_mapped_value('job_title')
+
+        return job
 
     def get_raw_name(self):
         split_name = self.full_name.split(',')
         last_name = split_name[0]
         split_firstname = split_name[1].split(' ')
         first_name = split_firstname[0]
-        if len(split_firstname) > 1 and len(split_firstname[1].strip()) > 0:
+
+        if len(split_firstname) == 2 and len(split_firstname[1]) == 1:
             middle_name = split_firstname[1]
         else:
+            first_name = split_name[1]
             middle_name = ''
 
         return u' '.join([first_name, middle_name, last_name])
-
-
-
-    ORGANIZATION_NAME = 'The University of Texas Health Science Center at San Antonio'
-
-    # TODO current app uses University Hospital
-    ORGANIZATION_CLASSIFICATION = 'University Hospital'
-
-    # TODO not given on spreadsheet, but they appear to give part time
-
-    @property
-    def compensation_type(self):
-        if self.get_mapped_value('compensation_type') == 'Full-Time':
-            return 'FT'
-        elif self.get_mapped_value('compensation_type') == 'Part-Time':
-            return 'PT'
-        else:
-            return ''
-
-    @property
-    def description(self):
-        if (self.get_mapped_value('compensation_type') == 'Full-Time'
-            or self.get_mapped_value('compensation_type') == 'Part-Time'
-            or self.get_mapped_value('compensation_type') == 'DUAL'):
-            return 'Annual Compensation'
-        elif self.get_mapped_value('compensation_type') == 'Hourly':
-            return 'Hourly Pay'
-
-    DATE_PROVIDED = date(2015, 10, 8)
-
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_health_san_antonio/salaries/2015-10/uthsca-2015-10-8.xlsx'
-
-    @property
-    def is_valid(self):
-        # check for name length is because CSVKit keeps going on an empty row for some reason
-        return self.get_mapped_value('compensation_type') != 'Non-regular' and len(self.full_name) !=0
-
 
 transform = base.transform_factory(TransformedRecord)
