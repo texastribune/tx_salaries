@@ -29,26 +29,14 @@ class TransformedRecord(
     gender_map = {
         'FEMALE':'F',
         'MALE':'M',
-<<<<<<< HEAD
-        '': u'Unknown'
-    }
-
-    NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
-=======
         '': 'Unknown'
     }
->>>>>>> master
 
     ORGANIZATION_NAME = 'University of Texas at Austin'
     ORGANIZATION_CLASSIFICATION = 'University'
     NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
 
-<<<<<<< HEAD
-    DATE_PROVIDED = date(2017, 7, 5)
-=======
     DATE_PROVIDED = date(2017, 7, 6)
->>>>>>> master
-
 
     URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
         'ut_austin/salaries/2017-07/OPENRECORDS.ESSIG.20160705.xlsx')
