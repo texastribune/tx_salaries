@@ -113,7 +113,7 @@ TRANSFORMERS = {
     '7a3671ec33d3ca63ee3aa9b532e42c36f616e56c': [ut_el_paso.transform, ],
     '4df8b9322ef4273b4613d57449b314a0d05c8713': [ut_health_houston.transform, ],
     '016ea020af8d794acb552fc1f7494a9649fb3c92': [ut_health_northeast.transform, ],
-    '2af31c303e013d25eeb1d1e68281aae30e090f8f': [ut_health_san_antonio.transform, ],
+    '128e3b2ced272388068fa4066305968e1068cf3f': [ut_health_san_antonio.transform, ],
     '4a6620f449d5653a0a5372f9ab5f9d85befa2ec8': [ut_md_anderson.transform, ],
     '7d89fdb0178d051e02bc77bf74f1542e59e0ce25': [ut_medical_branch.transform, ],
     'bf2d8d6cad54567327b44050c507096885f925b7': [ut_pan_american.transform, ],
