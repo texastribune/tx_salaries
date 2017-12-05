@@ -44,8 +44,8 @@ class TransformedRecord(
         'No Record': 'Not Specified'
     }
 
-    URL = ('http://s3.amazonaws.com/raw.texastribune.org/tarrant_county_college/'
-           'salaries/2015-11/tarrantcountycollege.xlsx')
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/ut_tyler/'
+           'salaries/2017-11/ut_tyler.xls')
 
     @property
     def is_valid(self):
