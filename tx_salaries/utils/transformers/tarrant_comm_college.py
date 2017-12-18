@@ -37,7 +37,7 @@ class TransformedRecord(
 
     @property
     def is_valid(self):
-        return self.hire_date.strip() != 'NULL'
+        return self.last_name.strip() != ''
 
     @property
     def compensation_type(self):
