@@ -31,8 +31,9 @@ class TransformedRecord(
     DATE_PROVIDED = date(2017, 11, 13)
 
     # UPDATE THIS URL WITH 2017 URL WHEN CLEAN DATA COMES BACK
-    URL = ('http://s3.amazonaws.com/raw.texastribune.org/tarrant_county_college/'
-           'salaries/2015-11/tarrantcountycollege.xlsx')
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
+           'tarrant_county_college/salaries/2017-12/'
+           'tarrant-county-college.xlsx')
 
     @property
     def is_valid(self):
