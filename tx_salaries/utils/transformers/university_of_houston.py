@@ -1,6 +1,8 @@
 from . import base
 from . import mixins
 
+import string
+
 from datetime import date
 
 
@@ -11,70 +13,66 @@ class TransformedRecord(
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
-    REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
+    # REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
 
     MAP = {
-        'last_name': 'Last',
-        'first_name': 'First Name',
-        'department': 'Dept',
-        'job_title': 'Job Title',
-        'hire_date': 'Start Date',
+        'full_name': 'Name',
+        'department': 'Department Desc',
+        'job_title': 'Job Tile',
+        'hire_date': 'Orig Hire Date',
         'compensation': 'Annual Rt',
         'employee_type': 'Full/Part',
-        'gender': 'Sex',
-        'nationality': 'Ethnic Grp',
-        'campus': 'Unit',
+        'gender': 'Gender',
+        'nationality': 'Ethnicity',
     }
 
-    NAME_FIELDS = ('first_name', 'last_name', )
+    NAME_FIELDS = ('full_name', )
 
     # The name of the organization this WILL SHOW UP ON THE SITE,
     # so double check it!
-    # ORGANIZATION_NAME = 'University of Houston'
+    ORGANIZATION_NAME = 'University of Houston'
 
     # What type of organization is this?
     # This MUST match what we use on the site,
     # double check against salaries.texastribune.org
     ORGANIZATION_CLASSIFICATION = 'University'
 
-    compensation_type = 'FT'
+    # How do they track gender? We need to map what they use to `F` and `M`.
+    # gender_map = {'F': 'F', 'M': 'M'}
 
-    description = 'Annual salary'
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
+           'university_houston/salaries/2018-01/univerity-of-houston.xls')
 
-    campus_map = {
-        'UH': 'University of Houston',
-        'UH Clear Lake': 'University of Houston-Clear Lake',
-        'UH Victoria': 'University of Houston-Victoria',
-        'UH System': 'University of Houston System',
-        'UH Downtown': 'University of Houston-Downtown',
+    race_map = {
+        'AMIND': 'American Indian',
+        'ASIAN': 'Asian',
+        'BLACK': 'Black',
+        'HISPA': 'Hispanic',
+        'NSPEC': 'Not Specified',
+        'WHITE': 'White',
+        'PACIF': 'Pacific Islander',
     }
 
-    # How do they track gender? We need to map what they use to `F` and `M`.
-    gender_map = {'F': 'F', 'M': 'M'}
-
-    DATE_PROVIDED = date(2016, 12, 1)
+    DATE_PROVIDED = date(2018, 1, 8)
     # Y/M/D agency provided the data
-    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
-           'university_houston/salaries/2016-12/uh.xls')
-
-    @property
-    def organization(self):
-        return {
-            'name': self.campus_map[self.campus.strip()],
-            'children': self.department_as_child,
-            'classification': self.ORGANIZATION_CLASSIFICATION,
-        }
 
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
-        has_first_name = True if self.first_name else False
-        has_last_name = True if self.last_name else False
-        has_hire_date = True if self.hire_date else False
-        has_salary = True if self.compensation else False
+        return self.full_name.strip() != ''
 
-        return (
-            has_first_name and has_last_name and has_hire_date and has_salary)
+    @property
+    def person(self):
+        name = self.get_name()
+        r = {
+            'family_name': name.last,
+            'given_name': name.first,
+            'additional_name': name.middle,
+            'name': unicode(name),
+            'gender': self.gender.strip()
+        }
+
+        return r
 
     @property
     def compensation_type(self):
@@ -98,10 +96,9 @@ class TransformedRecord(
 
     @property
     def race(self):
-        race = self.nationality.strip()
-
         return {
-            'name': race if race else 'Unknown'
+            'name': self.race_map[self.nationality.strip()]
         }
+
 
 transform = base.transform_factory(TransformedRecord)
