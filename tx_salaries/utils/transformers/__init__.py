@@ -76,7 +76,7 @@ TRANSFORMERS = {
     '2978e84159d1ce3bc77f66a679f385ba6cbadb73': [cypress_fairbanks_isd.transform, ],
     '95e5f3c47affecfb924230ce117cfb88599c2368': [dallas.transform, ],
     '361f2e1b29ca902008de1e291ad98ed134f4eea7': [dallas_county_comm_college.transform, ],
-    'eb61956148a1c009ab8f5275650b279531f970d6': [dallas_county.transform, ],
+    '5fb77188fdfa1b6a1d794754ffb1c9a9bf69a171': [dallas_county.transform, ],
     '75e1bfa34014b500ab194c557b686fa1ca021afc': [dallas_isd.transform, ],
     'b3ac361fd078f04d8035cef647ac839ef3f0f353': [eanes_isd.transform, ],
     'd18ad5c9635a40de15b0ead0e8f8fe97b8ccca31': [el_paso_county.transform, ],
