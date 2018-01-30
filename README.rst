@@ -36,18 +36,18 @@ Setup
     rmvirtualenv <name of virtual env>
 
 3. Make a new virtual environment::
-    
+
     mkvirtualenv <name of virtual env>
 
 4. Install the requirements::
-    
+
     pip install -r requirements/local.txt
 
 5. Install your local `tx_salaries` into this::
 
     pip install -e ../tx_salaries
 
-6. If you're using the local postgres database (which I recommend!), then you need to set that up. First set the DATABASE_URL::
+6. If you'pipre using the local postgres database (which I recommend!), then you need to set that up. First set the DATABASE_URL::
 
     export DATABASE_URL=postgres://localhost/salaries
 
@@ -69,7 +69,7 @@ In the terminal, go to the `salaries.texastribune.org`_ repo. While the transfor
 
     workon <name of virtual env>
     export DATABASE_URL=postgres://localhost/salaries
-    npm run serve
+    python salaries/manage.py runserver
 
 Check localhost:8000, should be up and running.
 
@@ -132,7 +132,7 @@ this:
     from datetime import date
 
     # add if necessary: --sheet="Request data" --row=3
-    
+
     class TransformedRecord(
         mixins.GenericCompensationMixin,
         mixins.GenericIdentifierMixin,
@@ -181,9 +181,9 @@ this:
         @property
         def person(self):
             name = self.get_name()
-        
+
             print self.gender_map[self.gender.strip()]
-        
+
             r = {
                 'family_name': name.last,
                 'given_name': name.first,
