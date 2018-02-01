@@ -1,71 +1,57 @@
-from datetime import date
-
 from . import base
 from . import mixins
 
+import string
+
+from datetime import date
+
 class TransformedRecord(
-    mixins.GenericCompensationMixin, mixins.GenericIdentifierMixin,
-    mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
+    mixins.GenericCompensationMixin,
+    mixins.GenericIdentifierMixin,
+    mixins.GenericPersonMixin,
     mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
     mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        'full_name': 'Employee Name',
+        'full_name': 'Name',
         'department': 'Department',
         'job_title': 'Job Title',
         'hire_date': 'Date of Hire',
-        'employee_type': 'Full or Part Time',
         'gender': 'Gender',
         'given_race': 'Race',
+        'status': 'Full or Part-Time',
         'compensation': 'Salary',
     }
 
-    gender_map = {u'Female': u'F', u'Male': u'M'}
+    # The order of the name fields to build a full name.
+    # If `full_name` is in MAP, you don't need this at all.
+    NAME_FIELDS = ('full_name', )
 
+    # The name of the organization this WILL SHOW UP ON THE SITE,
+    #  so double check it!
     ORGANIZATION_NAME = 'Texas Tech University Health Sciences Center'
 
+    # What type of organization is this? This MUST match what we use on the
+    # site, double check against salaries.texastribune.org
     ORGANIZATION_CLASSIFICATION = 'University'
 
-    DATE_PROVIDED = date(2016, 03, 24)
+    # When did you receive the data? NOT when we added it to the site.
+    DATE_PROVIDED = date(2018, 01, 22)
 
+    # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'texas_tech_health_science/salaries/2016-03/ttuhsc.xlsx')
+           'texas_tech_health_science/salaries/2018-01/TTUHSC_EMPLOYEE_ROSTER_1.22.2018.xlsx')
 
+    # How do they track gender? We need to map what they use to `F` and `M`.
+    gender_map = {'Female': 'F', 'Male': 'M'}
+
+
+    # This is how the loader checks for valid people. Defaults to checking to
+    # see if `last_name` is empty.
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.full_name.strip() != ''
-
-    @property
-    def compensation_type(self):
-        employee_type = self.employee_type
-
-        if employee_type == 'F':
-            return 'FT'
-
-        if employee_type == 'P':
-            return 'PT'
-
-    @property
-    def description(self):
-        employee_type = self.employee_type
-
-        if employee_type == 'F':
-            return "Salary"
-
-        if employee_type == 'P':
-            return "Part-time salary"
-
-    @property
-    def race(self):
-        listed_race = self.get_mapped_value('given_race').strip()
-
-        if 'Puerto Rican' in listed_race:
-            listed_race = 'Puerto Rican'
-
-        return {
-            'name': listed_race
-        }
 
     @property
     def person(self):
@@ -75,23 +61,58 @@ class TransformedRecord(
             'given_name': name.first,
             'additional_name': name.middle,
             'name': unicode(name),
-            'gender': self.gender_map[self.get_mapped_value('gender')],
+            'gender': self.gender_map[self.gender.strip()],
         }
 
         return r
 
-    def get_raw_name(self):
-        split_name = self.full_name.split(', ')
-        last_name = split_name[0]
-        split_firstname = split_name[1].split(' ')
-        first_name = split_firstname[0]
-        if len(split_firstname) == 2 and len(split_firstname[1]) == 1:
-            middle_name = split_firstname[1]
-        else:
-            first_name = split_name[1]
-            middle_name = ''
+    # def get_raw_name(self):
+    #     split_name = self.full_name.split(', ')
+    #     last_name = split_name[0]
+    #     split_firstname = split_name[1].split(' ')
+    #     first_name = split_firstname[0]
+    #     if len(split_firstname) == 2 and len(split_firstname[1]) == 1:
+    #         middle_name = split_firstname[1]
+    #     else:
+    #         first_name = split_name[1]
+    #         middle_name = ''
 
-        return u' '.join([first_name, middle_name, last_name])
+    #     return u' '.join([first_name, middle_name, last_name])
+
+    @property
+    def compensation(self):
+        salary = self.get_mapped_value('compensation')
+
+        return salary
+
+    @property
+    def compensation_type(self):
+        status = self.status
+
+        if status == 'F':
+            return 'FT'
+
+        if status == 'P':
+            return 'PT'
+
+    @property
+    def description(self):
+        status = self.status
+
+        if status == 'F':
+            return "Salary"
+
+        if status == 'P':
+            return "Part-time salary"
+
+    @property
+    def race(self):
+        listed_race = self.get_mapped_value('given_race').strip()
+
+        if listed_race:
+            return { 'name': listed_race }
+        else:
+            return { 'name': 'Unknown' }
 
     @property
     def organization(self):
@@ -138,6 +159,10 @@ class TransformedRecord(
             fullDept = fullDept.replace('SIM', 'Simulation Center')
         if 'OIRE' in fullDept:
             fullDept = fullDept.replace('OIRE', 'Office of Institutional Research')
+        if fullDept.endswith(' Genl'):
+            fullDept = fullDept.replace('Genl', 'General')
+        if 'Med ' in fullDept:
+            fullDept = fullDept.replace('Med', 'Medicine')
 
         #location specifications
         if ' Ama ' in fullDept or fullDept.endswith(' Ama'):
