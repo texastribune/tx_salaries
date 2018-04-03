@@ -64,9 +64,9 @@ from . import williamson_county
 TRANSFORMERS = {
     'ddd655aafc883a905a0e2b3556c0e42b34f21d04': [alamo_colleges.transform, ],
     '7c54a167e6d77023b08aa5c5566a434bb34c0357': [allen_isd.transform, ],
+    '245256cd03b1ce7f9f076c578f1f4d5be16ff4ee': [austin.transform, ],
     'ee4ad65260cc250e6a52b9728d45efa871fead0b': [austin_community_college.transform, ],
     '2a51198f9949fc5d13a90f048b3a9eb7a8c1c0de': [austin_isd.transform, ],
-    'd626664c9fb1d8c3e691777f14bb69775cb0abe9': [austin.transform, ],
     '129db1bc7003a42783d41a3b0d9cf0db77e1c76b': [beaumont_isd.transform, ],
     '215681115c43dc1e1e6f9e14d824c96e31b6144a': [bexar_county.transform, ],
     '6e4bb90321c62a34296cad61c3800b1dd308257e': [brownsville_isd.transform, ],
