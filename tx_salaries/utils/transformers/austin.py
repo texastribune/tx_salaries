@@ -41,9 +41,8 @@ class TransformedRecord(
     DATE_PROVIDED = date(2018, 3, 7)
 
     # The URL to find the raw data in our S3 bucket.
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'austin/salaries/2017-01/'
-           'cityofaustin.xlsx')
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/austin/'
+           'salaries/2018-03/austin.xls')
 
     @property
     def compensation(self):
