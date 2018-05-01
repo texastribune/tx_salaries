@@ -63,7 +63,7 @@ from . import williamson_county
 
 TRANSFORMERS = {
     'ddd655aafc883a905a0e2b3556c0e42b34f21d04': [alamo_colleges.transform, ],
-    '7c54a167e6d77023b08aa5c5566a434bb34c0357': [allen_isd.transform, ],
+    '9eec7552e7042c434b20f34aa4aa9fd87bb3228e': [allen_isd.transform, ],
     'ee4ad65260cc250e6a52b9728d45efa871fead0b': [austin_community_college.transform, ],
     '2a51198f9949fc5d13a90f048b3a9eb7a8c1c0de': [austin_isd.transform, ],
     'd626664c9fb1d8c3e691777f14bb69775cb0abe9': [austin.transform, ],
