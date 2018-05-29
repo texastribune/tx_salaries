@@ -142,6 +142,16 @@ class TransformedRecord(
         return normalize_organization_name(self.data['CLASS TITLE'])
 
     @property
+    def hire_date(self):
+        raw_hire_date = self.get_mapped_value('hire_date')
+        parsed_hire_date = map(int, raw_hire_date.split('/'))
+
+        return '-'.join([
+            str(i) for i in
+            [parsed_hire_date[2], parsed_hire_date[0], parsed_hire_date[1]]
+        ])
+
+    @property
     def post(self):
         return {'label': self.process_job_title()}
 
