@@ -19,20 +19,19 @@ class TransformedRecord(
     MAP = {
         'last_name': 'Last',
         'first_name': 'First Name',
-        'id_number': 'ID',
         'job_title': 'Job Title',
         'department': 'Department',
-        'race': 'Ethnicity',
+        'race': 'Ethnicity - Consolidated',
         'gender': 'Gender',
         'compensation_type': 'Employment Status',
         'hire_date': 'Original Hire Date',
         'compensation': 'Total Base Comp',
     }
 
-    COMPENSATION_MAP = {
-        'F': 'FT',
-        'P': 'PT'
-    }
+    # COMPENSATION_MAP = {
+    #     'FT': 'F',
+    #     'PT': 'P'
+    # }
 
     RACE_MAP = {
         'WHITE': 'White',
@@ -40,10 +39,13 @@ class TransformedRecord(
         'HISPA': 'Hispanic',
         'NSPEC': 'Not specified',
         'BLACK': 'Black',
-        'TWO OR MORE': 'Two or more races',
+        'Two or more races': 'Two or more races',
         'AMIND': 'American Indian',
         'PACIF': 'Pacific Islander',
+        'not available': 'Not specified',
     }
+
+    # gender_map = {'F': 'F', 'M': 'M'}
 
     description = 'Total compensation rate'
 
@@ -55,7 +57,7 @@ class TransformedRecord(
     # TODO current app uses University Hospital
     ORGANIZATION_CLASSIFICATION = 'University Hospital'
 
-    DATE_PROVIDED = date(2016, 10, 14)
+    DATE_PROVIDED = date(2018, 5, 9)
 
     @property
     def is_valid(self):
@@ -66,10 +68,10 @@ class TransformedRecord(
         'https://s3.amazonaws.com/raw.texastribune.org/ut_health_houston/'
         'salaries/2016-10/ut-health-science-houston-10-14-16.xlsx')
 
-    @property
-    def compensation_type(self):
-        return self.COMPENSATION_MAP[
-            self.get_mapped_value('compensation_type')]
+    # @property
+    # def compensation_type(self):
+    #     return self.COMPENSATION_MAP[
+    #         self.get_mapped_value('compensation_type')]
 
     @property
     def race(self):
@@ -85,14 +87,32 @@ class TransformedRecord(
         }
 
     @property
+    def compensation_type(self):
+        status = self.get_mapped_value('compensation_type')
+
+        if status == 'F':
+            return 'FT'
+        elif status == 'P':
+            return 'PT'
+
+    @property
     def description(self):
-        compensation_type = self.compensation_type
+        status = self.get_mapped_value('compensation_type')
 
-        if compensation_type == 'FT':
+        if status == 'F':
             return 'Base compensation rate'
-
-        if compensation_type == 'PT':
+        elif status == 'P':
             return 'Part-time base compensation rate'
+
+    # @property
+    # def description(self):
+    #     compensation_type = self.compensation_type
+
+    #     if compensation_type == 'F':
+    #         return 'Base compensation rate'
+
+    #     if compensation_type == 'P':
+    #         return 'Part-time base compensation rate'
 
 
 transform = base.transform_factory(TransformedRecord)
