@@ -1,26 +1,28 @@
 from . import base
 from . import mixins
-
+from .. import cleaver
 from datetime import date
 
+import string
 
 class TransformedRecord(
     mixins.GenericCompensationMixin,
     mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
     mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
     mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
+    mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        'last_name': 'LNAME',
-        'first_name': 'FNAME',
-        'department': 'DEPT',
-        'job_title': 'TITLE',
-        'hire_date': 'HIREDATE',
-        'compensation': 'BUDGETED_SALARY',
+        'last_name': 'PER_LAST_NAME',
+        'first_name': 'PER_FIRST_NAME',
+        'middle_name': 'PER_MIDDLE_NAME',
+        'department': 'Organization',
+        'job_title': 'ROLE_NAME',
+        'hire_date': 'EMP_HIRE_DT',
+        'compensation': 'EMP_ASGN_PAY_HIST_A_NRML_PAY',
         'hourly_rate': 'Hourly Rate',
-        'gender': 'SEX',
-        'race': 'Race',
+        'gender': 'PER_GENDER',
+        'race': 'PRIMARY_ETHNICITY_CODE',
         'employee_type': 'Status'
     }
 
@@ -30,9 +32,10 @@ class TransformedRecord(
 
     ORGANIZATION_CLASSIFICATION = 'School District'
 
-    DATE_PROVIDED = date(2016, 4, 25)
+    DATE_PROVIDED = date(2018, 5, 7)
 
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/beaumont_isd/salaries/2016-04/beaumont_isd.xlsx'
+    URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
+           'beaumont_isd/salaries/2018-06/foia.xlsx')
 
     @property
     def is_valid(self):
