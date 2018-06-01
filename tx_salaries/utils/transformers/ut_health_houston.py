@@ -66,7 +66,7 @@ class TransformedRecord(
 
     URL = (
         'https://s3.amazonaws.com/raw.texastribune.org/ut_health_houston/'
-        'salaries/2016-10/ut-health-science-houston-10-14-16.xlsx')
+        'salaries/2018-05/ut-houston-health.xlsx')
 
     # @property
     # def compensation_type(self):
