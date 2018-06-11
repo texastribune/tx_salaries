@@ -2,12 +2,13 @@ from . import base
 from . import mixins
 
 from datetime import date
+from .. import cleaver
 
 
-class TransformedRecord(
-    mixins.GenericCompensationMixin,
-    mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
-    mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+class TransformedRecord(mixins.GenericCompensationMixin,
+        mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
+        mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
+        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
@@ -27,12 +28,12 @@ class TransformedRecord(
 
     ORGANIZATION_CLASSIFICATION = 'School District'
 
-    DATE_PROVIDED = date(2016, 5, 26)
+    DATE_PROVIDED = date(2018, 5, 8)
     # Y/M/D agency provided the data
 
     # TODO
-    URL = ("http://raw.texastribune.org.s3.amazonaws.com/katy_isd/salaries"
-           "/2016-05/PIR%2015524-30-E%20%20Employee%20list.xlsx")
+    URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
+           'katy_isd/salaries/2018-05/pir.xlsx')
 
     description = 'Annual compensation'
 
