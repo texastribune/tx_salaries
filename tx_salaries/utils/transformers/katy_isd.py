@@ -71,14 +71,11 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         if employee_type == 'Part Time':
             return 'PT'
 
-    def calculate_tenure(self):
-        hire_date_data = map(int, self.hire_date.split('/'))
-        hire_date = date(hire_date_data[2], hire_date_data[0],
-                         hire_date_data[1])
-        tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
-        if tenure < 0:
-            return 0
-        return tenure
+    @property
+    def hire_date(self):
+        raw_date = self.get_mapped_value('hire_date')
+
+        return '-'.join([raw_date[-4:], raw_date[:2], raw_date[3:5]])
 
     @property
     def post(self):
