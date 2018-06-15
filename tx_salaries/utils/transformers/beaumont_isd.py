@@ -20,7 +20,7 @@ class TransformedRecord(
         'hire_date': 'EMP_HIRE_DT',
         'compensation': 'EMP_ASGN_PAY_HIST_A_NRML_PAY',
         'gender': 'PER_GENDER',
-        'race': 'PRIMARY_ETHNICITY_CODE',
+        'nationality': 'PRIMARY_ETHNICITY_CODE',
         'employee_type': 'Status'
     }
 
@@ -33,8 +33,16 @@ class TransformedRecord(
     DATE_PROVIDED = date(2018, 6, 14)
 
     # The URL to find the raw data in our S3 bucket.
-    URL = ('https://s3.amazonaws.com/raw.texastribune.org/beaumont/'
-           'salaries/beaumont/foia.xlsx')
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/beaumont_isd/'
+           'salaries/2018-06/foia.xlsx')
+
+    race_map = {
+        'AFRICAN AM': 'African American',
+        'WHITE': 'White',
+        'HISPANIC': 'Hispanic',
+        'ASIAN': 'Asian',
+        'AMER IND': 'American Indian'
+    }
 
     # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
     @property
@@ -66,16 +74,18 @@ class TransformedRecord(
 
         return "Yearly salary"
 
-    # @property
-    # def compensation(self):
-    #     salary = self.get_mapped_value('compensation')
-    #     wage = self.get_mapped_value('hourly_rate')
-    #     employee_type = self.employee_type
+    @property
+    def hire_date(self):
+        raw_date = self.get_mapped_value('hire_date')[:10]
 
-    #     if employee_type == 'Part-Time':
-    #         return wage
-    #     else:
-    #         return salary
+        return raw_date
+
+    @property
+    def race(self):
+        return {
+            'name': self.race_map[self.nationality.strip()]
+        }
+
 
     @property
     def person(self):
