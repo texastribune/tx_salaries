@@ -32,28 +32,15 @@ class TransformedRecord(
 
     DATE_PROVIDED = date(2018, 6, 22)
 
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'texas_a%26m_university_system/salaries/2016-12/'
-           'am2016.csv')
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
+           'texas_a%26m_university_system/salaries/2018-06/tamu_system.xlsx')
 
     gender_map = {'Female': 'F', 'Male': 'M', 'Declined to Specify': 'Unknown'}
-
-    # race_map = {
-    #     '1': 'White (Not Hispanic or Latino)',
-    #     '2': 'Black or African American',
-    #     '3': 'Hispanic or Latino',
-    #     '4': 'Asian',
-    #     '5': 'American Indian or Alaskan Native',
-    #     '6': 'Native Hawaiian or Other Pacific Islander',
-    #     '7': 'Two or More Races',
-    #     '8': 'Not Specified',
-    #     '': 'Not Specified',
-    # }
 
     @property
     def organization(self):
         return {
-            'name': self.organization_name,
+            'name': self.organization_name.strip(),
             'children': self.department_as_child,
             'classification': self.ORGANIZATION_CLASSIFICATION,
         }
@@ -73,17 +60,10 @@ class TransformedRecord(
 
         return 'PT'
 
-    # @property
-    # def gender(self):
-    #     sex = self.gender_map[self.get_mapped_value('gender')]
-    #     print(sex)
-    #     return sex.strip()
-
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.last_name.strip() != ''
-
 
     def calculate_tenure(self):
             hire_date_data = map(int, self.hire_date.split('-'))
@@ -93,7 +73,6 @@ class TransformedRecord(
             if tenure < 0:
                 tenure = 0
             return tenure
-
 
     @property
     def person(self):
