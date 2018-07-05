@@ -12,46 +12,35 @@ class TransformedRecord(
         mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        'last_name': 'LastName',
-        'first_name': 'FirstName',
-        'middle_name': 'MiddleInitial',
-        'department': 'ShortAdlocDesc',
-        'job_title': 'ShortTitleDesc',
-        'hire_date': 'CurrEmplDate',
-        'compensation': 'BudgetedSalary',
-        'gender': 'Sex',
-        'minority_code': 'EEOMinorityCode',
-        'organization_name': 'MbrName',
-        'rate': 'AnnualTermMonths',
-        'full_or_part_time': 'FullorPartTime',
+        'last_name': 'Worker Legal Name Last Name',
+        'first_name': 'Worker Legal Name First Name',
+        'middle_name': 'Worker Legal Name Middle Name',
+        'department': 'Adloc Desc',
+        'job_title': 'Title Description',
+        'hire_date': 'Curr Empl Date',
+        'compensation': 'Annual Budgeted Salary',
+        'gender': 'Gender',
+        'race': 'Race-Ethnicity',
+        'organization_name': 'Mbr Name',
+        'rate': 'Annual Term Mths',
+        'full_or_part_time': 'Part/Full Time',
     }
 
     NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
 
     ORGANIZATION_CLASSIFICATION = 'University'
 
-    DATE_PROVIDED = date(2016, 12, 1)
+    DATE_PROVIDED = date(2018, 6, 22)
 
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'texas_a%26m_university_system/salaries/2016-12/'
-           'am2016.csv')
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
+           'texas_a%26m_university_system/salaries/2018-06/tamu_system.xlsx')
 
-    race_map = {
-        '1': 'White (Not Hispanic or Latino)',
-        '2': 'Black or African American',
-        '3': 'Hispanic or Latino',
-        '4': 'Asian',
-        '5': 'American Indian or Alaskan Native',
-        '6': 'Native Hawaiian or Other Pacific Islander',
-        '7': 'Two or More Races',
-        '8': 'Not Specified',
-        '': 'Not Specified',
-    }
+    gender_map = {'Female': 'F', 'Male': 'M', 'Declined to Specify': 'Unknown'}
 
     @property
     def organization(self):
         return {
-            'name': self.organization_name,
+            'name': self.organization_name.strip(),
             'children': self.department_as_child,
             'classification': self.ORGANIZATION_CLASSIFICATION,
         }
@@ -76,12 +65,6 @@ class TransformedRecord(
         # Adjust to return False on invalid fields.  For example:
         return self.last_name.strip() != ''
 
-    @property
-    def race(self):
-        return {
-            'name': self.race_map[self.minority_code.strip()]
-        }
-
     def calculate_tenure(self):
             hire_date_data = map(int, self.hire_date.split('-'))
             hire_date = date(hire_date_data[0], hire_date_data[1],
@@ -90,5 +73,18 @@ class TransformedRecord(
             if tenure < 0:
                 tenure = 0
             return tenure
+
+    @property
+    def person(self):
+        name = self.get_name()
+        r = {
+            'family_name': name.last,
+            'given_name': name.first,
+            'additional_name': name.middle,
+            'name': unicode(name),
+            'gender': self.gender_map[self.gender.strip()]
+        }
+
+        return r
 
 transform = base.transform_factory(TransformedRecord)

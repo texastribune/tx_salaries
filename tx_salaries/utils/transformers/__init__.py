@@ -97,7 +97,7 @@ TRANSFORMERS = {
     '726e9866bf87f07b036ea66116653a75083c29b9': [state_of_texas.transform, ],
     '2aaf4d7f6687edfb719e84bd4a370c49425399b7': [tarrant_county.transform, ],
     'ba91bb9dc1a2e1359ff3ca96d024b66d2e01e65f': [tarrant_comm_college.transform, ],
-    'e1af1d516d482dc89008704156ed2cc4e40ea18e': [texas_am_system.transform, ],
+    'a6f58e9f74ec0afae72b954668b620d6d7baba23': [texas_am_system.transform, ],
     '04f3e0ad1d1b1e59b61e9d8c29b8ba572a2ef17c': [texas_state_university.transform, ],
     'bc023bcf9e573ecdf8335ebafb24feec596e473f': [texas_tech_system.transform, ],
     'c60489252da989ab04f6a47a86265dc047dd367b': [texas_tech_university.transform, ],
