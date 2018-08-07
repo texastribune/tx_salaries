@@ -1,25 +1,26 @@
 from . import base
 from . import mixins
-
-from datetime import date
 from .. import cleaver
+from datetime import date
 
+import string
 
-class TransformedRecord(mixins.GenericCompensationMixin,
-        mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
-        mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
-        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
+class TransformedRecord(
+    mixins.GenericCompensationMixin,
+    mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
+    mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
+    mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+    mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
         'full_name': 'Full Name',
-        'department': 'Building Code Desc',
+        'department': 'Position Building Desc',
         'job_title': 'Position Group Desc',
         'hire_date': 'Hire Date',
         'compensation': 'Position Contract Amt',
         'gender': 'Gender',
         'race': 'Race Desc',
-        'employee_type': 'Position Job Type Desc',
+        'employee_type': 'Position FTE'
     }
 
     ORGANIZATION_NAME = 'Allen ISD'
@@ -30,10 +31,10 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     description = 'Position contract amount'
 
-    DATE_PROVIDED = date(2016, 4, 6)
+    DATE_PROVIDED = date(2018, 5, 1)
 
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'allen_isd/salaries/2016-04/allen-isd.xlsx')
+           'allen_isd/salaries/2018-04/request.xlsx')
 
     gender_map = {'Female': 'F', 'Male': 'M'}
 
@@ -53,14 +54,12 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     @property
     def compensation_type(self):
-        employee_type = self.employee_type
+        employee_type = self.get_mapped_value('employee_type')
 
-        if employee_type.endswith('P'):
-            return 'PT'
-        elif employee_type == '':
+        if float(employee_type) >= 1:
             return 'FT'
-        else:
-            return 'FT'
+
+        return 'PT'
 
     @property
     def person(self):

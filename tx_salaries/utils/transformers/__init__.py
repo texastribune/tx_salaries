@@ -63,11 +63,11 @@ from . import williamson_county
 
 TRANSFORMERS = {
     'ddd655aafc883a905a0e2b3556c0e42b34f21d04': [alamo_colleges.transform, ],
-    '7c54a167e6d77023b08aa5c5566a434bb34c0357': [allen_isd.transform, ],
+    '9eec7552e7042c434b20f34aa4aa9fd87bb3228e': [allen_isd.transform, ],
     '245256cd03b1ce7f9f076c578f1f4d5be16ff4ee': [austin.transform, ],
     'ee4ad65260cc250e6a52b9728d45efa871fead0b': [austin_community_college.transform, ],
     '2a51198f9949fc5d13a90f048b3a9eb7a8c1c0de': [austin_isd.transform, ],
-    '129db1bc7003a42783d41a3b0d9cf0db77e1c76b': [beaumont_isd.transform, ],
+    '977015f0f9ef0fe0f99138b912b31b4f31c3aff1': [beaumont_isd.transform, ],
     '215681115c43dc1e1e6f9e14d824c96e31b6144a': [bexar_county.transform, ],
     '6e4bb90321c62a34296cad61c3800b1dd308257e': [brownsville_isd.transform, ],
     '2ec7de74cf3768a517adfbe035b1c6436f353649': [bryan_isd.transform, ],
@@ -97,7 +97,7 @@ TRANSFORMERS = {
     '726e9866bf87f07b036ea66116653a75083c29b9': [state_of_texas.transform, ],
     '2aaf4d7f6687edfb719e84bd4a370c49425399b7': [tarrant_county.transform, ],
     'ba91bb9dc1a2e1359ff3ca96d024b66d2e01e65f': [tarrant_comm_college.transform, ],
-    'e1af1d516d482dc89008704156ed2cc4e40ea18e': [texas_am_system.transform, ],
+    'a6f58e9f74ec0afae72b954668b620d6d7baba23': [texas_am_system.transform, ],
     '04f3e0ad1d1b1e59b61e9d8c29b8ba572a2ef17c': [texas_state_university.transform, ],
     'bc023bcf9e573ecdf8335ebafb24feec596e473f': [texas_tech_system.transform, ],
     'c60489252da989ab04f6a47a86265dc047dd367b': [texas_tech_university.transform, ],

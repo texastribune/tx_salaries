@@ -5,22 +5,22 @@ from datetime import date
 
 
 class TransformedRecord(
-    mixins.GenericCompensationMixin,
-    mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
-    mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
-    mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+        mixins.GenericCompensationMixin,
+        mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
+        mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
+        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        'last_name': 'LNAME',
-        'first_name': 'FNAME',
-        'department': 'DEPT',
-        'job_title': 'TITLE',
-        'hire_date': 'HIREDATE',
-        'compensation': 'BUDGETED_SALARY',
-        'hourly_rate': 'Hourly Rate',
-        'gender': 'SEX',
-        'race': 'Race',
+        'last_name': 'PER_LAST_NAME',
+        'first_name': 'PER_FIRST_NAME',
+        'middle_name': 'PER_MIDDLE_NAME',
+        'department': 'Organization',
+        'job_title': 'ROLE_NAME',
+        'hire_date': 'EMP_HIRE_DT',
+        'compensation': 'EMP_ASGN_PAY_HIST_A_NRML_PAY',
+        'gender': 'PER_GENDER',
+        'nationality': 'PRIMARY_ETHNICITY_CODE',
         'employee_type': 'Status'
     }
 
@@ -30,23 +30,35 @@ class TransformedRecord(
 
     ORGANIZATION_CLASSIFICATION = 'School District'
 
-    DATE_PROVIDED = date(2016, 4, 25)
+    DATE_PROVIDED = date(2018, 6, 14)
 
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/beaumont_isd/salaries/2016-04/beaumont_isd.xlsx'
+    # The URL to find the raw data in our S3 bucket.
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/beaumont_isd/'
+           'salaries/2018-06/foia.xlsx')
 
+    race_map = {
+        'AFRICAN AM': 'African American',
+        'WHITE': 'White',
+        'HISPANIC': 'Hispanic',
+        'ASIAN': 'Asian',
+        'AMER IND': 'American Indian'
+    }
+
+    # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
     @property
     def is_valid(self):
-        return self.employee_type.strip() != 'Contract'
+        # Adjust to return False on invalid fields.  For example:
+        return self.last_name.strip() != ''
 
     @property
     def compensation_type(self):
         employee_type = self.employee_type
 
-        if employee_type == 'Full Time':
-            return 'FT'
-
-        if employee_type == 'Part Time':
+        if employee_type == 'Part-Time':
             return 'PT'
+
+        if employee_type == '':
+            return 'FT'
 
         return 'FT'
 
@@ -54,24 +66,26 @@ class TransformedRecord(
     def description(self):
         employee_type = self.employee_type
 
-        if employee_type == 'Full Time':
-            return "Budgeted Salary"
+        if employee_type == '':
+            return "Yearly salary"
 
-        if employee_type == 'Part Time':
-            return "Part-time hourly rate"
+        if employee_type == 'Part-Time':
+            return "Part-time, hourly rate"
 
-        return "Budgeted Salary"
+        return "Yearly salary"
 
     @property
-    def compensation(self):
-        salary = self.get_mapped_value('compensation')
-        wage = self.get_mapped_value('hourly_rate')
-        employee_type = self.employee_type
+    def hire_date(self):
+        raw_date = self.get_mapped_value('hire_date')[:10]
 
-        if employee_type == 'Part Time':
-            return wage
-        else:
-            return salary
+        return raw_date
+
+    @property
+    def race(self):
+        return {
+            'name': self.race_map[self.nationality.strip()]
+        }
+
 
     @property
     def person(self):
@@ -79,6 +93,7 @@ class TransformedRecord(
         r = {
             'family_name': name.last,
             'given_name': name.first,
+            'additional_name': name.middle,
             'name': unicode(name),
             'gender': self.gender,
         }
