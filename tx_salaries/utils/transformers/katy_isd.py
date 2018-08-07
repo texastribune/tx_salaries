@@ -14,12 +14,13 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     MAP = {
         'last_name': 'Last Name',
         'first_name': 'First Name',
-        'department': 'Location',
+        'department': 'Dept Description',
         'job_title': 'Job Title',
         'hire_date': 'Hire Date',
         'compensation': 'Salary',
-        'employee_type': 'Part Time Full Time',
+        'employee_type': 'FT/PT',
         'gender': 'Gender',
+        'race': 'Race'
     }
 
     NAME_FIELDS = ('first_name', 'last_name', )
@@ -28,38 +29,19 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_CLASSIFICATION = 'School District'
 
-    DATE_PROVIDED = date(2018, 5, 8)
+    DATE_PROVIDED = date(2018, 6, 14)
     # Y/M/D agency provided the data
 
     # TODO
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'katy_isd/salaries/2018-05/pir.xlsx')
+           'katy_isd/salaries/2018-06/pir.xlsx')
 
-    description = 'Annual compensation'
-
-    ethnicity_choices = ['American Indian', 'Asian', 'Black', 'White',
-                         'Pacific Islander', 'Hispanic Ethnicity']
+    description = 'Annual salary'
 
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.last_name.strip() != ''
-
-    @property
-    def race(self):
-        ethnicities = []
-        for choice in self.ethnicity_choices:
-            if self.data[choice] == "Y":
-                if choice == 'Hispanic Ethnicity':
-                    ethnicities.append('Hispanic')
-                else:
-                    ethnicities.append(choice)
-        ethnicity = ", ".join(ethnicities)
-        if ethnicity == '':
-            ethnicity = 'Not given'
-        return {
-            'name': ethnicity.strip()
-        }
 
     @property
     def compensation_type(self):
@@ -76,13 +58,5 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         raw_date = self.get_mapped_value('hire_date')
 
         return '-'.join([raw_date[-4:], raw_date[:2], raw_date[3:5]])
-
-    @property
-    def post(self):
-        return {'label': self.job_title.strip()}
-
-    @property
-    def department_as_child(self):
-        return [{'name': self.department.strip(), }, ]
 
 transform = base.transform_factory(TransformedRecord)
