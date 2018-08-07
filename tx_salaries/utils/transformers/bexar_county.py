@@ -88,10 +88,6 @@ class TransformedRecord(
         middle_name = split_name[2].strip()
         last_name = split_name[0].strip()
 
-        print('---')
-        print(first_name)
-        print(middle_name)
-        print(last_name)
         return u' '.join([first_name, middle_name, last_name])
 
 transform = base.transform_factory(TransformedRecord)
