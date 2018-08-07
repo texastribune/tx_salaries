@@ -68,7 +68,7 @@ TRANSFORMERS = {
     'ee4ad65260cc250e6a52b9728d45efa871fead0b': [austin_community_college.transform, ],
     '2a51198f9949fc5d13a90f048b3a9eb7a8c1c0de': [austin_isd.transform, ],
     '977015f0f9ef0fe0f99138b912b31b4f31c3aff1': [beaumont_isd.transform, ],
-    '215681115c43dc1e1e6f9e14d824c96e31b6144a': [bexar_county.transform, ],
+    'da2a22ec28df5fa21a018fb237edee71a3549b6b': [bexar_county.transform, ],
     '6e4bb90321c62a34296cad61c3800b1dd308257e': [brownsville_isd.transform, ],
     '2ec7de74cf3768a517adfbe035b1c6436f353649': [bryan_isd.transform, ],
     'bbeaab35571afadf074586ef3d75f739a4dfe471': [college_station_isd.transform, ],
