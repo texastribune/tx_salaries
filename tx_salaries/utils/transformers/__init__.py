@@ -95,7 +95,7 @@ TRANSFORMERS = {
     '465604c88252932722ac0ed913354d54e8780b69': [san_antonio.transform, ],
     '2412f56c1cbced970ab823b9603a082778a0b3b1': [rockwall_isd.transform, ],
     '726e9866bf87f07b036ea66116653a75083c29b9': [state_of_texas.transform, ],
-    '2aaf4d7f6687edfb719e84bd4a370c49425399b7': [tarrant_county.transform, ],
+    'f6f34e7019ffbe0180962e18b80a380973509f94': [tarrant_county.transform, ],
     'ba91bb9dc1a2e1359ff3ca96d024b66d2e01e65f': [tarrant_comm_college.transform, ],
     'a6f58e9f74ec0afae72b954668b620d6d7baba23': [texas_am_system.transform, ],
     '04f3e0ad1d1b1e59b61e9d8c29b8ba572a2ef17c': [texas_state_university.transform, ],
