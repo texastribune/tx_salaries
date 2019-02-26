@@ -104,7 +104,7 @@ TRANSFORMERS = {
     '69c230c1c29f5d7c64cedd3c14ffe6d149f6bad3': [texas_tech_university_hsc.transform, ],
     '63ca4b9cd0465cb3daaad24b070689a0c065d863': [texas_womans_university.transform, ],
     'd511e81acc629e5d701826885dfb4c6a1181ef05': [travis_county.transform, ],
-    '67d1306dcef659d2e9df5b080e70a326b5dcc178': [ut_arlington.transform, ],
+    'cc53178eb3453667e07593476ce27457db5fea34': [ut_arlington.transform, ],
     '7ffb43ec6298e629cde3be3118a16d15ee11e36f': [university_of_houston.transform, ],
     '30c0ee0b76df0b8ae4007901f38af1e959acd889': [university_of_north_texas_system.transform, ],
     '635e2f22442ecacad7e7028951ed6f61a7f07671': [ut_austin.transform, ],
