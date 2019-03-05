@@ -41,7 +41,7 @@ class TransformedRecord(
     # gender_map = {'F': 'F', 'M': 'M'}
 
     URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
-           'university_houston/salaries/2018-01/univerity-of-houston.xls')
+           'university_houston/salaries/2019-03/campuses.xlsx')
 
     race_map = {
         'AMIND': 'American Indian',
@@ -53,8 +53,24 @@ class TransformedRecord(
         'PACIF': 'Pacific Islander',
     }
 
-    DATE_PROVIDED = date(2018, 1, 8)
+    campus_map = {
+        'HR730': 'University of Houston',
+        'HR759': 'University of Houston-Clear Lake',
+        'HR765': 'University of Houston-Victoria',
+        'HR783': 'University of Houston System',
+        'HR784': 'University of Houston-Downtown',
+    }
+
+    DATE_PROVIDED = date(2019, 2, 27)
     # Y/M/D agency provided the data
+
+    @property
+    def organization(self):
+        return {
+            'name': self.campus_map[self.campus.strip()],
+            'children': self.department_as_child,
+            'classification': self.ORGANIZATION_CLASSIFICATION,
+    }
 
     @property
     def is_valid(self):
