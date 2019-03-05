@@ -80,7 +80,7 @@ TRANSFORMERS = {
     '75e1bfa34014b500ab194c557b686fa1ca021afc': [dallas_isd.transform, ],
     'b3ac361fd078f04d8035cef647ac839ef3f0f353': [eanes_isd.transform, ],
     'd18ad5c9635a40de15b0ead0e8f8fe97b8ccca31': [el_paso_county.transform, ],
-    '578a8bb56581d0cae8154b26286abc93f2bf093a': [fort_worth.transform, ],
+    '041bfb1d9323fb82d08e93d724b472ffd418edb0': [fort_worth.transform, ],
     'a9c48289c0c112b10e91baca6cf42159597f2c6d': [hays_county.transform, ],
     'e5f6cf05268ab2b6198dfa297d40f87f59f5c3d7': [houston.transform, ],
     'a4f1152500a1c25df0705463266f75a9b15f6b5a': [houston_community_college.transform, ],
