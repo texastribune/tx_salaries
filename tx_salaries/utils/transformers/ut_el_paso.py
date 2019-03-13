@@ -1,47 +1,48 @@
-from datetime import date
-
 from . import base
 from . import mixins
+from unicodedata import numeric
 
-from .. import cleaver
+import string
 
+from datetime import date
 
-class TransformedRecord(mixins.GenericCompensationMixin,
-        mixins.GenericIdentifierMixin, mixins.GenericPersonMixin,
-        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
+class TransformedRecord(
+    mixins.GenericCompensationMixin,
+    mixins.GenericIdentifierMixin,
+    mixins.GenericPersonMixin,
+    mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
+    mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
+
     MAP = {
-        'full_name': 'Name',
-        'department': 'Department',
-        'job_title': 'Title',
+        'first_name': 'First Name',
+        'last_name': 'Last',
+        'department': 'Dept',
+        'job_title': 'Job Title',
         'hire_date': 'Start Date',
-        'nationality': 'Race',
-        'gender': 'Sex',
         'compensation': 'Annual Rt',
-        'status': 'Full/Part'
+        'employee_type': 'Full/Part',
+        'gender': 'Sex',
+        'nationality': 'Descr'
     }
 
-    RACE_MAP = {
-        'White': 'White',
-        'Asian': 'Asian',
-        'Hisp/Ltno': 'Hispanic/Latino',
-        'AmIndAlsk': 'American Indian/Alaska Native',
-        'Blk/AfrAm': 'Black/African American',
-        'NotSpec': 'Not Specified',
-        'HwnPacIsln': 'Native Hawaiian/Other Pacific Islander'
-    }
+    NAME_FIELDS = ('first_name', 'last_name', )
 
     ORGANIZATION_NAME = 'University of Texas at El Paso'
 
     ORGANIZATION_CLASSIFICATION = 'University'
 
-    # TODO not given on spreadsheet, 40 earn < 4000
-    # compensation_type = 'FT'
     description = 'Annual rate'
 
-    DATE_PROVIDED = date(2016, 6, 21)
+    DATE_PROVIDED = date(2018, 9, 25)
 
-    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_el_paso/salaries/2016-06/utep.xlsx'
+    URL = 'http://raw.texastribune.org.s3.amazonaws.com/ut_el_paso/salaries/2018-09/TPIA.xlsx'
+
+    REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
+
+    @property
+    def is_valid(self):
+        # Adjust to return False on invalid fields.  For example:
+        return self.last_name.strip() != ''
 
     @property
     def person(self):
@@ -58,41 +59,31 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         return r
 
     @property
-    def is_valid(self):
-        # Adjust to return False on invalid fields.  For example:
-        return self.full_name.strip() != ''
+    def race(self):
+        if self.nationality.strip() == '':
+            self.nationality = 'Not given'
+        return {
+            'name': self.nationality
+        }
 
     @property
     def compensation_type(self):
-        emptype = self.get_mapped_value('status')
+        employee_type = self.employee_type
 
-        if emptype == 'F':
+        if employee_type == 'F':
             return 'FT'
-        else:
+
+        if employee_type == 'P':
             return 'PT'
 
     @property
-    def race(self):
-        return {
-            'name': self.RACE_MAP[self.nationality.strip()]
-        }
+    def description(self):
+        employee_type = self.employee_type
 
-    # def calculate_tenure(self, hire_date):
-    #     try:
-    #         hire_date_data = map(int, hire_date.split('-'))
-    #     except:
-    #         return None
-    #     hire_date = date(hire_date_data[0], hire_date_data[1],
-    #                      hire_date_data[2])
-    #     tenure = float((self.DATE_PROVIDED - hire_date).days) / float(360)
-    #     if tenure < 0:
-    #         error_msg = ("An employee was hired after the data was provided.\n"
-    #                      "Is DATE_PROVIDED correct?")
-    #         raise ValueError(error_msg)
-    #     return tenure
+        if employee_type == 'F':
+            return "Annual salary"
 
-    def get_name(self):
-        return cleaver.EmployeeNameCleaver(
-            self.get_mapped_value('full_name')).parse()
+        if employee_type == 'P':
+            return "Part-time annual salary"
 
 transform = base.transform_factory(TransformedRecord)
