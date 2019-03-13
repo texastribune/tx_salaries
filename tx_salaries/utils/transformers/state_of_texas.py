@@ -103,10 +103,10 @@ class TransformedRecord(
 
     ORGANIZATION_CLASSIFICATION = 'State'
 
-    DATE_PROVIDED = date(2018, 4, 26)
+    DATE_PROVIDED = date(2019, 3, 8)
 
     URL = ('https://s3.amazonaws.com/raw.texastribune.org/state_of_texas/'
-           'salaries/2018-05/state_of_texas.csv')
+           'salaries/2019-03/state_of_texas.csv')
 
     @property
     def is_valid(self):
@@ -141,15 +141,16 @@ class TransformedRecord(
     def process_job_title(self):
         return normalize_organization_name(self.data['CLASS TITLE'])
 
-    @property
-    def hire_date(self):
-        raw_hire_date = self.get_mapped_value('hire_date')
-        parsed_hire_date = map(int, raw_hire_date.split('/'))
+    # Only uncomment this if the dates are coming over as MM/DD/YYYY, normally should be YYYY-MM-DD
+    # @property
+    # def hire_date(self):
+    #     raw_hire_date = self.get_mapped_value('hire_date')
+    #     parsed_hire_date = map(int, raw_hire_date.split('/'))
 
-        return '-'.join([
-            str(i) for i in
-            [parsed_hire_date[2], parsed_hire_date[0], parsed_hire_date[1]]
-        ])
+    #     return '-'.join([
+    #         str(i) for i in
+    #         [parsed_hire_date[2], parsed_hire_date[0], parsed_hire_date[1]]
+    #     ])
 
     @property
     def post(self):
