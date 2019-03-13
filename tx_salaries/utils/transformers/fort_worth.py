@@ -1,6 +1,8 @@
 from . import base
 from . import mixins
 
+import string
+
 from datetime import date
 
 
@@ -14,9 +16,6 @@ class TransformedRecord(
     MAP = {
         'last_name': 'Last',
         'first_name': 'First Name',
-        # 'middle_name': '', if needed
-        # 'full_name': '', if needed
-        # 'suffix': '', if needed
         'department': 'Department',
         'job_title': 'Job',
         'hire_date': 'Last Start',
@@ -37,6 +36,8 @@ class TransformedRecord(
         '2ORMORE': 'Two or more races'
     }
 
+    REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
+
     # The order of the name fields to build a full name.
     # If `full_name` is in MAP, you don't need this at all.
     NAME_FIELDS = ('first_name', 'last_name', )
@@ -54,11 +55,11 @@ class TransformedRecord(
     description = 'Annual salary'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2016, 11, 30)
+    DATE_PROVIDED = date(2019, 03, 04)
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'fort_worth/salaries/2016-11/fort_worth.xls')
+           'fort_worth/salaries/2019-03/salaries.xlsx')
 
     # How do they track gender? We need to map what they use to `F` and `M`.
     gender_map = {'F': 'F', 'M': 'M', 'U': 'Unknown'}
