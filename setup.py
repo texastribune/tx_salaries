@@ -27,7 +27,7 @@ for dirpath, dirnames, filenames in os.walk("tx_salaries"):
 
 setup(
     name="tx_salaries",
-    version="1.26.0",
+    version="1.27.0",
     description="Texas Tribune: tx_salaries",
     author="Tribune Tech",
     author_email="tech@texastribune.org",
@@ -37,7 +37,7 @@ setup(
     install_requires=[
         "csvkit==0.9.2",
         "name_cleaver==0.6.0",
-        "requests==2.19.1",
+        "requests==2.21.0",
         "psycopg2>=2.6.1",
         "tx_people>=2.0.0",
     ],
