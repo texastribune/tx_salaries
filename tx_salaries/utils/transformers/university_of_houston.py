@@ -1,36 +1,35 @@
 from . import base
 from . import mixins
 
-import string
-
 from datetime import date
 
 
 class TransformedRecord(
-        mixins.GenericCompensationMixin,
-        mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
-        mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
-        mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
+        mixins.GenericCompensationMixin, mixins.GenericDepartmentMixin,
+        mixins.GenericIdentifierMixin, mixins.GenericJobTitleMixin,
+        mixins.GenericPersonMixin, mixins.MembershipMixin,
+        mixins.OrganizationMixin, mixins.PostMixin, mixins.RaceMixin,
+        mixins.LinkMixin, base.BaseTransformedRecord):
 
     # REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
 
     MAP = {
         'full_name': 'Name',
         'department': 'Department Desc',
-        'job_title': 'Job Tile',
+        'job_title': 'Job Title',
         'hire_date': 'Orig Hire Date',
         'compensation': 'Annual Rt',
         'employee_type': 'Full/Part',
-        'gender': 'Gender',
-        'nationality': 'Ethnicity',
+        'gender': 'Sex',
+        'nationality': 'Ethnic Grp',
+        'campus': 'Campus'
     }
 
     NAME_FIELDS = ('full_name', )
 
     # The name of the organization this WILL SHOW UP ON THE SITE,
     # so double check it!
-    ORGANIZATION_NAME = 'University of Houston'
+    # ORGANIZATION_NAME = 'University of Houston'
 
     # What type of organization is this?
     # This MUST match what we use on the site,
@@ -41,7 +40,7 @@ class TransformedRecord(
     # gender_map = {'F': 'F', 'M': 'M'}
 
     URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
-           'university_houston/salaries/2018-01/univerity-of-houston.xls')
+           'university_houston/salaries/2019-03/campuses.xlsx')
 
     race_map = {
         'AMIND': 'American Indian',
@@ -51,15 +50,35 @@ class TransformedRecord(
         'NSPEC': 'Not Specified',
         'WHITE': 'White',
         'PACIF': 'Pacific Islander',
+        'NHISP': 'Not Hispanic',
+        '': 'Not Specified'
     }
 
-    DATE_PROVIDED = date(2018, 1, 8)
+    campus_map = {
+        'HR730': 'University of Houston',
+        'HR759': 'University of Houston-Clear Lake',
+        'HR765': 'University of Houston-Victoria',
+        'HR783': 'University of Houston System',
+        'HR784': 'University of Houston-Downtown',
+    }
+
+    DATE_PROVIDED = date(2019, 3, 2)
     # Y/M/D agency provided the data
 
     @property
     def is_valid(self):
         # Adjust to return False on invalid fields.  For example:
         return self.full_name.strip() != ''
+
+    @property
+    def organization(self):
+        r = {
+            'name': self.campus_map[self.campus.strip()],
+            'children': self.department_as_child,
+            'classification': self.ORGANIZATION_CLASSIFICATION,
+        }
+
+        return r
 
     @property
     def person(self):
@@ -73,16 +92,6 @@ class TransformedRecord(
         }
 
         return r
-
-    @property
-    def compensation_type(self):
-        employee_type = self.employee_type
-
-        if employee_type == 'F':
-            return 'FT'
-
-        if employee_type == 'P':
-            return 'PT'
 
     @property
     def description(self):
@@ -99,6 +108,28 @@ class TransformedRecord(
         return {
             'name': self.race_map[self.nationality.strip()]
         }
+
+    @property
+    def compensation_type(self):
+        employee_type = self.employee_type
+
+        if employee_type == 'F':
+            return 'FT'
+
+        if employee_type == 'P':
+            return 'PT'
+
+    @property
+    def department(self):
+        dept = self.get_mapped_value('department')
+
+        return dept
+
+    @property
+    def job_title(self):
+        job = self.get_mapped_value('job_title')
+
+        return job
 
 
 transform = base.transform_factory(TransformedRecord)
