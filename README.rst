@@ -32,7 +32,7 @@ Setup
 """""
 1. Pull `master` for both `salaries.texastribune.org` and `tx_salaries`
 
-2. Set up pipenv if it's not already setup, using instructions in the [salaries.texastribune.org repo](https://github.com/texastribune/salaries.texastribune.org)
+2. Set up pipenv if it's not already setup, using instructions in the `salaries.texastribune.org`_ repo
 
 4. If you're using the local postgres database (which I recommend!), then you need to set that up. First set the DATABASE_URL::
 
