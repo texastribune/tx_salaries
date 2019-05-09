@@ -34,15 +34,15 @@ Setup
 
 2. Set up pipenv if it's not already setup, using instructions in the `salaries.texastribune.org`_ repo
 
-4. If you're using the local postgres database (which I recommend!), then you need to set that up. First set the DATABASE_URL::
+3. If you're using the local postgres database (which I recommend!), then you need to set that up. First set the DATABASE_URL::
 
     export DATABASE_URL=postgres://localhost/salaries
 
-5. Then pull down the backup::
+4. Then pull down the backup::
 
     make local/db-fetch
 
-6. And load it::
+5. And load it::
 
     make local/db-restore
 
