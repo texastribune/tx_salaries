@@ -74,7 +74,7 @@ TRANSFORMERS = {
     'bbeaab35571afadf074586ef3d75f739a4dfe471': [college_station_isd.transform, ],
     '39bcb735ae0a6d3b9bddb839337680abf76be1fd': [collin_college.transform, ],
     '2978e84159d1ce3bc77f66a679f385ba6cbadb73': [cypress_fairbanks_isd.transform, ],
-    '95e5f3c47affecfb924230ce117cfb88599c2368': [dallas.transform, ],
+    '95d6d9a4f8a38137a69ba2031b0b96bf19a8a74a': [dallas.transform, ],
     '361f2e1b29ca902008de1e291ad98ed134f4eea7': [dallas_county_comm_college.transform, ],
     '5fb77188fdfa1b6a1d794754ffb1c9a9bf69a171': [dallas_county.transform, ],
     '75e1bfa34014b500ab194c557b686fa1ca021afc': [dallas_isd.transform, ],

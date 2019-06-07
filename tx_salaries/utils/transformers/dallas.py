@@ -13,14 +13,14 @@ class TransformedRecord(
 
     MAP = {
         'full_name': 'Name - Full',
-        'department': 'Process Level Desc',
+        'department_raw': 'Process Level Desc',
         'job_title': 'Job Code Description',
         'hire_date': 'Hire Date',
         'compensation': 'Rate of Pay',
         'hours': 'Annual Hours',
         'gender': 'Gender',
         'nationality': 'Ethnicity',
-        'employment_type': 'Status'
+        'employment_type': 'Status Description'
     }
 
     # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
@@ -30,11 +30,11 @@ class TransformedRecord(
     ORGANIZATION_CLASSIFICATION = 'City'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2017, 2, 7)
+    DATE_PROVIDED = date(2019, 5, 1)
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'dallas/salaries/2017-02/dallas.xlsx')
+           'dallas/salaries/2019-04/orr_dallas.xlsx')
 
     race_map = {
         'AMIN': 'American Indian',
@@ -82,6 +82,9 @@ class TransformedRecord(
         if 'Military' in status:
             return 'Full-time annual salary (on non-paid military leave)'
 
+        if 'No Pay' in status:
+            return 'Full-time annual salary (on non-paid leave)'
+
         if any(['Intern' in status, 'Seasonal' in status, 'Temporary' in status]):
             return 'Hourly rate'
 
@@ -101,6 +104,12 @@ class TransformedRecord(
                 return comp * int(self.hours)
             else:
                 return comp
+
+    @property
+    def department(self):
+        dept = self.department_raw
+
+        return dept.replace("'S", "'s")
 
     # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
     @property
