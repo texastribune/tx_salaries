@@ -4,24 +4,24 @@ from . import mixins
 from datetime import date
 
 
-class TransformedRecord(mixins.GenericCompensationMixin,
+class TransformedRecord(
+        mixins.GenericCompensationMixin,
         mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
         mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
         mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
-        'last_name': 'Last Name',
-        'first_name': 'First Name',
-        'middle_name': 'Mid Name',
+        'last_name': 'Last name',
+        'first_name': 'First name',
+        'middle_name': 'Middle name',
         'department': 'Department',
-        'job_title': 'Title',
+        'job_title': 'Job Title',
         'hire_date': 'Hire Date',
-        'employee_type': 'Status',
-        'wage_type': 'Base Pay Wage Type',
-        'compensation': 'Base Pay Rate',
+        'compensation': 'Annual Salary',
         'gender': 'Gender',
-        'race': 'Race',
+        'race': 'Racial Category',
+        'employment_type': 'Employee Grp',
     }
 
     NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
@@ -30,108 +30,22 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
     ORGANIZATION_CLASSIFICATION = 'City'
 
-    DATE_PROVIDED = date(2017, 5, 3)
+    description = 'Annual salary'
 
-    URL = "http://raw.texastribune.org.s3.amazonaws.com/houston/salaries/2017-05/houston.xlsx"
+    DATE_PROVIDED = date(2019, 7, 17)
+
+    URL = "http://raw.texastribune.org.s3.amazonaws.com/houston/salaries/2019-07/COH_revised_2018_calendar_year_v2.xlsx"
 
     gender_map = {'Female': 'F', 'Male': 'M'}
-
-    department_map = {
-        '1000': 'Houston Police',
-        '1100': 'Neighborhood',
-        '1200': 'Houston Fire',
-        '1500': 'Houston Emergency Center',
-        '1600': 'Municipal Court',
-        '2000': 'Public Works & Engineering',
-        '2100': 'Solid Waste',
-        '2500': 'General Service',
-        '2800': 'Houston Airport System',
-        '3200': 'Housing & Community Development',
-        '3400': 'Houston Public Library',
-        '3600': 'Parks & Recreation',
-        '3800': 'Health & Human Services',
-        '4200': 'Convention',
-        '5000': 'Mayors Office',
-        '5100': 'Office of Business Opportunity',
-        '5500': 'City Council',
-        '6000': 'Controllers',
-        '6400': 'Finance',
-        '6500': 'Admin. & Regulatory Affairs',
-        '6700': 'Fleet',
-        '6800': 'Houston IT Services',
-        '7000': 'Planning',
-        '7500': 'City Secretary',
-        '8000': 'Human Resources',
-        '9000': 'Legal',
-    }
 
     @property
     def is_valid(self):
         return self.last_name.strip() != ''
 
     @property
-    def compensation(self):
-        pay = float(self.get_mapped_value('compensation'))
-        status = self.get_mapped_value('employee_type')
-        wage_type = self.get_mapped_value('wage_type')
-
-        if status == 'Full Time':
-            if wage_type == 'Cadet Period Salary':
-                # cadets salary isn't an annual thing, so do hourly
-                return pay / 80
-            else:
-                # everyone else is two-week period, multiple by 26 for annual
-                return pay * 26
-        else:
-            # part-timers are listed for 80 hours like full-timers, but we can't
-            # say how many hours they work, so can't multiply. Instead, I divide
-            # by 80 and just list their hourly rate
-            return pay / 80
-
-
-    @property
-    def compensation_type(self):
-        status = self.get_mapped_value('employee_type')
-        wage_type = self.get_mapped_value('wage_type')
-
-        # cadets are listed as full-timers but we dont want them in the calcs
-        if status == 'Full Time' and wage_type != 'Cadet Period Salary':
-            return 'FT'
-        else:
-            return 'PT'
-
-    @property
-    def description(self):
-        status = self.get_mapped_value('employee_type')
-        wage_type = self.get_mapped_value('wage_type')
-
-        if status == 'Full Time':
-            if wage_type == 'Cadet Period Salary':
-                return 'Cadet hourly rate'
-            else:
-                return 'Annualized base pay'
-        else:
-            return 'Part-time hourly rate'
-
-    @property
-    def department(self):
-        dept = self.get_mapped_value('department')
-        return self.department_map[dept]
-
-    @property
-    def race(self):
-        if self.get_mapped_value('race') == '':
-            return {
-                'name': 'Not specified'
-            }
-        else:
-            return {
-                'name': self.get_mapped_value('race')
-            }
-
-    @property
     def person(self):
         name = self.get_name()
+
         r = {
             'family_name': name.last,
             'given_name': name.first,
@@ -141,5 +55,34 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         }
 
         return r
+
+    @property
+    def compensation_type(self):
+        status = self.get_mapped_value('employment_type')
+
+        if status == 'Full Time':
+            return 'FT'
+        else:
+            return 'PT'
+
+    @property
+    def description(self):
+        status = self.get_mapped_value('employment_type')
+
+        if status == 'Full Time':
+            return 'Annualized base pay'
+        elif status == 'HFD Deferred Term':
+            return 'Deferred compensation'
+        else:
+            return 'Part-time, annual salary'
+
+    @property
+    def race(self):
+        given_race = self.get_mapped_value('race')
+
+        if given_race == '':
+            given_race = 'Unknown/Not Specified'
+
+        return {'name': given_race}
 
 transform = base.transform_factory(TransformedRecord)
