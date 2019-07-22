@@ -57,6 +57,16 @@ class TransformedRecord(
         return r
 
     @property
+    def compensation(self):
+        status = self.get_mapped_value('employment_type')
+
+        if status == 'Full Time':
+            return self.get_mapped_value('compensation')
+        else:
+            return 0
+
+
+    @property
     def compensation_type(self):
         status = self.get_mapped_value('employment_type')
 
@@ -70,11 +80,13 @@ class TransformedRecord(
         status = self.get_mapped_value('employment_type')
 
         if status == 'Full Time':
-            return 'Annualized base pay'
+            return 'Annual salary'
         elif status == 'HFD Deferred Term':
-            return 'Deferred compensation'
-        else:
-            return 'Part-time, annual salary'
+            return 'Deferred term: paid hourly rate'
+        elif status == 'Temporary':
+            return 'Temporary: paid hourly rate'
+        elif 'Part Time' in status:
+            return 'Part-time: paid hourly rate'
 
     @property
     def race(self):
