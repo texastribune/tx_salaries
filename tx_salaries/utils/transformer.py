@@ -69,6 +69,10 @@ def get_transformers(labels):
     This takes a list of headers for a given spreadsheet and returns
     the known transformers that match against it.
     """
+
+    print('---')
+    print(labels)
+
     try:
         return TRANSFORMERS[generate_key(labels)]
     except KeyError:
