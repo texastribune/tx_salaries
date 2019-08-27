@@ -20,8 +20,8 @@ class TransformedRecord(
         'hire_date': 'Date of Employment',
         'compensation': 'Annual Salary',
         'gender': 'Gender',
-        'race': 'Race',
-        'employment_type': 'Status'
+        'race': 'Ethnicity',
+        'employment_type': 'Part Time/Full Time'
     }
 
     # The order of the name fields to build a full name.
@@ -38,12 +38,11 @@ class TransformedRecord(
     description = 'Annual salary'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2017, 1, 27)
+    DATE_PROVIDED = date(2018, 3, 7)
 
     # The URL to find the raw data in our S3 bucket.
-    URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'austin/salaries/2017-01/'
-           'cityofaustin.xlsx')
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/austin/'
+           'salaries/2018-03/austin.xls')
 
     @property
     def compensation(self):
@@ -77,9 +76,21 @@ class TransformedRecord(
 
     @property
     def race(self):
+    # according to City of Austin HR:
+    #  We recently had all employees take a look at their ethnicity
+    #  identification in our HR System to realign themselves with the approved
+    #  ethnicity types by the Department of Labor.  Some employees failed to
+    #  make the necessary changes to their ethnicity which are no longer valid
+    #  options (i.e., Other, Asian/Pacific Isl).  Because of this, we tied an
+    #  Invalid identifier to their ethnicity choice until they can go and
+    #  make the necessary changes to their ethnicity choice.
         given_race = self.get_mapped_value('race')
         if given_race == '':
             given_race = 'Unknown/Not Specified'
+        elif given_race == '(Invalid) Asian/Pacific Isl':
+            given_race = 'Asian/Pacific Islander'
+        elif given_race == '(Invalid) Other':
+            given_race = 'Other'
         return {'name': given_race}
 
     @property
@@ -92,7 +103,6 @@ class TransformedRecord(
             'name': unicode(name),
             'gender': self.gender.strip()
         }
-
         return r
 
 transform = base.transform_factory(TransformedRecord)

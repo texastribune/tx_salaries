@@ -9,3 +9,6 @@ dist/
 *.pyo
 .tox/*
 .DS_Store
+
+# Visual Studio Code
+.vscode

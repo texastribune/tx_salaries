@@ -30,7 +30,14 @@ class TransformedRecord(mixins.GenericCompensationMixin,
     NAME_FIELDS = ('full_name', )
     ORGANIZATION_NAME = 'University of Texas at Austin'
     ORGANIZATION_CLASSIFICATION = 'University'
+<<<<<<< HEAD
     DATE_PROVIDED = date(2019, 7, 30)
+=======
+    NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
+
+    DATE_PROVIDED = date(2017, 7, 6)
+
+>>>>>>> 33654245d3f21b1ea97778d42091c22cf57e5a4d
     URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
         'ut_austin/salaries/2019-07/employee_data.xlsx')
 

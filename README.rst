@@ -31,31 +31,18 @@ that csvkit's `in2csv`_ understands.
 Setup
 """""
 1. Pull `master` for both `salaries.texastribune.org` and `tx_salaries`
-2. Get rid of your old virtual environment for salaries::
 
-    rmvirtualenv <name of virtual env>
+2. Set up pipenv if it's not already setup, using instructions in the `salaries.texastribune.org`_ repo
 
-3. Make a new virtual environment::
-    
-    mkvirtualenv <name of virtual env>
-
-4. Install the requirements::
-    
-    pip install -r requirements/local.txt
-
-5. Install your local `tx_salaries` into this::
-
-    pip install -e ../tx_salaries
-
-6. If you're using the local postgres database (which I recommend!), then you need to set that up. First set the DATABASE_URL::
+3. If you're using the local postgres database (which I recommend!), then you need to set that up. First set the DATABASE_URL::
 
     export DATABASE_URL=postgres://localhost/salaries
 
-7. Then pull down the backup::
+4. Then pull down the backup::
 
     make local/db-fetch
 
-8. And load it::
+5. And load it::
 
     make local/db-restore
 
@@ -67,9 +54,9 @@ Start the salaries.texastribune.org server
 
 In the terminal, go to the `salaries.texastribune.org`_ repo. While the transformers live in tx_salaries, all of the data management happens in the salaries.texastribune repo, and that's where you'll run these commands::
 
-    workon <name of virtual env>
+    pipenv shell
     export DATABASE_URL=postgres://localhost/salaries
-    npm run serve
+    python salaries/manage.py runserver
 
 Check localhost:8000, should be up and running.
 
@@ -132,7 +119,7 @@ this:
     from datetime import date
 
     # add if necessary: --sheet="Request data" --row=3
-    
+
     class TransformedRecord(
         mixins.GenericCompensationMixin,
         mixins.GenericIdentifierMixin,
@@ -181,9 +168,9 @@ this:
         @property
         def person(self):
             name = self.get_name()
-        
+
             print self.gender_map[self.gender.strip()]
-        
+
             r = {
                 'family_name': name.last,
                 'given_name': name.first,

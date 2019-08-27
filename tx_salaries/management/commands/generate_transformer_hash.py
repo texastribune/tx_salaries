@@ -1,18 +1,36 @@
 from django.core.management.base import BaseCommand
-from optparse import make_option
 
 from ...utils import transformer
 
 
 class Command(BaseCommand):
-    option_list = BaseCommand.option_list + (
-        make_option('--sheet', action='store', dest='sheet', default=None,
-                    help='Sheet name'),
-        make_option('--row', action='store', dest='label_row', default=1,
-                    help='Location of the row of labels, defaults to 1'),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('filename')
 
-    def handle(self, filename, label_row=1, sheet=None, *args, **kwargs):
+        parser.add_argument('--sheet',
+                            action='store',
+                            dest='sheet',
+                            default=None,
+                            help='Sheet name')
+        parser.add_argument('--row',
+                            action='store',
+                            dest='label_row',
+                            default=1,
+                            help='Location of the row of labels, defaults to 1')
+
+    def handle(self, *args, **options):
+        if options['sheet']:
+            sheet = options['sheet']
+        else:
+            sheet = None
+
+        if options['label_row']:
+            label_row = options['label_row']
+        else:
+            label_row = 1
+
+        filename = options['filename']
+
         reader = transformer.convert_to_csv_reader(filename, sheet=sheet)
         for i in range(1, int(label_row)):
             reader.next()
