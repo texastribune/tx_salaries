@@ -16,13 +16,11 @@ class TransformedRecord(
         'department': 'Department',
         'job_title': 'Title',
         'hire_date': 'Hire Date',
-        'employee_type': 'Full-time or Part-time',
+        'compensation': 'Annual Salary Rate',
         'gender': 'Gender',
         'race': 'Race/Ethinicity',
-        'compensation': 'Annual Salary Rate',
+        'employee_type': 'Full-time or Part-time',
     }
-
-    NAME_FIELDS = ('full_name', )
 
     ORGANIZATION_NAME = 'University of Texas at Austin'
 
@@ -30,8 +28,7 @@ class TransformedRecord(
 
     DATE_PROVIDED = date(2019, 7, 30)
 
-    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
-        'ut_austin/salaries/2019-07/employee_data.xlsx')
+    URL = "http://raw.texastribune.org.s3.amazonaws.com/ut_austin/salaries/2019-07/employee_data.xlsx"
 
     gender_map = {
         'Female':'F',
