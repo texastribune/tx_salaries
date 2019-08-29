@@ -172,8 +172,6 @@ def transform_factory(record_class, transform_func=None):
     class is supposed to be used.
     """
 
-    print(record_class)
-
     if transform_func is None:
         transform_func = generic_transform
 
