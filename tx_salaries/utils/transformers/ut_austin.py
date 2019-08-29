@@ -4,11 +4,12 @@ from . import mixins
 from datetime import date
 
 
-class TransformedRecord(mixins.GenericCompensationMixin,
+class TransformedRecord(
+        mixins.GenericCompensationMixin,
         mixins.GenericDepartmentMixin, mixins.GenericIdentifierMixin,
         mixins.GenericJobTitleMixin, mixins.GenericPersonMixin,
         mixins.MembershipMixin, mixins.OrganizationMixin, mixins.PostMixin,
-        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord)::
+        mixins.RaceMixin, mixins.LinkMixin, base.BaseTransformedRecord):
 
     MAP = {
         'full_name': 'Name',
@@ -17,9 +18,20 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         'hire_date': 'Hire Date',
         'employee_type': 'Full-time or Part-time',
         'gender': 'Gender',
-        'given_race': 'Race/Ethinicity',
+        'race': 'Race/Ethinicity',
         'compensation': 'Annual Salary Rate',
     }
+
+    NAME_FIELDS = ('full_name', )
+
+    ORGANIZATION_NAME = 'University of Texas at Austin'
+
+    ORGANIZATION_CLASSIFICATION = 'University'
+
+    DATE_PROVIDED = date(2019, 7, 30)
+
+    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
+        'ut_austin/salaries/2019-07/employee_data.xlsx')
 
     gender_map = {
         'Female':'F',
@@ -27,34 +39,15 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         '': 'Unknown'
     }
 
-    NAME_FIELDS = ('full_name', )
-    ORGANIZATION_NAME = 'University of Texas at Austin'
-    ORGANIZATION_CLASSIFICATION = 'University'
-<<<<<<< HEAD
-    DATE_PROVIDED = date(2019, 7, 30)
-=======
-    NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
-
-    DATE_PROVIDED = date(2017, 7, 6)
-
->>>>>>> 33654245d3f21b1ea97778d42091c22cf57e5a4d
-    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
-        'ut_austin/salaries/2019-07/employee_data.xlsx')
+    description = 'Annual salary rate'
 
     @property
     def is_valid(self):
+        print('self')
+        print(self)
+
         # Adjust to return False on invalid fields.  For example:
         return self.full_name.strip() != ''
-
-    @property
-    def race(self):
-        race = self.given_race.strip()
-
-        if race == '':
-            race = 'Unknown'
-        return {
-            'name': race
-        }
 
     @property
     def person(self):
@@ -71,6 +64,17 @@ class TransformedRecord(mixins.GenericCompensationMixin,
         return r
 
     @property
+    def race(self):
+        race = self.given_race.strip()
+
+        if race == '':
+            race = 'Unknown'
+
+        return {
+            'name': race
+        }
+
+    @property
     def compensation_type(self):
         employee_type = self.employee_type
 
@@ -79,10 +83,6 @@ class TransformedRecord(mixins.GenericCompensationMixin,
 
         if employee_type == 'Part-time':
             return 'PT'
-
-    @property
-    def description(self):
-        return "Annual salary rate"
 
 
 transform = base.transform_factory(TransformedRecord)
