@@ -46,6 +46,7 @@ class TransformedRecord(
         # Adjust to return False on invalid fields.  For example:
         return self.full_name.strip() != ''
 
+
     @property
     def person(self):
         name = self.get_name()
