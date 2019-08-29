@@ -35,12 +35,12 @@ class TransformedRecord(
     ORGANIZATION_CLASSIFICATION = 'City'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2017, 6, 23)
+    DATE_PROVIDED = date(2019, 7, 26)
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
-           'san_antonio/salaries/2017-06/'
-           'W156567-020817_FY16.xlsx')
+           'san_antonio/salaries/2019/'
+           'FY18City_Comp.xlsx')
 
     # How do they track gender? We need to map what they use to `F` and `M`.
     gender_map = {'FEMALE': 'F', 'MALE': 'M'}
