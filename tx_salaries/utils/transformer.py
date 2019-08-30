@@ -61,7 +61,6 @@ def transform(filename, sheet=None, label_row=1, infer_types=True):
 def generate_key(labels):
     return hashlib.sha1("::".join(labels)).hexdigest()
 
-
 def get_transformers(labels):
     """
     Return one (or more) transfer for a given set of headers

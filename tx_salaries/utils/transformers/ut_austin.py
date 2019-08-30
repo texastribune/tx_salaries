@@ -1,8 +1,9 @@
 from . import base
 from . import mixins
-
+from .. import cleaver
 from datetime import date
 
+import string
 
 class TransformedRecord(
         mixins.GenericCompensationMixin,
@@ -16,22 +17,19 @@ class TransformedRecord(
         'department': 'Department',
         'job_title': 'Title',
         'hire_date': 'Hire Date',
-        'employee_type': 'Full-time or Part-time',
-        'gender': 'Gender',
-        'race': 'Race/Ethinicity',
         'compensation': 'Annual Salary Rate',
+        'gender': 'Gender',
+        'given_race': 'RaceEthinicity',
+        'employee_type': 'Fulltime or Parttime',
     }
-
-    NAME_FIELDS = ('full_name', )
 
     ORGANIZATION_NAME = 'University of Texas at Austin'
 
     ORGANIZATION_CLASSIFICATION = 'University'
 
-    DATE_PROVIDED = date(2019, 7, 30)
+    DATE_PROVIDED = date(2019, 9, 5)
 
-    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
-        'ut_austin/salaries/2019-07/employee_data.xlsx')
+    URL = "http://raw.texastribune.org.s3.amazonaws.com/ut_austin/salaries/2019-07/employee_data_new.xlsx"
 
     gender_map = {
         'Female':'F',
@@ -43,9 +41,6 @@ class TransformedRecord(
 
     @property
     def is_valid(self):
-        print('self')
-        print(self)
-
         # Adjust to return False on invalid fields.  For example:
         return self.full_name.strip() != ''
 
@@ -64,15 +59,16 @@ class TransformedRecord(
         return r
 
     @property
+    def job_title(self):
+        title = self.get_mapped_value('job_title').split(' - ')[1]
+
+        return title
+
+    @property
     def race(self):
         race = self.given_race.strip()
 
-        if race == '':
-            race = 'Unknown'
-
-        return {
-            'name': race
-        }
+        return {'name': race}
 
     @property
     def compensation_type(self):
@@ -84,5 +80,9 @@ class TransformedRecord(
         if employee_type == 'Part-time':
             return 'PT'
 
+
+    def get_name(self):
+        return cleaver.EmployeeNameCleaver(
+            self.get_mapped_value('full_name')).parse()
 
 transform = base.transform_factory(TransformedRecord)
