@@ -13,7 +13,7 @@ class TransformedRecord(
     MAP = {
         'last_name': 'FAMILY_NAME',
         'first_name': 'GIVEN_NAME',
-        'department': 'DEPARTMENT',
+        'department': 'DEPTID_DESCR',
         'job_title': 'JOBTITLE',
         'gender': 'GENDER',
         'race': 'ETHNIC_GROUP_DESCR',
@@ -31,10 +31,10 @@ class TransformedRecord(
 
     ORGANIZATION_CLASSIFICATION = 'University Hospital'
 
-    DATE_PROVIDED = date(2017, 5, 15)
+    DATE_PROVIDED = date(2019, 7, 30)
 
     URL = ('https://s3.amazonaws.com/raw.texastribune.org/ut_medical_branch/'
-            'salaries/2017-05/utmb.xlsx')
+            'salaries/2019/Response.xlsx')
 
     @property
     def compensation_type(self):
