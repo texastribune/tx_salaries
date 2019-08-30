@@ -171,6 +171,7 @@ def transform_factory(record_class, transform_func=None):
     to take, along with a ``record_class`` argument that specifies which
     class is supposed to be used.
     """
+
     if transform_func is None:
         transform_func = generic_transform
 
