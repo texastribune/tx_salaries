@@ -18,7 +18,7 @@ class TransformedRecord(
         'department': 'BUSINESS AREA',
         'job_title': 'JOB TITLE',
         'hire_date': 'HIRE DATE1',
-        'compensation': 'FY16 ANNUAL SALARY2',
+        'compensation': 'FY18 ANNUAL SALARY2',
         'gender': 'GENDER',
         'nationality': 'ETHNIC ORIGIN10',
         'employee_type': 'EMPLOYEE SUBGROUP',
@@ -43,7 +43,7 @@ class TransformedRecord(
            'FY18City_Comp.xlsx')
 
     # How do they track gender? We need to map what they use to `F` and `M`.
-    gender_map = {'FEMALE': 'F', 'MALE': 'M'}
+    gender_map = {'FEMALE': 'F', 'MALE': 'M', 'UNKNOWN': 'Unknown'}
 
     # This is how the loader checks for valid people. Defaults to checking to see if `last_name` is empty.
     @property
