@@ -76,10 +76,10 @@ class TransformedRecord(
             return 'PT'
 
     @property
-    def job_title(self):
-        title = self.get_mapped_value('job_title').replace("'S","'s")
+    def department(self):
+        dept = self.get_mapped_value('department').replace("'S","'s")
 
-        return title
+        return dept
 
     @property
     def description(self):
