@@ -15,14 +15,20 @@ class TransformedRecord(
     # REJECT_ALL_IF_INVALID_RECORD_EXISTS = False
 
     MAP = {
-        'full_name': 'EMPL_NAME',
-        'department': 'DEPT_NAME',
-        'job_title': 'JOB_TITLE',
-        'hire_date': 'LAST_HIRE_DATE',
-        'compensation': 'ANNUAL_RATE',
-        'gender': 'GENDER',
+        'full_name': 'Primary Name',
+        'department': 'Department Description',
+        'job_title': 'Job Code Description',
+        'hire_date': 'Date First Hire',
+        'compensation': 'Annual Pay',
+        'gender': 'Gender',
         'given_race': 'RACE',
-        'status': 'FULL-TIME/PART-TIME'
+        'status': 'Full Time Type Description',
+
+        'race_american_indian': 'Race American Indian Flag',
+        'race_asian': 'Race Asian Flag',
+        'race_pacific_islander': 'Race Pacific Islander Flag',
+        'race_african_american': 'Race African American Flag',
+        'race_white': 'Race White Flag'
     }
 
      # The order of the name fields to build a full name.
@@ -38,14 +44,14 @@ class TransformedRecord(
     ORGANIZATION_CLASSIFICATION = 'University Hospital'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2017, 5, 27)
+    DATE_PROVIDED = date(2019, 7, 30)
 
     # How do they track gender? We need to map what they use to `F` and `M`.
     gender_map = {'Female': 'F', 'Male': 'M', 'Unknown': 'Unknown'}
 
     # The URL to find the raw data in our S3 bucket.
-    URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
-        'ut_southwestern_medical/salaries/2017-05/12295_PIR_UTSW_Employees.xlsx')
+    URL = ('http://raw.texastribune.org.s3.amazonaws.com/'
+        'ut_southwestern_medical/salaries/2019/TPIA_Data_Release.xlsx')
 
     # This is how the loader checks for valid people. Defaults to checking to
     # see if `full_name` is empty.
@@ -115,9 +121,20 @@ class TransformedRecord(
 
     @property
     def race(self):
-        return {
-            'name': self.get_mapped_value('given_race').strip().title()
-        }
+        if self.race_american_indian == 'Y':
+            race = 'American Indian'
+        elif self.race_asian == 'Y':
+            race = 'Asian'
+        elif self.race_pacific_islander == 'Y':
+            race = 'Pacific Islander'
+        elif self.race_african_american == 'Y':
+            race = 'African American'
+        elif self.race_white == 'Y':
+            race = 'White'
+        else:
+            race = 'Unknown'
+
+        return {'name': race}
 
     @property
     def description(self):

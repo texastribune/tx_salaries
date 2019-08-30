@@ -122,7 +122,7 @@ TRANSFORMERS = {
     '86f7d5e59772f88ebe483a5383fb07617f9dc4f3': [ut_tyler.transform, ],
     'ec2e93286df0335f4100f6550278ce8d128397dd': [ut_system.transform, ],
     '5714aa39bed15a7d032097c2aa0be7df68507e56': [ut_southwestern.transform, ],
-    '6121ff820451267363efe09a1249154334e4afb0': [ut_southwestern_mc.transform, ],
+    '0c43b8c9dbcb65ab659a4f9b5e017fdd3794daca': [ut_southwestern_mc.transform, ],
     'fd66132338a69d2fb76faa1d91b6f0d21ffc5aec': [ut_san_antonio.transform, ],
     '068d88f0ea10973339f5a4d57c8d806686d2df40': [ut_tyler.transform, ],
     '82fbe7f20bd25bf024dfd909f0370de9f8427a62': [williamson_county.transform, ]
