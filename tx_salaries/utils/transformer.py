@@ -69,9 +69,6 @@ def get_transformers(labels):
     the known transformers that match against it.
     """
 
-    print('---')
-    print(labels)
-
     try:
         return TRANSFORMERS[generate_key(labels)]
     except KeyError:
