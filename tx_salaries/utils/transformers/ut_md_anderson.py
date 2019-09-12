@@ -15,11 +15,11 @@ class TransformedRecord(
         'full_name': 'Employee Name',
         'department': 'Dept Name',
         'job_title': 'Job Title',
-        'hire_date': 'Last Start Dt',
+        'hire_date': 'Last Start Date',
         'compensation': 'Annual Rate',
         'gender': 'Gender',
         'nationality': 'Ethnic Grp Descr',
-        'employee_type': 'Full/Part',
+        'employee_type': 'Full/Part Time',
     }
 
     # The name of the organization this WILL SHOW UP ON THE SITE, so double check it!
@@ -35,11 +35,11 @@ class TransformedRecord(
     # description = 'Annual salary'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2017, 9, 20)
+    DATE_PROVIDED = date(2019, 8, 30)
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
-           'ut_md_anderson/salaries/2017-09/ut_md_anderson.xlsx')
+           'ut_md_anderson/salaries/2019/ORR.xlsx')
 
     # How do they track gender? We need to map what they use to `F` and `M`.
     gender_map = {'Female': 'F', 'Male': 'M'}
@@ -71,19 +71,19 @@ class TransformedRecord(
     def compensation_type(self):
         employee_type = self.employee_type
 
-        if employee_type == 'Full Time':
+        if employee_type == 'Full-Time':
             return 'FT'
 
-        if employee_type == 'Part Time':
+        if employee_type == 'Part-Time':
             return 'PT'
 
     @property
     def description(self):
         status = self.get_mapped_value('employee_type')
-        if status == 'Full Time':
+        if status == 'Full-Time':
             return "Annual salary"
 
-        if status == 'Part Time':
+        if status == 'Part-Time':
             return "Annual part-time salary"
 
     @property
