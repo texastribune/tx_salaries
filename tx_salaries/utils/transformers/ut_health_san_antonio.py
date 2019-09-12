@@ -16,12 +16,12 @@ class TransformedRecord(
         'full_name': 'Name',
         'department': 'Dept',
         'job_title': 'Job Title',
-        'hire_date': 'Last Hire Date',
+        'hire_date': 'Rehire Dt',
         'gender': 'Sex',
-        'race': 'Ethnicity',
+        'race': 'Ethnic Grp',
         'compensation': 'Comp Rate',
-        'employee_type': 'Overall Status (All Positions)',
-        'compensation_type': 'Hourly/Salary'
+        'compensation_type': 'Full/Part',
+        'pay_type': 'Hourly/Salary'
     }
 
     # The order of the name fields to build a full name.
@@ -36,11 +36,17 @@ class TransformedRecord(
     ORGANIZATION_CLASSIFICATION = 'University Hospital'
 
     # When did you receive the data? NOT when we added it to the site.
-    DATE_PROVIDED = date(2017, 11, 27)
+    DATE_PROVIDED = date(2019, 8, 14)
 
     # The URL to find the raw data in our S3 bucket.
     URL = ('https://s3.amazonaws.com/raw.texastribune.org/'
-    'ut_health_san_antonio/salaries/2017-11/325_-_Essig_TPIA_-_resp_docs.xls')
+    'ut_health_san_antonio/salaries/2019-09/454_Essig_TPIA_responsive_doc.xls')
+
+    gender_map = {
+        'Female':'F',
+        'Male':'M',
+        'Unknown': 'Unknown'
+    }
 
     @property
     def is_valid(self):
@@ -55,7 +61,7 @@ class TransformedRecord(
             'family_name': name.last,
             'given_name': name.first,
             'name': unicode(name),
-            'gender': self.gender.strip()
+            'gender': self.gender_map[self.gender.strip()]
         }
 
         return r
@@ -71,9 +77,9 @@ class TransformedRecord(
 
     @property
     def compensation_type(self):
-        emp_type = self.employee_type
+        comp_type = self.get_mapped_value('compensation_type')
 
-        if emp_type == 'Full Time':
+        if comp_type == 'Full-Time':
             return 'FT'
         else:
             return 'PT'
@@ -82,28 +88,31 @@ class TransformedRecord(
     @property
     def description(self):
         comp_type = self.get_mapped_value('compensation_type')
-        emp_type = self.employee_type
+        pay_type = self.get_mapped_value('pay_type')
 
-        if comp_type == 'Salary' and emp_type == 'Full Time':
+        if pay_type == 'S' and comp_type == 'Full-Time':
             return 'Annual salary'
-        elif comp_type == 'Salary' and emp_type == 'Part Time':
+        elif pay_type == 'S' and comp_type == 'Part-Time':
             return 'Part time annual salary'
-        elif comp_type == 'Hourly' and emp_type == 'Full Time':
+        elif pay_type == 'H' and comp_type == 'Full-Time':
             return 'Full time hourly wage'
-        elif comp_type == 'Hourly' and emp_type == 'Part Time':
+        elif pay_type == 'H' and comp_type == 'Part-Time':
             return 'Part time hourly wage'
+
+    @property
+    def race(self):
+        race = self.get_mapped_value('race')
+
+        if race == '':
+            race = 'Unknown'
+
+        return {'name': race}
 
     @property
     def department(self):
         dept = self.get_mapped_value('department')
 
         return dept
-
-    @property
-    def job_title(self):
-        job = self.get_mapped_value('job_title')
-
-        return job
 
     def get_raw_name(self):
         split_name = self.full_name.split(',')
