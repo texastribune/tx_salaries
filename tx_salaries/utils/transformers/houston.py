@@ -34,7 +34,7 @@ class TransformedRecord(
 
     DATE_PROVIDED = date(2019, 7, 17)
 
-    URL = "http://raw.texastribune.org.s3.amazonaws.com/houston/salaries/2019-07/COH_revised_2018_calendar_year_v2.xlsx"
+    URL = "http://raw.texastribune.org.s3.amazonaws.com/houston/salaries/2019-11/TPIA_request_tt_edit.xlsx"
 
     gender_map = {'Female': 'F', 'Male': 'M'}
 
