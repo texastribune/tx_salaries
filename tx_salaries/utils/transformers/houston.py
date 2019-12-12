@@ -18,7 +18,16 @@ class TransformedRecord(
         'department': 'Department',
         'job_title': 'Job Title',
         'hire_date': 'Hire Date',
-        'compensation': 'Annual Salary',
+        # We received several sheets from Houston, one that had an important Status column
+        # But was missing thousands of salaries
+        # We have another one that has all the right salaries
+        # But was missing the Status column
+        # So we merged those two files into one
+        # Which is why the compensation col needs to be 'Annual Salary_x'
+        # The 'x' was added when the join happened
+        # 'x' = the first sheet we joined on
+        # 'y' = the second sheet we joined on
+        'compensation': 'Annual Salary_x',
         'gender': 'Gender',
         'race': 'Racial Category',
         'employment_type': 'Employee Grp',
@@ -34,13 +43,21 @@ class TransformedRecord(
 
     DATE_PROVIDED = date(2019, 7, 17)
 
-    URL = "http://raw.texastribune.org.s3.amazonaws.com/houston/salaries/2019-11/TPIA_request_tt_edit.xlsx"
+    URL = "http://raw.texastribune.org.s3.amazonaws.com/houston/salaries/2019-11/TPIA_request_tt_edit.csv"
 
     gender_map = {'Female': 'F', 'Male': 'M'}
 
     @property
     def is_valid(self):
-        return self.last_name.strip() != ''
+        # We have two people with names of 'NA'
+        # So let's account for them
+        if self.first_name == '' and self.last_name == 'YAO':
+            self.first_name = 'NA'
+
+        if self.last_name == '' and self.first_name == 'JOHN':
+             self.last_name = 'NA'
+
+        return self.first_name != ''
 
     @property
     def person(self):
