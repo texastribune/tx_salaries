@@ -31,6 +31,7 @@ class TransformedRecord(
         'gender': 'Gender',
         'race': 'Racial Category',
         'employment_type': 'Employee Grp',
+        'employment_subtype': 'Employee Subgroup',
     }
 
     NAME_FIELDS = ('first_name', 'middle_name', 'last_name', )
@@ -76,6 +77,7 @@ class TransformedRecord(
     @property
     def compensation(self):
         status = self.get_mapped_value('employment_type')
+        compensation = self.get_mapped_value('compensation')
 
         if status == 'Full Time':
             return self.get_mapped_value('compensation')
@@ -86,6 +88,7 @@ class TransformedRecord(
     @property
     def compensation_type(self):
         status = self.get_mapped_value('employment_type')
+        compensation = self.get_mapped_value('compensation')
 
         if status == 'Full Time':
             return 'FT'
@@ -101,15 +104,16 @@ class TransformedRecord(
     @property
     def description(self):
         status = self.get_mapped_value('employment_type')
+        sub_status = self.get_mapped_value('employment_subtype')
 
         if status == 'Full Time':
             return 'Annual salary'
         elif status == 'HFD Deferred Term':
-            return 'Deferred term: paid hourly rate'
+            return 'Deferred term: Paid hourly rate, which is not shown'
         elif status == 'Temporary':
-            return 'Temporary: paid hourly rate'
+            return 'Temporary: Paid hourly rate, which is not shown'
         elif 'Part Time' in status:
-            return 'Part-time: paid hourly rate'
+            return 'Part-time: Paid hourly rate, which is not shown'
 
     @property
     def race(self):
